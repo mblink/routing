@@ -54,7 +54,7 @@ object QueryStringPart extends QueryStringPartLP with UrlPart.Companion[QueryStr
 }
 
 sealed trait QueryStringBuilderLP { self: Url =>
-  protected type ExtractQS[A] = { def unapply(m: Map[String, Seq[String]]): Option[A] }
+  protected type ExtractQS[A] = { def unapply(m: Map[String, collection.Seq[String]]): Option[A] }
 
   protected def nextQS[A](
     mkQSPart: A => QueryStringPart,
@@ -73,7 +73,7 @@ sealed trait QueryStringBuilderLP { self: Url =>
     lazy val paramTpes = self.paramTpes :+ tt
 
     protected def matchPath(path: Path): Option[(Path, PathParams)] = self.matchPath(path)
-    protected def matchQueryString(params: Map[String, Seq[String]]): Option[(Map[String, Seq[String]], QueryStringParams)] =
+    protected def matchQueryString(params: Map[String, collection.Seq[String]]): Option[(Map[String, collection.Seq[String]], QueryStringParams)] =
       self.matchQueryString(params).flatMap { case (ps, qs) => ps match {
         case extract(a) +& rest => Some((rest, (qs, a)))
         case _ => None
@@ -123,7 +123,7 @@ sealed trait PathBuilder { self: Url =>
         case _ => None
       }}
 
-    protected def matchQueryString(params: Map[String, Seq[String]]): Option[(Map[String, Seq[String]], QueryStringParams)] =
+    protected def matchQueryString(params: Map[String, collection.Seq[String]]): Option[(Map[String, collection.Seq[String]], QueryStringParams)] =
       self.matchQueryString(params)
   }
 
@@ -154,7 +154,7 @@ sealed abstract class Url extends PathBuilder with QueryStringBuilder { self =>
   protected def mkParams(pp: PathParams, qp: QueryStringParams): Params
 
   protected def matchPath(path: Path): Option[(Path, PathParams)]
-  protected def matchQueryString(params: Map[String, Seq[String]]): Option[(Map[String, Seq[String]], QueryStringParams)]
+  protected def matchQueryString(params: Map[String, collection.Seq[String]]): Option[(Map[String, collection.Seq[String]], QueryStringParams)]
 
   def pathParts(params: Params): Vector[PathPart]
   def queryStringParts(params: Params): Vector[QueryStringPart]
@@ -204,7 +204,7 @@ object Url {
     protected def matchPath(path: Path): Option[(Path, Unit)] =
       Some((path, ()))
 
-    protected def matchQueryString(params: Map[String, Seq[String]]): Option[(Map[String, Seq[String]], QueryStringParams)] =
+    protected def matchQueryString(params: Map[String, collection.Seq[String]]): Option[(Map[String, collection.Seq[String]], QueryStringParams)] =
       Some((params, ()))
   }
 }
