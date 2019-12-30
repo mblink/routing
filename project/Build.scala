@@ -74,9 +74,9 @@ object Build {
   }
 
   val commonSettings = splainSettings ++ Seq(
-    organization := "routing",
+    organization := "com.mrdziuban",
     crossScalaVersions := scalaVersions,
-    scalaVersion := scalaVersions.find(_.startsWith("2.12")).get,
+    scalaVersion := scalaVersions.find(_.startsWith("2.13")).get,
     version := currentVersion,
     addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full),
     scalacOptions ++= Seq(
@@ -113,7 +113,7 @@ object Build {
   val publishSettings = Seq(
     skip in publish := false,
     bintrayOrganization := Some("bondlink"),
-    bintrayRepository := "routing",
+    bintrayRepository := "http4s-routing",
     bintrayReleaseOnPublish in ThisBuild := false,
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
   )
