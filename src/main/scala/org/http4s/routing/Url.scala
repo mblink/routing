@@ -5,7 +5,7 @@ import cats.{Semigroup, Show}
 import cats.instances.string._
 import cats.syntax.semigroup._
 import cats.syntax.show._
-import org.http4s.dsl.impl.{:?, ->, /:, +&, OptionalQueryParamDecoderMatcher, Path, QueryParamDecoderMatcher, Root}
+import org.http4s.dsl.impl.{:?, ->, /:, +&, OptionalQueryParamDecoderMatcher, Path, QueryParamDecoderMatcher, Root => DslRoot}
 import scala.language.reflectiveCalls
 import scala.reflect.runtime.universe.TypeTag
 
@@ -199,7 +199,7 @@ sealed abstract class Url extends PathBuilder with QueryStringBuilder { self =>
     request match {
       case `method` -> p :? q => (matchPath(p), matchQueryString(q)) match {
         // TODO - what's the correct behavior if there are any unmatched query params remaining?
-        case (Some((Root, pp)), Some((_, qp))) => Some(mkParams(pp, qp))
+        case (Some((DslRoot, pp)), Some((_, qp))) => Some(mkParams(pp, qp))
         case _ => None
       }
       case _ => None
