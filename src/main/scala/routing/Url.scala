@@ -1,9 +1,9 @@
+package org.http4s
 package routing
 
 import cats.Show
 import cats.instances.string._
 import cats.syntax.show._
-import org.http4s.{Method, Request, Query, QueryParamDecoder, Uri}
 import org.http4s.dsl.impl.{:?, ->, /:, +&, OptionalQueryParamDecoderMatcher, Path, QueryParamDecoderMatcher, Root}
 import scala.language.reflectiveCalls
 import scala.reflect.runtime.universe.TypeTag

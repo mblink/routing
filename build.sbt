@@ -1,4 +1,4 @@
-import routing.Build._
+import org.http4s.routing.Build._
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 

@@ -1,4 +1,4 @@
-package routing
+package org.http4s.routing
 
 import bintray.BintrayKeys._
 import java.io.File
