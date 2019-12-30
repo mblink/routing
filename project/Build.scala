@@ -67,12 +67,6 @@ object Build {
       case _ => Seq()
     }
 
-  def profileTraceOpts(baseDir: File, name: String): Seq[String] = {
-    val dir = baseDir / ".traces"
-    s"mkdir -p $dir".!!
-    Seq("-Yprofile-trace", s"$dir/$name.trace")
-  }
-
   val commonSettings = splainSettings ++ Seq(
     organization := "com.mrdziuban",
     crossScalaVersions := scalaVersions,
@@ -93,12 +87,11 @@ object Build {
       "-Ywarn-dead-code",
       "-Ywarn-numeric-widen",
       "-Ywarn-value-discard"
-    ) ++ profileTraceOpts(baseDirectory.value, name.value) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+    ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 12)) => scala212_opts ++ scala212_213_opts
       case Some((2, 13)) => scala212_213_opts
       case _ => Seq()
     }),
-    scalacOptions in Test ++= profileTraceOpts(baseDirectory.value, s"${name.value}-test"),
     scalacOptions in (Compile, console) := scalacOptions.value.filterNot(x =>
       x.startsWith("-Ywarn-unused") || x.startsWith("-Xlint") || x.startsWith("-P:splain")),
     scalacOptions in (Test, console) := (scalacOptions in (Compile, console)).value,
