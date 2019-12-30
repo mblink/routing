@@ -1,4 +1,6 @@
-package org.http4s.routing
+package org.http4s
+package routing
+package util
 
 sealed abstract class Nestable[Flat, Nested](f: Flat => Nested, g: Nested => Flat) {
   final def nest(a: Flat): Nested = f(a)
