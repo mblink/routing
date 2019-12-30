@@ -130,11 +130,18 @@ object Build {
   )
 
   val catsCore = "org.typelevel" %% "cats-core" % "2.1.0"
+  val http4sCore = "org.http4s" %% "http4s-core" % "0.21.0-M6"
+  val http4sDsl = "org.http4s" %% "http4s-dsl" % "0.21.0-M6"
 
   def coreBase = Project("core", file("core"))
     .settings(commonSettings)
     .settings(publishSettings)
     .settings(testSettings)
-    .settings(libraryDependencies += catsCore % Optional)
+    .settings(libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      catsCore,
+      http4sCore,
+      http4sDsl
+    ))
     .settings(Seq(name := "routing-core"))
 }

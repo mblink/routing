@@ -1,12 +1,12 @@
 package routing
 
-import cats.effect.IO
+import cats.Show
 import cats.instances.string._
+import cats.syntax.show._
 import org.http4s.{Method, Request, Query, QueryParamDecoder, Uri}
-import org.http4s.dsl.io.{:?, ->, /:, +&, OptionalQueryParamDecoderMatcher, Path, QueryParamDecoderMatcher, Root}
+import org.http4s.dsl.impl.{:?, ->, /:, +&, OptionalQueryParamDecoderMatcher, Path, QueryParamDecoderMatcher, Root}
 import scala.language.reflectiveCalls
 import scala.reflect.runtime.universe.TypeTag
-import Show.syntax._
 
 sealed trait UrlPart {
   type T
@@ -170,7 +170,7 @@ sealed abstract class Url extends PathBuilder with QueryStringBuilder { self =>
   final def apply(params: Params): Uri = Uri(path = path(params), query = queryString(params))
   final def apply[A](params: A)(implicit t: Nestable[A, Params]): Uri = apply(t.nest(params))
 
-  final def unapply(method: Method, request: Request[IO]): Option[Params] =
+  final def unapply[F[_]](method: Method, request: Request[F]): Option[Params] =
     request match {
       case `method` -> p :? q => (matchPath(p), matchQueryString(q)) match {
         // TODO - what's the correct behavior if there are any unmatched query params remaining?
@@ -196,8 +196,8 @@ object Url {
 
     protected def mkParams(pp: Unit, qp: Unit): Unit = ()
 
-    def pathParts(@scalaz.unused u: Unit) = Vector()
-    def queryStringParts(@scalaz.unused u: Unit) = Vector()
+    def pathParts(u: Unit) = Vector()
+    def queryStringParts(u: Unit) = Vector()
 
     lazy val paramTpes = Vector()
 
