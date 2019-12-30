@@ -2,14 +2,13 @@ package org.http4s.routing
 
 import bintray.BintrayKeys._
 import java.io.File
-import play.twirl.sbt.Import.TwirlKeys
-import play.twirl.sbt.SbtTwirl
 import sbt._
 import sbt.Keys._
 import scala.sys.process._
 
 object Build {
   lazy val scalaVersions = Seq("2.12.10", "2.13.1")
+  lazy val silencerVersion = "1.4.4"
 
   val splainSettings = Seq(
     addCompilerPlugin("io.tryp" % "splain" % "0.4.1" cross CrossVersion.patch),
@@ -73,13 +72,14 @@ object Build {
     scalaVersion := scalaVersions.find(_.startsWith("2.13")).get,
     version := currentVersion,
     addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full),
+    addCompilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
+    libraryDependencies += "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full,
     scalacOptions ++= Seq(
       "-deprecation",
       "-encoding", "UTF-8",
       "-explaintypes",
       "-feature",
       "-language:higherKinds",
-      "-language:implicitConversions",
       "-unchecked",
       "-Xcheckinit",
       "-Xfatal-warnings",
@@ -125,16 +125,4 @@ object Build {
   val catsCore = "org.typelevel" %% "cats-core" % "2.1.0"
   val http4sCore = "org.http4s" %% "http4s-core" % "0.21.0-M6"
   val http4sDsl = "org.http4s" %% "http4s-dsl" % "0.21.0-M6"
-
-  def coreBase = Project("core", file("core"))
-    .settings(commonSettings)
-    .settings(publishSettings)
-    .settings(testSettings)
-    .settings(libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      catsCore,
-      http4sCore,
-      http4sDsl
-    ))
-    .settings(Seq(name := "routing-core"))
 }

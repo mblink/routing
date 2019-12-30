@@ -30,6 +30,7 @@ trait PathBuilder { self: Route =>
 
     lazy val show = self.show |+| Route.shownPath[A](name)
 
+    lazy val method = self.method
     def pathParts(params: P) = self.pathParts(getParams(params)) :+ mkPathPart(params)
     def queryStringParts(params: P) = self.queryStringParts(getParams(params))
 

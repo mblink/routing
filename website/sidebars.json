@@ -1,0 +1,13 @@
+{
+  "docs": {
+    "Documentation": [
+      "installation",
+      "building-routes",
+      "forward-routing",
+      "reverse-routing"
+    ],
+    "Concepts": [
+      "route"
+    ]
+  }
+}

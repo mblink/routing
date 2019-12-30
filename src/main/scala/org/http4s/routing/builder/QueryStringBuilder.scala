@@ -4,18 +4,16 @@ package builder
 
 import cats.Show
 import cats.syntax.semigroup._
+import extractor.QueryStringExtractor
 import org.http4s.dsl.impl.{+&, OptionalQueryParamDecoderMatcher, Path, QueryParamDecoderMatcher}
 import part.QueryStringPart
-import scala.language.reflectiveCalls
 import scala.reflect.runtime.universe.TypeTag
 
 sealed trait QueryStringBuilderLP { self: Route =>
-  protected type ExtractQS[A] = { def unapply(m: Map[String, collection.Seq[String]]): Option[A] }
-
   protected def nextQS[A](
     key: String,
     mkQSPart: A => QueryStringPart,
-    extract: ExtractQS[A],
+    extract: QueryStringExtractor[A],
   )(implicit tt: TypeTag[A]): Route.Aux[PathParams, (QueryStringParams, A), (Params, A)] = new Route {
     type PathParams = self.PathParams
     type QueryStringParams = (self.QueryStringParams, A)
@@ -26,6 +24,7 @@ sealed trait QueryStringBuilderLP { self: Route =>
 
     lazy val show = self.show |+| Route.shownQueryParam[A](key)
 
+    lazy val method = self.method
     def pathParts(params: Params) = self.pathParts(params._1)
     def queryStringParts(params: Params) = self.queryStringParts(params._1) :+ mkQSPart(params._2)
 
@@ -39,17 +38,17 @@ sealed trait QueryStringBuilderLP { self: Route =>
       }}
   }
 
-  def ?[A: Show: TypeTag: QueryParamDecoder](t: (String, Option[A])): Route.Aux[PathParams, (QueryStringParams, A), (Params, A)] =
+  def :?[A: Show: TypeTag: QueryParamDecoder](t: (String, Option[A])): Route.Aux[PathParams, (QueryStringParams, A), (Params, A)] =
     nextQS[A](t._1, a => QueryStringPart.inst((t._1, a)), new QueryParamDecoderMatcher(t._1) {})
 
   def &[A: Show: TypeTag: QueryParamDecoder](t: (String, Option[A])): Route.Aux[PathParams, (QueryStringParams, A), (Params, A)] =
-    ?(t)
+    :?(t)
 }
 
 trait QueryStringBuilder extends QueryStringBuilderLP { _: Route =>
-  def ?[A: Show: TypeTag: QueryParamDecoder](t: (String, Option[Option[A]]))(implicit d: DummyImplicit): Route.Aux[PathParams, (QueryStringParams, Option[A]), (Params, Option[A])] =
+  def :?[A: Show: TypeTag: QueryParamDecoder](t: (String, Option[Option[A]]))(implicit d: DummyImplicit): Route.Aux[PathParams, (QueryStringParams, Option[A]), (Params, Option[A])] =
     nextQS[Option[A]](t._1, a => QueryStringPart.inst((t._1, a)), new OptionalQueryParamDecoderMatcher(t._1) {})
 
   def &[A: Show: TypeTag: QueryParamDecoder](t: (String, Option[Option[A]]))(implicit d: DummyImplicit): Route.Aux[PathParams, (QueryStringParams, Option[A]), (Params, Option[A])] =
-    ?(t)
+    :?(t)
 }
