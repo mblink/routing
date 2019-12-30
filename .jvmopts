@@ -1,0 +1,4 @@
+-Xmx10G
+-Xss20M
+-XX:+UseParallelGC
+-XX:-UseGCOverheadLimit
