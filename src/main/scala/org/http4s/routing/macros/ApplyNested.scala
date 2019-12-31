@@ -10,7 +10,7 @@ private[routing] object ApplyNested {
 
     c.macroApplication match {
       case Apply(Select(x, TermName(method)), args) =>
-        def res(xs: List[c.Tree]): c.Tree = Apply(Select(x, TermName(method ++ "0")), xs)
+        def res(xs: List[c.Tree]): c.Tree = Apply(Select(x, TermName(s"${method}Raw")), xs)
 
         args match {
           case Nil => res(List(q"()"))

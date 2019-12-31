@@ -33,16 +33,16 @@ abstract class Route0 extends PathBuilder with QueryStringBuilder { self =>
 
   def paramTpes: Vector[TypeTag[_]]
 
-  def path0(params: Params): Uri.Path = pathParts(params).map(_.show).mkString("/", "/", "")
+  def pathRaw(params: Params): Uri.Path = pathParts(params).map(_.show).mkString("/", "/", "")
   def path(params: Any*): Uri.Path = macro macros.ApplyNested.impl
 
-  def queryString0(params: Params): Query = Query(queryStringParts(params).flatMap(_.show):_*)
+  def queryStringRaw(params: Params): Query = Query(queryStringParts(params).flatMap(_.show):_*)
   def queryString(params: Any*): Query = macro macros.ApplyNested.impl
 
-  def uri0(params: Params): Uri = Uri(path = path0(params), query = queryString0(params))
+  def uriRaw(params: Params): Uri = Uri(path = pathRaw(params), query = queryStringRaw(params))
   def uri(params: Any*): Query = macro macros.ApplyNested.impl
 
-  def url0(params: Params): Uri = uri0(params)
+  def urlRaw(params: Params): Uri = uriRaw(params)
   def url(params: Any*): Query = macro macros.ApplyNested.impl
 
   def call(params0: Params): Call = new Call {
@@ -50,7 +50,7 @@ abstract class Route0 extends PathBuilder with QueryStringBuilder { self =>
     lazy val params = params0
   }
 
-  def apply0(params: Params): Call = call(params)
+  def applyRaw(params: Params): Call = call(params)
   def apply(params: Any*): Call = macro macros.ApplyNested.impl
 
   def unapply0[F[_]](request: Request[F]): Option[Params] = {

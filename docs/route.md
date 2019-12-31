@@ -67,7 +67,7 @@ The `Params` type ends up as an increasingly nested `Tuple2`, but a simple macro
 
 ```scala mdoc
 // Using nested params
-path4.apply0(((((), 1), true), "foo"))
+path4.applyRaw(((((), 1), true), "foo"))
 
 // Much better
 path4(1, true, "foo")
