@@ -4,7 +4,7 @@ package macros
 
 import scala.reflect.macros.blackbox.Context
 
-private[routing] object ApplyNested {
+object ApplyNested {
   def impl(c: Context)(@unused params: c.Tree*): c.Tree = {
     import c.universe._
 
