@@ -9,6 +9,7 @@ import cats.syntax.traverse._
 import org.http4s.dsl.impl.{:?, ->, Path, Root => DslRoot}
 import part._
 import util._
+import scala.language.experimental.{macros => scalaMacros}
 import scala.reflect.runtime.universe.TypeTag
 
 abstract class Route0 extends PathBuilder with QueryStringBuilder { self =>
@@ -32,25 +33,25 @@ abstract class Route0 extends PathBuilder with QueryStringBuilder { self =>
 
   def paramTpes: Vector[TypeTag[_]]
 
-  def path(params: Params): Uri.Path = pathParts(params).map(_.show).mkString("/", "/", "")
-  def path[A](params: A)(implicit n: Nestable[A, Params]): Uri.Path = path(n.nest(params))
+  def path0(params: Params): Uri.Path = pathParts(params).map(_.show).mkString("/", "/", "")
+  def path(params: Any*): Uri.Path = macro macros.ApplyNested.impl
 
-  def queryString(params: Params): Query = Query(queryStringParts(params).flatMap(_.show):_*)
-  def queryString[A](params: A)(implicit n: Nestable[A, Params]): Query = queryString(n.nest(params))
+  def queryString0(params: Params): Query = Query(queryStringParts(params).flatMap(_.show):_*)
+  def queryString(params: Any*): Query = macro macros.ApplyNested.impl
 
-  def uri(params: Params): Uri = Uri(path = path(params), query = queryString(params))
-  def uri[A](params: A)(implicit n: Nestable[A, Params]): Uri = uri(n.nest(params))
+  def uri0(params: Params): Uri = Uri(path = path0(params), query = queryString0(params))
+  def uri(params: Any*): Query = macro macros.ApplyNested.impl
 
-  def url(params: Params): Uri = uri(params)
-  def url[A](params: A)(implicit n: Nestable[A, Params]): Uri = url(n.nest(params))
+  def url0(params: Params): Uri = uri0(params)
+  def url(params: Any*): Query = macro macros.ApplyNested.impl
 
   def call(params0: Params): Call = new Call {
     val route: self.type = self
     lazy val params = params0
   }
 
-  def apply(params: Params): Call = call(params)
-  def apply[A](params: A)(implicit n: Nestable[A, Params]): Call = apply(n.nest(params))
+  def apply0(params: Params): Call = call(params)
+  def apply(params: Any*): Call = macro macros.ApplyNested.impl
 
   def unapply0[F[_]](request: Request[F]): Option[Params] = {
     val m = method

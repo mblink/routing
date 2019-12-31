@@ -63,12 +63,12 @@ val path3: Route[GET.type, ((Unit, Int), Boolean)] = path2 :? ("key1" -> Option.
 val path4: Route[GET.type, (((Unit, Int), Boolean), String)] = path3 & ("key2" -> Option.empty[String])
 ```
 
-The `Params` type ends up as an increasingly nested `Tuple2`, but the [`Nestable` typeclass](./Nestable.md) lets us define functions that accept a flattened tuple instead:
+The `Params` type ends up as an increasingly nested `Tuple2`, but a simple macro lets us pass arguments the standard way:
 
 ```scala mdoc
 // Using nested params
-path4(((((), 1), true), "foo"))
+path4.apply0(((((), 1), true), "foo"))
 
-// Using flat params
-path4((1, true, "foo"))
+// Much better
+path4(1, true, "foo")
 ```

@@ -19,15 +19,15 @@ val BlogPost = GET / "post" / ("slug" -> StringVar) :? queryParam[Int]("id")
 Then we can apply the necessary parameters to build the `Call` for each route:
 
 ```scala mdoc
-Login(())
+Login()
 Hello("world")
-BlogPost(("test-slug", 1))
+BlogPost("test-slug", 1)
 ```
 
 We can convert a `Call` to an http4s `Uri`, produce a `String` representation of the route's URL, or access the route's path and query string directly:
 
 ```scala mdoc
-val blogPost = BlogPost(("test-slug", 1))
+val blogPost = BlogPost("test-slug", 1)
 
 blogPost.uri
 blogPost.toString

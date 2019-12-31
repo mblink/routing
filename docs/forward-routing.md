@@ -37,9 +37,9 @@ def testRoute(call: Call) =
     .as[String]
     .unsafeRunSync
 
-testRoute(Login(()))
+testRoute(Login())
 testRoute(Hello("world"))
-testRoute(BlogPost(("my-slug", 1)))
+testRoute(BlogPost("my-slug", 1))
 ```
 
 We can also check that requests matching none of our routes are not handled by the service:
