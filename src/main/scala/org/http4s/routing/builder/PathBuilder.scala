@@ -10,7 +10,7 @@ import part.PathPart
 import scala.language.reflectiveCalls
 import scala.reflect.runtime.universe.TypeTag
 
-trait PathBuilder { self: Route =>
+trait PathBuilder { self: Route0 =>
   protected type ExtractPath[A] = { def unapply(s: String): Option[A] }
 
   private def nextPath[PP, P, A: TypeTag](
@@ -21,12 +21,11 @@ trait PathBuilder { self: Route =>
     extract: ExtractPath[A],
     mkNewParams: (PathParams, A) => PP,
     paramTpe: Option[TypeTag[_]]
-  ): Route.Aux[PP, QueryStringParams, P] = new Route {
+  ): Route.Aux[Method, PP, QueryStringParams, P] = new Route[Method, P] {
     type PathParams = PP
     type QueryStringParams = self.QueryStringParams
-    type Params = P
 
-    protected def mkParams(pp: PP, qp: QueryStringParams): P = mkParams0(pp, qp)
+    def mkParams(pp: PP, qp: QueryStringParams): P = mkParams0(pp, qp)
 
     lazy val show = self.show |+| Route.shownPath[A](name)
 
@@ -36,17 +35,17 @@ trait PathBuilder { self: Route =>
 
     lazy val paramTpes = self.paramTpes ++ paramTpe
 
-    protected def matchPath(path: Path): Option[(Path, PP)] =
+    def matchPath(path: Path): Option[(Path, PP)] =
       self.matchPath(path).flatMap { case (p, ps) => p match {
         case extract(a) /: rest => Some((rest, mkNewParams(ps, a)))
         case _ => None
       }}
 
-    protected def matchQueryString(params: Map[String, collection.Seq[String]]): Option[(Map[String, collection.Seq[String]], QueryStringParams)] =
+    def matchQueryString(params: QueryParams): Option[(QueryParams, QueryStringParams)] =
       self.matchQueryString(params)
   }
 
-  def /(s: String): Route.Aux[PathParams, QueryStringParams, Params] =
+  def /(s: String): Route.Aux[Method, PathParams, QueryStringParams, Params] { type Method = self.Method } =
     nextPath[PathParams, Params, String](
       Left(s),
       identity _,
@@ -56,7 +55,7 @@ trait PathBuilder { self: Route =>
       (pp, _) => pp,
       None)
 
-  def /[V: Show](t: (String, ExtractPath[V]))(implicit s: Show[V], tt: TypeTag[V]): Route.Aux[(PathParams, V), QueryStringParams, (Params, V)] =
+  def /[V: Show](t: (String, ExtractPath[V]))(implicit s: Show[V], tt: TypeTag[V]): Route.Aux[Method, (PathParams, V), QueryStringParams, (Params, V)] { type Method = self.Method } =
     nextPath[(PathParams, V), (Params, V), V](
       Right(t._1),
       _._1,

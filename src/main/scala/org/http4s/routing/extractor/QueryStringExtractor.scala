@@ -6,12 +6,12 @@ import org.http4s.dsl.impl.{OptionalQueryParamDecoderMatcher, QueryParamDecoderM
 import scala.language.implicitConversions
 
 sealed trait QueryStringExtractor[A] {
-  def unapply(m: Map[String, collection.Seq[String]]): Option[A]
+  def unapply(m: QueryParams): Option[A]
 }
 
 object QueryStringExtractor {
-  def inst[A](f: Map[String, collection.Seq[String]] => Option[A]): QueryStringExtractor[A] = new QueryStringExtractor[A] {
-    def unapply(m: Map[String, collection.Seq[String]]) = f(m)
+  def inst[A](f: QueryParams => Option[A]): QueryStringExtractor[A] = new QueryStringExtractor[A] {
+    def unapply(m: QueryParams) = f(m)
   }
 
   implicit def fromQueryParamDecoderMatcher[A](m: QueryParamDecoderMatcher[A]): QueryStringExtractor[A] =

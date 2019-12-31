@@ -2,7 +2,7 @@ package org.http4s
 package routing
 
 trait Call {
-  val route: Route
+  val route: Route0
   def params: route.Params
 
   final lazy val path: Uri.Path = route.path(params)

@@ -56,11 +56,11 @@ GET / "path" :? ("key1" -> Option.empty[Boolean]) & ("key2" -> Option.empty[Stri
 When building a `Route`, the `Params` type mentioned above is updated with every call to `/`, `?`, and `&`:
 
 ```scala mdoc
-val root: Route { type Params = Unit } = GET
-val path1: Route { type Params = Unit } = root / "path" // Static path parts add no parameters
-val path2: Route { type Params = (Unit, Int) } = path1 / ("id" -> IntVar)
-val path3: Route { type Params = ((Unit, Int), Boolean) } = path2 :? ("key1" -> Option.empty[Boolean])
-val path4: Route { type Params = (((Unit, Int), Boolean), String) } = path3 & ("key2" -> Option.empty[String])
+val root: Route[GET.type, Unit] = GET
+val path1: Route[GET.type, Unit] = root / "path" // Static path parts add no parameters
+val path2: Route[GET.type, (Unit, Int)] = path1 / ("id" -> IntVar)
+val path3: Route[GET.type, ((Unit, Int), Boolean)] = path2 :? ("key1" -> Option.empty[Boolean])
+val path4: Route[GET.type, (((Unit, Int), Boolean), String)] = path3 & ("key2" -> Option.empty[String])
 ```
 
 The `Params` type ends up as an increasingly nested `Tuple2`, but the [`Nestable` typeclass](./Nestable.md) lets us define functions that accept a flattened tuple instead:

@@ -11,15 +11,16 @@ import part._
 import util._
 import scala.reflect.runtime.universe.TypeTag
 
-abstract class Route extends PathBuilder with QueryStringBuilder { self =>
+abstract class Route0 extends PathBuilder with QueryStringBuilder { self =>
+  type Method <: org.http4s.Method
   type PathParams
   type QueryStringParams
   type Params
 
-  protected def mkParams(pp: PathParams, qp: QueryStringParams): Params
+  def mkParams(pp: PathParams, qp: QueryStringParams): Params
 
-  protected def matchPath(path: Path): Option[(Path, PathParams)]
-  protected def matchQueryString(params: Map[String, collection.Seq[String]]): Option[(Map[String, collection.Seq[String]], QueryStringParams)]
+  def matchPath(path: Path): Option[(Path, PathParams)]
+  def matchQueryString(params: QueryParams): Option[(QueryParams, QueryStringParams)]
 
   def show: Route.Shown
 
@@ -31,27 +32,27 @@ abstract class Route extends PathBuilder with QueryStringBuilder { self =>
 
   def paramTpes: Vector[TypeTag[_]]
 
-  final def path(params: Params): Uri.Path = pathParts(params).map(_.show).mkString("/", "/", "")
-  final def path[A](params: A)(implicit n: Nestable[A, Params]): Uri.Path = path(n.nest(params))
+  def path(params: Params): Uri.Path = pathParts(params).map(_.show).mkString("/", "/", "")
+  def path[A](params: A)(implicit n: Nestable[A, Params]): Uri.Path = path(n.nest(params))
 
-  final def queryString(params: Params): Query = Query(queryStringParts(params).flatMap(_.show):_*)
-  final def queryString[A](params: A)(implicit n: Nestable[A, Params]): Query = queryString(n.nest(params))
+  def queryString(params: Params): Query = Query(queryStringParts(params).flatMap(_.show):_*)
+  def queryString[A](params: A)(implicit n: Nestable[A, Params]): Query = queryString(n.nest(params))
 
-  final def uri(params: Params): Uri = Uri(path = path(params), query = queryString(params))
-  final def uri[A](params: A)(implicit n: Nestable[A, Params]): Uri = uri(n.nest(params))
+  def uri(params: Params): Uri = Uri(path = path(params), query = queryString(params))
+  def uri[A](params: A)(implicit n: Nestable[A, Params]): Uri = uri(n.nest(params))
 
-  final def url(params: Params): Uri = uri(params)
-  final def url[A](params: A)(implicit n: Nestable[A, Params]): Uri = url(n.nest(params))
+  def url(params: Params): Uri = uri(params)
+  def url[A](params: A)(implicit n: Nestable[A, Params]): Uri = url(n.nest(params))
 
-  final def call(params0: Params): Call = new Call {
+  def call(params0: Params): Call = new Call {
     val route: self.type = self
     lazy val params = params0
   }
 
-  final def apply(params: Params): Call = call(params)
-  final def apply[A](params: A)(implicit n: Nestable[A, Params]): Call = apply(n.nest(params))
+  def apply(params: Params): Call = call(params)
+  def apply[A](params: A)(implicit n: Nestable[A, Params]): Call = apply(n.nest(params))
 
-  final def unapply[F[_]](request: Request[F]): Option[Params] = {
+  def unapply0[F[_]](request: Request[F]): Option[Params] = {
     val m = method
     request match {
       case `m` -> p :? q => (matchPath(p), matchQueryString(q)) match {
@@ -62,23 +63,41 @@ abstract class Route extends PathBuilder with QueryStringBuilder { self =>
       case _ => None
     }
   }
+
+  def unapply[F[_], A](req: Request[F])(implicit t: Nestable[A, Params]): Option[A] =
+    unapply0(req).map(t.unnest(_))
+}
+
+abstract class Route[M <: Method, P] extends Route0 {
+  type Method = M
+  type Params = P
 }
 
 object Route {
-  type Parameterized[P] = Route { type Params = P }
-
-  type Aux[PP, QP, P] = Route {
-    type Params = P
+  type Aux[M <: Method, PP, QP, P] = Route[M, P] {
     type PathParams = PP
     type QueryStringParams = QP
   }
 
-  def empty(m: Method): Aux[Unit, Unit, Unit] = new Route { self =>
+  abstract class From[M <: Method, P](val r: Route[M, P]) extends Route[M, P] {
+    type PathParams = r.PathParams
+    type QueryStringParams = r.QueryStringParams
+
+    def mkParams(pp: PathParams, qp: QueryStringParams): Params = r.mkParams(pp, qp)
+    def matchPath(path: Path): Option[(Path, PathParams)] = r.matchPath(path)
+    def matchQueryString(params: QueryParams): Option[(QueryParams, QueryStringParams)] = r.matchQueryString(params)
+    def method: Method = r.method
+    def paramTpes: Vector[TypeTag[_]] = r.paramTpes
+    def pathParts(params: Params): Vector[PathPart] = r.pathParts(params)
+    def queryStringParts(params: Params): Vector[QueryStringPart] = r.queryStringParts(params)
+    def show: Shown = r.show
+  }
+
+  def empty[M <: Method](m: M): Aux[M, Unit, Unit, Unit] = new Route[M, Unit] { self =>
     type PathParams = Unit
     type QueryStringParams = Unit
-    type Params = Unit
 
-    protected def mkParams(pp: Unit, qp: Unit): Unit = ()
+    def mkParams(pp: Unit, qp: Unit): Unit = ()
 
     lazy val show = Shown(Vector(), Vector())
 
@@ -88,25 +107,25 @@ object Route {
 
     lazy val paramTpes = Vector()
 
-    protected def matchPath(path: Path): Option[(Path, Unit)] =
+    def matchPath(path: Path): Option[(Path, Unit)] =
       Some((path, ()))
 
-    protected def matchQueryString(params: Map[String, collection.Seq[String]]): Option[(Map[String, collection.Seq[String]], QueryStringParams)] =
+    def matchQueryString(params: QueryParams): Option[(QueryParams, QueryStringParams)] =
       Some((params, ()))
   }
 
-  abstract class HandledRoute[F[_], R <: Route](val route: R) {
+  abstract class HandledRoute[F[_], R <: Route0](val route: R) {
     def handle: Nestable[?, route.Params] /~\ (? => F[Response[F]])
   }
 
   trait MkHttpRoutes[F[_]] {
-    def apply(routes: HandledRoute[F, _ <: Route]*)(
+    def apply(routes: HandledRoute[F, _ <: Route0]*)(
       implicit D: Defer[F],
       F: Applicative[F]
     ): HttpRoutes[F] =
       HttpRoutes[F](req => OptionT(routes.foldLeft(Option.empty[F[Response[F]]]) { (acc, r) =>
         val h = r.handle
-        acc.orElse(r.route.unapply[F](req).map(x => h.b(h.a.unnest(x))))
+        acc.orElse(r.route.unapply0(req).map(x => h.b(h.a.unnest(x))))
       }.sequence))
   }
 

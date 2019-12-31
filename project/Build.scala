@@ -67,7 +67,7 @@ object Build {
     }
 
   val commonSettings = splainSettings ++ Seq(
-    organization := "com.mrdziuban",
+    organization := "bondlink",
     crossScalaVersions := scalaVersions,
     scalaVersion := scalaVersions.find(_.startsWith("2.13")).get,
     version := currentVersion,
