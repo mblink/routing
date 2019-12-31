@@ -16,12 +16,21 @@ val Hello = GET / "hello" / ("name" -> StringVar)
 val BlogPost = GET / "post" / ("slug" -> StringVar) :? queryParam[Int]("id")
 ```
 
-Then you can specify the handling logic for a given route by calling the `handled` method. `handled` takes a function from the route's parameters to an http4s response (`F[Response[F]]`).
+Then you can specify the handling logic for a given route by calling the `handled` method. `handled` takes a function of the type:
+
+```scala
+// where `P` is a tuple of the route's parameter types
+Request[F] => P => F[Response[F]]
+```
+
+from the route's parameters to an http4s response (`F[Response[F]]`).
 
 ```scala mdoc
-val handledLogin = Login.handled(_ => Ok("Login page"))
-val handledHello = Hello.handled(name => Ok(s"Hello, $name"))
-val handledBlogPost = BlogPost.handled { case (slug, id) => Ok(s"Blog post with id: $id, slug: $slug") }
+import cats.effect.IO
+
+val handledLogin = Login.handled[IO](_ => _ => Ok("Login page"))
+val handledHello = Hello.handled[IO](_ => name => Ok(s"Hello, $name"))
+val handledBlogPost = BlogPost.handled[IO](_ => { case (slug, id) => Ok(s"Blog post with id: $id, slug: $slug") })
 ```
 
 And finally, you can compose your handled routes into a service by passing them to `Route.httpRoutes`:

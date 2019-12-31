@@ -116,7 +116,9 @@ object Route {
   }
 
   abstract class Handled[F[_], R <: Route0](val route: R) {
-    def handle: Nestable[?, route.Params] /~\ (? => F[Response[F]])
+    type P
+    def nestable: Nestable[P, route.Params]
+    def handle: Request[F] => P => F[Response[F]]
   }
 
   trait MkHttpRoutes[F[_]] {
@@ -124,10 +126,8 @@ object Route {
       implicit D: Defer[F],
       F: Applicative[F]
     ): HttpRoutes[F] =
-      HttpRoutes[F](req => OptionT(routes.foldLeft(Option.empty[F[Response[F]]]) { (acc, r) =>
-        val h = r.handle
-        acc.orElse(r.route.unapply0(req).map(x => h.b(h.a.unnest(x))))
-      }.sequence))
+      HttpRoutes[F](req => OptionT(routes.foldLeft(Option.empty[F[Response[F]]])((acc, r) =>
+        acc.orElse(r.route.unapply0(req).map(x => r.handle(req)(r.nestable.unnest(x))))).sequence))
   }
 
   def httpRoutes[F[_]]: MkHttpRoutes[F] = new MkHttpRoutes[F] {}

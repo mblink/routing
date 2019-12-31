@@ -1,14 +1,16 @@
 package org.http4s
 
 import routing.Route
-import routing.util.{/~\, Nestable}
+import routing.util.Nestable
 import scala.language.implicitConversions
 
 trait RoutingLP {
   implicit class RouteOps[M <: Method, FP, NP](val route: Route[M, NP])(implicit n: Nestable[FP, NP]) {
-    def handled[F[_]](f: FP => F[Response[F]]): Route.Handled[F, route.type] =
+    def handled[F[_]](f: Request[F] => FP => F[Response[F]]): Route.Handled[F, route.type] =
       new Route.Handled[F, route.type](route) {
-        lazy val handle = /~\[Nestable[?, route.Params], ? => F[Response[F]], FP](n, f)
+        type P = FP
+        lazy val nestable = n
+        lazy val handle = f
       }
   }
 }
