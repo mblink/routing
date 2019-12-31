@@ -2,8 +2,8 @@
   "docs": {
     "Documentation": [
       "installation",
-      "building-routes",
-      "forward-routing",
+      "routes",
+      "routing",
       "reverse-routing"
     ],
     "Concepts": [

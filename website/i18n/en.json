@@ -5,8 +5,8 @@
     "previous": "Previous",
     "tagline": "Fast, simple, and type-safe forward and reverse routing for http4s",
     "docs": {
-      "building-routes": {
-        "title": "Building Routes"
+      "routes": {
+        "title": "Routes"
       },
       "forward-routing": {
         "title": "Forward Routing"
@@ -19,6 +19,9 @@
       },
       "route": {
         "title": "Route"
+      },
+      "routing": {
+        "title": "Routing"
       }
     },
     "links": {

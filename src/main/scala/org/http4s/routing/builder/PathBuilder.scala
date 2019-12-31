@@ -16,22 +16,22 @@ trait PathBuilder { self: Route0 =>
   private def nextPath[PP, P, A: TypeTag](
     name: Either[String, String],
     getParams: P => Params,
-    mkParams0: (PP, QueryStringParams) => P,
+    mkParams0: (PP, QueryParams) => P,
     mkPathPart: P => PathPart,
     extract: ExtractPath[A],
     mkNewParams: (PathParams, A) => PP,
     paramTpe: Option[TypeTag[_]]
-  ): Route.Aux[Method, PP, QueryStringParams, P] = new Route[Method, P] {
+  ): Route.Aux[Method, PP, QueryParams, P] = new Route[Method, P] {
     type PathParams = PP
-    type QueryStringParams = self.QueryStringParams
+    type QueryParams = self.QueryParams
 
-    def mkParams(pp: PP, qp: QueryStringParams): P = mkParams0(pp, qp)
+    def mkParams(pp: PP, qp: QueryParams): P = mkParams0(pp, qp)
 
     lazy val show = self.show |+| Route.shownPath[A](name)
 
     lazy val method = self.method
     def pathParts(params: P) = self.pathParts(getParams(params)) :+ mkPathPart(params)
-    def queryStringParts(params: P) = self.queryStringParts(getParams(params))
+    def queryParts(params: P) = self.queryParts(getParams(params))
 
     lazy val paramTpes = self.paramTpes ++ paramTpe
 
@@ -41,11 +41,11 @@ trait PathBuilder { self: Route0 =>
         case _ => None
       }}
 
-    def matchQueryString(params: QueryParams): Option[(QueryParams, QueryStringParams)] =
-      self.matchQueryString(params)
+    def matchQuery(params: QPMap): Option[(QPMap, QueryParams)] =
+      self.matchQuery(params)
   }
 
-  def /(s: String): Route.Aux[Method, PathParams, QueryStringParams, Params] { type Method = self.Method } =
+  def /(s: String): Route.Aux[Method, PathParams, QueryParams, Params] { type Method = self.Method } =
     nextPath[PathParams, Params, String](
       Left(s),
       identity _,
@@ -55,7 +55,7 @@ trait PathBuilder { self: Route0 =>
       (pp, _) => pp,
       None)
 
-  def /[V: Show](t: (String, ExtractPath[V]))(implicit s: Show[V], tt: TypeTag[V]): Route.Aux[Method, (PathParams, V), QueryStringParams, (Params, V)] { type Method = self.Method } =
+  def /[V: Show](t: (String, ExtractPath[V]))(implicit s: Show[V], tt: TypeTag[V]): Route.Aux[Method, (PathParams, V), QueryParams, (Params, V)] { type Method = self.Method } =
     nextPath[(PathParams, V), (Params, V), V](
       Right(t._1),
       _._1,

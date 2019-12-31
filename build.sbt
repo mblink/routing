@@ -19,9 +19,14 @@ lazy val docs = project.in(file("http4s-routing-docs"))
     moduleName := "http4s-routing-docs",
     mdocExtraArguments += "--no-link-hygiene",
     mdocVariables := Map(
-      "VERSION" -> (http4sRouting / version).value
+      "VERSION" -> (http4sRouting / version).value,
+      "GITHUB_REPO_URL" -> githubRepoUrl,
+      "GITHUB_SRC_URL" -> githubSrcUrl,
+      "GITHUB_ROUTING_URL" -> s"$githubSrcUrl/org/http4s/routing"
     )
   )
   .dependsOn(http4sRouting)
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
 
+lazy val githubRepoUrl = "https://github.com/mrdziuban/http4s-routing"
+lazy val githubSrcUrl = s"$githubRepoUrl/blob/master/src/main/scala"

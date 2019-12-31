@@ -6,7 +6,7 @@ trait Call {
   def params: route.Params
 
   final lazy val path: Uri.Path = route.pathRaw(params)
-  final lazy val queryString: Query = route.queryStringRaw(params)
+  final lazy val query: Query = route.queryRaw(params)
   final lazy val uri: Uri = route.uriRaw(params)
   final lazy val url: Uri = uri
 
