@@ -26,14 +26,13 @@ const siteConfig = {
   ],
 
   /* path to images for header/footer */
-  headerIcon: 'img/bondlink-icon.png',
-  favicon: 'img/bondlink-icon.png',
+  headerIcon: 'img/routing.png',
+  favicon: 'img/routing.png',
 
   /* Colors for website */
   colors: {
-    primaryColor: '#32769e',
-    secondaryColor: '#5aa701',
-    gray: '#333333'
+    primaryColor: '#333333',
+    secondaryColor: '#333333'
   },
 
   /* Custom fonts for website */
