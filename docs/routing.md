@@ -27,10 +27,13 @@ from the route's parameters to an http4s response (`F[Response[F]]`).
 
 ```scala mdoc
 import cats.effect.IO
+import org.http4s.Request
 
-val handledLogin = Login.handled[IO](_ => _ => Ok("Login page"))
-val handledHello = Hello.handled[IO](_ => name => Ok(s"Hello, $name"))
-val handledBlogPost = BlogPost.handled[IO](_ => { case (slug, id) => Ok(s"Blog post with id: $id, slug: $slug") })
+val handledLogin = Login.handle.with_.logic[IO](_ => _ => Ok("Login page"))
+val handledHello = Hello.handle.with_.logic[IO](_ => name => Ok(s"Hello, $name"))
+val handledBlogPost = BlogPost.handle.with_.logic((req: Request[IO]) => { case (slug, id) =>
+  Ok(s"Blog post with id: $id, slug: $slug found at ${req.uri}")
+})
 ```
 
 And finally, you can compose your handled routes into a service by passing them to `Route.httpRoutes`:

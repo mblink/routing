@@ -115,14 +115,8 @@ object Route {
       Some((params, ()))
   }
 
-  abstract class Handled[F[_], R <: Route0](val route: R) {
-    type P
-    def nestable: Nestable[P, route.Params]
-    def handle: Request[F] => P => F[Response[F]]
-  }
-
   trait MkHttpRoutes[F[_]] {
-    def apply(routes: Handled[F, _ <: Route0]*)(
+    def apply(routes: Handled[F]*)(
       implicit D: Defer[F],
       F: Applicative[F]
     ): HttpRoutes[F] =
