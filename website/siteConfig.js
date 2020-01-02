@@ -1,20 +1,20 @@
 // See https://docusaurus.io/docs/site-config for all the possible
 // site configuration options.
 
-const repoUrl = 'https://github.com/mrdziuban/http4s-routing';
+const repoUrl = 'https://github.com/mblink/http4s-routing';
 
 const siteConfig = {
   title: 'http4s routing', // Title for your website.
   tagline: 'Fast, simple, and type-safe forward and reverse routing for http4s',
-  url: 'https://your-docusaurus-test-site.com', // Your website URL
-  baseUrl: '/', // Base URL for your project */
+  url: 'https://mblink.github.io', // Your website URL
+  baseUrl: '/http4s-routing/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
 
   // Used for publishing and more
   projectName: 'http4s-routing',
-  organizationName: 'bondlink',
+  organizationName: 'mblink',
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'
