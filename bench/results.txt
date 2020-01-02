@@ -1,0 +1,149 @@
+[info] running (fork) org.openjdk.jmh.Main -i 15 -wi 15 -f1 -t1 .*
+[info] # JMH version: 1.21
+[info] # VM version: JDK 1.8.0_144, Java HotSpot(TM) 64-Bit Server VM, 25.144-b01
+[info] # VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_144.jdk/Contents/Home/jre/bin/java
+[info] # VM options: <none>
+[info] # Warmup: 15 iterations, 10 s each
+[info] # Measurement: 15 iterations, 10 s each
+[info] # Timeout: 10 min per iteration
+[info] # Threads: 1 thread, will synchronize iterations
+[info] # Benchmark mode: Throughput, ops/time
+[info] # Benchmark: org.http4s.routing.bench.ServiceBenchmark.http4s
+[info] # Run progress: 0.00% complete, ETA 00:15:00
+[info] # Fork: 1 of 1
+[info] # Warmup Iteration   1: 76875.204 ops/s
+[info] # Warmup Iteration   2: 122493.968 ops/s
+[info] # Warmup Iteration   3: 120168.152 ops/s
+[info] # Warmup Iteration   4: 116842.739 ops/s
+[info] # Warmup Iteration   5: 116202.691 ops/s
+[info] # Warmup Iteration   6: 118860.180 ops/s
+[info] # Warmup Iteration   7: 120365.871 ops/s
+[info] # Warmup Iteration   8: 114534.749 ops/s
+[info] # Warmup Iteration   9: 120129.658 ops/s
+[info] # Warmup Iteration  10: 117931.750 ops/s
+[info] # Warmup Iteration  11: 122030.768 ops/s
+[info] # Warmup Iteration  12: 129901.063 ops/s
+[info] # Warmup Iteration  13: 130803.150 ops/s
+[info] # Warmup Iteration  14: 135321.089 ops/s
+[info] # Warmup Iteration  15: 128277.814 ops/s
+[info] Iteration   1: 131330.772 ops/s
+[info] Iteration   2: 133414.270 ops/s
+[info] Iteration   3: 129684.857 ops/s
+[info] Iteration   4: 132551.113 ops/s
+[info] Iteration   5: 130705.442 ops/s
+[info] Iteration   6: 133133.098 ops/s
+[info] Iteration   7: 133830.224 ops/s
+[info] Iteration   8: 129075.736 ops/s
+[info] Iteration   9: 136272.821 ops/s
+[info] Iteration  10: 135653.684 ops/s
+[info] Iteration  11: 135585.477 ops/s
+[info] Iteration  12: 132844.349 ops/s
+[info] Iteration  13: 135543.887 ops/s
+[info] Iteration  14: 133499.909 ops/s
+[info] Iteration  15: 138239.859 ops/s
+[info] Result "org.http4s.routing.bench.ServiceBenchmark.http4s":
+[info]   133424.366 ±(99.9%) 2732.459 ops/s [Average]
+[info]   (min, avg, max) = (129075.736, 133424.366, 138239.859), stdev = 2555.943
+[info]   CI (99.9%): [130691.908, 136156.825] (assumes normal distribution)
+[info] # JMH version: 1.21
+[info] # VM version: JDK 1.8.0_144, Java HotSpot(TM) 64-Bit Server VM, 25.144-b01
+[info] # VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_144.jdk/Contents/Home/jre/bin/java
+[info] # VM options: <none>
+[info] # Warmup: 15 iterations, 10 s each
+[info] # Measurement: 15 iterations, 10 s each
+[info] # Timeout: 10 min per iteration
+[info] # Threads: 1 thread, will synchronize iterations
+[info] # Benchmark mode: Throughput, ops/time
+[info] # Benchmark: org.http4s.routing.bench.ServiceBenchmark.routing
+[info] # Run progress: 33.33% complete, ETA 00:10:01
+[info] # Fork: 1 of 1
+[info] # Warmup Iteration   1: 76107.540 ops/s
+[info] # Warmup Iteration   2: 123121.922 ops/s
+[info] # Warmup Iteration   3: 125218.390 ops/s
+[info] # Warmup Iteration   4: 123962.365 ops/s
+[info] # Warmup Iteration   5: 127243.136 ops/s
+[info] # Warmup Iteration   6: 120627.295 ops/s
+[info] # Warmup Iteration   7: 126748.399 ops/s
+[info] # Warmup Iteration   8: 126320.593 ops/s
+[info] # Warmup Iteration   9: 122546.644 ops/s
+[info] # Warmup Iteration  10: 125230.008 ops/s
+[info] # Warmup Iteration  11: 125883.335 ops/s
+[info] # Warmup Iteration  12: 122829.598 ops/s
+[info] # Warmup Iteration  13: 127756.905 ops/s
+[info] # Warmup Iteration  14: 127935.485 ops/s
+[info] # Warmup Iteration  15: 126154.291 ops/s
+[info] Iteration   1: 125265.842 ops/s
+[info] Iteration   2: 123424.545 ops/s
+[info] Iteration   3: 121764.028 ops/s
+[info] Iteration   4: 124127.422 ops/s
+[info] Iteration   5: 123983.971 ops/s
+[info] Iteration   6: 119528.441 ops/s
+[info] Iteration   7: 122590.245 ops/s
+[info] Iteration   8: 122177.565 ops/s
+[info] Iteration   9: 118393.380 ops/s
+[info] Iteration  10: 120408.704 ops/s
+[info] Iteration  11: 118391.740 ops/s
+[info] Iteration  12: 120178.111 ops/s
+[info] Iteration  13: 121373.407 ops/s
+[info] Iteration  14: 118672.430 ops/s
+[info] Iteration  15: 123640.415 ops/s
+[info] Result "org.http4s.routing.bench.ServiceBenchmark.routing":
+[info]   121594.683 ±(99.9%) 2412.116 ops/s [Average]
+[info]   (min, avg, max) = (118391.740, 121594.683, 125265.842), stdev = 2256.295
+[info]   CI (99.9%): [119182.567, 124006.799] (assumes normal distribution)
+[info] # JMH version: 1.21
+[info] # VM version: JDK 1.8.0_144, Java HotSpot(TM) 64-Bit Server VM, 25.144-b01
+[info] # VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_144.jdk/Contents/Home/jre/bin/java
+[info] # VM options: <none>
+[info] # Warmup: 15 iterations, 10 s each
+[info] # Measurement: 15 iterations, 10 s each
+[info] # Timeout: 10 min per iteration
+[info] # Threads: 1 thread, will synchronize iterations
+[info] # Benchmark mode: Throughput, ops/time
+[info] # Benchmark: org.http4s.routing.bench.ServiceBenchmark.routingManual
+[info] # Run progress: 66.67% complete, ETA 00:05:00
+[info] # Fork: 1 of 1
+[info] # Warmup Iteration   1: 75066.471 ops/s
+[info] # Warmup Iteration   2: 120776.871 ops/s
+[info] # Warmup Iteration   3: 121158.339 ops/s
+[info] # Warmup Iteration   4: 119855.500 ops/s
+[info] # Warmup Iteration   5: 119892.281 ops/s
+[info] # Warmup Iteration   6: 118153.021 ops/s
+[info] # Warmup Iteration   7: 119996.450 ops/s
+[info] # Warmup Iteration   8: 119679.133 ops/s
+[info] # Warmup Iteration   9: 120953.525 ops/s
+[info] # Warmup Iteration  10: 117358.617 ops/s
+[info] # Warmup Iteration  11: 117417.035 ops/s
+[info] # Warmup Iteration  12: 115075.552 ops/s
+[info] # Warmup Iteration  13: 115640.080 ops/s
+[info] # Warmup Iteration  14: 120688.629 ops/s
+[info] # Warmup Iteration  15: 119593.613 ops/s
+[info] Iteration   1: 121085.842 ops/s
+[info] Iteration   2: 114314.451 ops/s
+[info] Iteration   3: 113463.749 ops/s
+[info] Iteration   4: 116717.939 ops/s
+[info] Iteration   5: 114947.067 ops/s
+[info] Iteration   6: 114019.114 ops/s
+[info] Iteration   7: 119476.026 ops/s
+[info] Iteration   8: 113303.731 ops/s
+[info] Iteration   9: 117771.940 ops/s
+[info] Iteration  10: 119876.590 ops/s
+[info] Iteration  11: 113324.066 ops/s
+[info] Iteration  12: 118112.776 ops/s
+[info] Iteration  13: 112834.340 ops/s
+[info] Iteration  14: 117331.728 ops/s
+[info] Iteration  15: 123536.810 ops/s
+[info] Result "org.http4s.routing.bench.ServiceBenchmark.routingManual":
+[info]   116674.411 ±(99.9%) 3518.031 ops/s [Average]
+[info]   (min, avg, max) = (112834.340, 116674.411, 123536.810), stdev = 3290.768
+[info]   CI (99.9%): [113156.380, 120192.442] (assumes normal distribution)
+[info] # Run complete. Total time: 00:15:02
+[info] REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
+[info] why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
+[info] experiments, perform baseline and negative tests that provide experimental control, make sure
+[info] the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
+[info] Do not assume the numbers tell you what you want them to tell.
+[info] Benchmark                        Mode  Cnt       Score      Error  Units
+[info] ServiceBenchmark.http4s         thrpt   15  133424.366 ± 2732.459  ops/s
+[info] ServiceBenchmark.routing        thrpt   15  121594.683 ± 2412.116  ops/s
+[info] ServiceBenchmark.routingManual  thrpt   15  116674.411 ± 3518.031  ops/s

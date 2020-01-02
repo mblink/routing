@@ -6,13 +6,21 @@ lazy val http4sRouting = project.in(file("."))
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(testSettings)
-  .settings(libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-    catsCore,
-    http4sCore,
-    http4sDsl
-  ))
-  .settings(Seq(name := "http4s-routing"))
+  .settings(
+    name := "http4s-routing",
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      catsCore,
+      http4sCore,
+      http4sDsl
+    )
+  )
+
+lazy val bench = project.in(file("bench"))
+  .settings(commonSettings)
+  .settings(name := "bench")
+  .dependsOn(http4sRouting)
+  .enablePlugins(JmhPlugin)
 
 lazy val docs = project.in(file("http4s-routing-docs"))
   .settings(

@@ -29,9 +29,9 @@ Here's how you could handle the routes above:
 import cats.effect.IO
 import org.http4s.Request
 
-val handledLogin = Login.handle.with_.logic[IO](_ => _ => Ok("Login page"))
-val handledHello = Hello.handle.with_.logic[IO](_ => name => Ok(s"Hello, $name"))
-val handledBlogPost = BlogPost.handle.with_.logic((req: Request[IO]) => { case (slug, id) =>
+val handledLogin = Login.handle.with_[IO](_ => _ => Ok("Login page"))
+val handledHello = Hello.handle.with_[IO](_ => name => Ok(s"Hello, $name"))
+val handledBlogPost = BlogPost.handle.with_((req: Request[IO]) => { case (slug, id) =>
   Ok(s"Blog post with id: $id, slug: $slug found at ${req.uri}")
 })
 ```

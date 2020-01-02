@@ -3,10 +3,13 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "Fast, simple, and type-safe forward and reverse routing for http4s",
+    "tagline": "Simple and type-safe forward and reverse routing for http4s",
     "docs": {
-      "routes": {
-        "title": "Routes"
+      "benchmarks": {
+        "title": "Benchmarks"
+      },
+      "building-routes": {
+        "title": "Building Routes"
       },
       "forward-routing": {
         "title": "Forward Routing"
@@ -20,6 +23,9 @@
       "route": {
         "title": "Route"
       },
+      "routes": {
+        "title": "Routes"
+      },
       "routing": {
         "title": "Routing"
       }
@@ -29,7 +35,8 @@
       "GitHub": "GitHub"
     },
     "categories": {
-      "Documentation": "Documentation"
+      "Documentation": "Documentation",
+      "Performance": "Performance"
     }
   },
   "pages-strings": {

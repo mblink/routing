@@ -30,24 +30,21 @@ object Handled {
 
   trait Ops {
     implicit class RouteHandlerOps[R_](route: R_) { self =>
-      sealed abstract class With0[M_ <: Method, NP_](implicit ev0: R_ <:< Route[M_, NP_]) {
-        sealed abstract class With1[FP_](implicit n: Nestable[FP_, NP_]) {
-          def logic[F[_]](f: Request[F] => FP_ => F[Response[F]]): Handled.Aux[F, M_, FP_, NP_, R_] = new Handled[F] {
-            type M = M_
-            type FP = FP_
-            type NP = NP_
-            type R = R_
-            lazy val route0 = self.route
-            lazy val ev = ev0
-            lazy val nestable = n
-            lazy val handle = f
-          }
+      sealed abstract class With[M_ <: Method, FP_, NP_](implicit ev0: R_ <:< Route[M_, NP_], n: Nestable[FP_, NP_]) {
+        def with_[F[_]](f: Request[F] => FP_ => F[Response[F]]): Handled.Aux[F, M_, FP_, NP_, R_] = new Handled[F] {
+          type M = M_
+          type FP = FP_
+          type NP = NP_
+          type R = R_
+          lazy val route0 = self.route
+          lazy val ev = ev0
+          lazy val nestable = n
+          lazy val handle = f
         }
-
-        def with_[FP_](implicit n: Nestable[FP_, NP_]): With1[FP_] = new With1[FP_] {}
       }
 
-      def handle[M <: Method, NP](implicit ev: R_ <:< Route[M, NP]): With0[M, NP] = new With0[M, NP] {}
+      def handle[M <: Method, FP, NP](implicit ev: R_ <:< Route[M, NP], n: Nestable[FP, NP]): With[M, FP, NP] =
+        new With[M, FP, NP] {}
     }
   }
 }

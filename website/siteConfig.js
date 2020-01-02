@@ -5,7 +5,7 @@ const repoUrl = 'https://github.com/mblink/http4s-routing';
 
 const siteConfig = {
   title: 'http4s routing', // Title for your website.
-  tagline: 'Fast, simple, and type-safe forward and reverse routing for http4s',
+  tagline: 'Simple and type-safe forward and reverse routing for http4s',
   url: 'https://mblink.github.io', // Your website URL
   baseUrl: '/http4s-routing/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
