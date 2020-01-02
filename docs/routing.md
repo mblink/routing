@@ -16,14 +16,14 @@ val Hello = GET / "hello" / ("name" -> StringVar)
 val BlogPost = GET / "post" / ("slug" -> StringVar) :? queryParam[Int]("id")
 ```
 
-Then you can specify the handling logic for a given route by calling the `handled` method. `handled` takes a function of the type:
+Then you can specify the handling logic for a given route by calling `handle.with.logic_`, which takes a function of the type:
 
 ```scala
 // where `P` is a tuple of the route's parameter types
 Request[F] => P => F[Response[F]]
 ```
 
-from the route's parameters to an http4s response (`F[Response[F]]`).
+Here's how you could handle the routes above:
 
 ```scala mdoc
 import cats.effect.IO
