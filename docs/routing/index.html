@@ -76,31 +76,42 @@
 <span class="hljs-keyword">import</span> org.http4s.<span class="hljs-type">Request</span>
 
 <span class="hljs-keyword">val</span> handledLogin = <span class="hljs-type">Login</span>.handle.with_.logic[<span class="hljs-type">IO</span>](_ =&gt; _ =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"Login page"</span>))
-<span class="hljs-comment">// handledLogin: Handled.Aux[IO, org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, Unit, Unit, Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody}] = org.http4s.routing.Handled$Ops$RouteHandlerOps$With0$With1$$anon$1@4b0ff8c3</span>
+<span class="hljs-comment">// handledLogin: Handled.Aux[IO, org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, Unit, Unit, Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody}] = org.http4s.routing.Handled$Ops$RouteHandlerOps$With0$With1$$anon$1@282c7f86</span>
 <span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle.with_.logic[<span class="hljs-type">IO</span>](_ =&gt; name =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>))
-<span class="hljs-comment">// handledHello: Handled.Aux[IO, org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, String, (Unit, String), Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody}] = org.http4s.routing.Handled$Ops$RouteHandlerOps$With0$With1$$anon$1@59eb2a8c</span>
+<span class="hljs-comment">// handledHello: Handled.Aux[IO, org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, String, (Unit, String), Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody}] = org.http4s.routing.Handled$Ops$RouteHandlerOps$With0$With1$$anon$1@2470eb83</span>
 <span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle.with_.logic((req: <span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>]) =&gt; { <span class="hljs-keyword">case</span> (slug, id) =&gt;
   <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>)
 })
-<span class="hljs-comment">// handledBlogPost: Handled.Aux[IO, org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, (String, Int), ((Unit, String), Int), Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody}] = org.http4s.routing.Handled$Ops$RouteHandlerOps$With0$With1$$anon$1@27e61904</span>
+<span class="hljs-comment">// handledBlogPost: Handled.Aux[IO, org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, (String, Int), ((Unit, String), Int), Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody}] = org.http4s.routing.Handled$Ops$RouteHandlerOps$With0$With1$$anon$1@5bc46359</span>
 </code></pre>
 <p>And finally, you can compose your handled routes into a service by passing them to <code>Route.httpRoutes</code>:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> cats.effect.<span class="hljs-type">IO</span>
 <span class="hljs-keyword">import</span> org.http4s.<span class="hljs-type">HttpRoutes</span>
 
-<span class="hljs-keyword">val</span> service: <span class="hljs-type">HttpRoutes</span>[<span class="hljs-type">IO</span>] = <span class="hljs-type">Route</span>.httpRoutes(
+<span class="hljs-keyword">val</span> service1: <span class="hljs-type">HttpRoutes</span>[<span class="hljs-type">IO</span>] = <span class="hljs-type">Route</span>.httpRoutes(
   handledLogin,
   handledHello,
   handledBlogPost
 )
-<span class="hljs-comment">// service: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.Http$$$Lambda$64584/663664522@4a88442a</span>
+<span class="hljs-comment">// service1: HttpRoutes[IO] = Kleisli(</span>
+<span class="hljs-comment">//   org.http4s.Http$$$Lambda$70042/1357459093@4503a0b3</span>
+<span class="hljs-comment">// )</span>
+</code></pre>
+<p>If you prefer, you can build an <code>HttpRoutes</code> manually by matching on your <code>Route</code>s:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> service2: <span class="hljs-type">HttpRoutes</span>[<span class="hljs-type">IO</span>] = <span class="hljs-type">HttpRoutes</span>.of {
+  <span class="hljs-keyword">case</span> <span class="hljs-type">Login</span>(_) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"Login page"</span>)
+  <span class="hljs-keyword">case</span> <span class="hljs-type">Hello</span>(name) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>)
+  <span class="hljs-keyword">case</span> req @ <span class="hljs-type">BlogPost</span>(slug, id) =&gt;
+    <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>)
+}
+<span class="hljs-comment">// service2: HttpRoutes[IO] = Kleisli(</span>
+<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$70043/1928905304@1b2c214f</span>
 <span class="hljs-comment">// )</span>
 </code></pre>
 <p>You can confirm that routes are matched correctly by passing some test requests to the service:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.http4s.<span class="hljs-type">Request</span>
 
-<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">testRoute</span></span>(call: <span class="hljs-type">Call</span>) =
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">testRoute</span></span>(service: <span class="hljs-type">HttpRoutes</span>[<span class="hljs-type">IO</span>], call: <span class="hljs-type">Call</span>) =
   service
     .run(<span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>](method = call.route.method, uri = call.uri))
     .value
@@ -109,27 +120,34 @@
     .as[<span class="hljs-type">String</span>]
     .unsafeRunSync
 
-testRoute(<span class="hljs-type">Login</span>())
+testRoute(service1, <span class="hljs-type">Login</span>())
 <span class="hljs-comment">// res0: String = "Login page"</span>
-testRoute(<span class="hljs-type">Hello</span>(<span class="hljs-string">"world"</span>))
+testRoute(service1, <span class="hljs-type">Hello</span>(<span class="hljs-string">"world"</span>))
 <span class="hljs-comment">// res1: String = "Hello, world"</span>
-testRoute(<span class="hljs-type">BlogPost</span>(<span class="hljs-string">"my-slug"</span>, <span class="hljs-number">1</span>))
+testRoute(service1, <span class="hljs-type">BlogPost</span>(<span class="hljs-string">"my-slug"</span>, <span class="hljs-number">1</span>))
 <span class="hljs-comment">// res2: String = "Blog post with id: 1, slug: my-slug found at /post/my-slug?id=1"</span>
+
+testRoute(service2, <span class="hljs-type">Login</span>())
+<span class="hljs-comment">// res3: String = "Login page"</span>
+testRoute(service2, <span class="hljs-type">Hello</span>(<span class="hljs-string">"world"</span>))
+<span class="hljs-comment">// res4: String = "Hello, world"</span>
+testRoute(service2, <span class="hljs-type">BlogPost</span>(<span class="hljs-string">"my-slug"</span>, <span class="hljs-number">1</span>))
+<span class="hljs-comment">// res5: String = "Blog post with id: 1, slug: my-slug found at /post/my-slug?id=1"</span>
 </code></pre>
 <p>You can also check that requests matching none of your routes are not handled by the service:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.http4s.{<span class="hljs-type">Method</span>, <span class="hljs-type">Uri</span>}
 
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">unhandled</span></span>(method: <span class="hljs-type">Method</span>, path: <span class="hljs-type">String</span>) =
-  service
+  service1
     .run(<span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>](method = method, uri = <span class="hljs-type">Uri</span>(path = path)))
     .value
     .unsafeRunSync
 
 unhandled(<span class="hljs-type">GET</span>, <span class="hljs-string">"/fake"</span>)
-<span class="hljs-comment">// res3: Option[org.http4s.Response[IO]] = None</span>
+<span class="hljs-comment">// res6: Option[org.http4s.Response[IO]] = None</span>
 
 <span class="hljs-comment">// Not handled by `Hello` because the method doesn't match</span>
 unhandled(<span class="hljs-type">POST</span>, <span class="hljs-string">"/hello/world"</span>)
-<span class="hljs-comment">// res4: Option[org.http4s.Response[IO]] = None</span>
+<span class="hljs-comment">// res7: Option[org.http4s.Response[IO]] = None</span>
 </code></pre>
 </span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/http4s-routing/docs/routes"><span class="arrow-prev">← </span><span>Routes</span></a><a class="docs-next button" href="/http4s-routing/docs/reverse-routing"><span>Reverse Routing</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer" style="background-color:#333333"><section class="sitemap"><div><h5>Docs</h5><a href="/http4s-routing/docs/installation">Installation</a></div><div><h5>Community</h5></div><div><h5>More</h5><a href="https://github.com/mblink/http4s-routing">GitHub</a></div></section><section class="copyright">Copyright © 2020 BondLink</section></footer></div></body></html>
