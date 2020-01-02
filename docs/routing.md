@@ -42,11 +42,22 @@ And finally, you can compose your handled routes into a service by passing them 
 import cats.effect.IO
 import org.http4s.HttpRoutes
 
-val service: HttpRoutes[IO] = Route.httpRoutes(
+val service1: HttpRoutes[IO] = Route.httpRoutes(
   handledLogin,
   handledHello,
   handledBlogPost
 )
+```
+
+If you prefer, you can build an `HttpRoutes` manually by matching on your `Route`s:
+
+```scala mdoc
+val service2: HttpRoutes[IO] = HttpRoutes.of {
+  case Login(_) => Ok("Login page")
+  case Hello(name) => Ok(s"Hello, $name")
+  case req @ BlogPost(slug, id) =>
+    Ok(s"Blog post with id: $id, slug: $slug found at ${req.uri}")
+}
 ```
 
 You can confirm that routes are matched correctly by passing some test requests to the service:
@@ -54,7 +65,7 @@ You can confirm that routes are matched correctly by passing some test requests 
 ```scala mdoc
 import org.http4s.Request
 
-def testRoute(call: Call) =
+def testRoute(service: HttpRoutes[IO], call: Call) =
   service
     .run(Request[IO](method = call.route.method, uri = call.uri))
     .value
@@ -63,9 +74,13 @@ def testRoute(call: Call) =
     .as[String]
     .unsafeRunSync
 
-testRoute(Login())
-testRoute(Hello("world"))
-testRoute(BlogPost("my-slug", 1))
+testRoute(service1, Login())
+testRoute(service1, Hello("world"))
+testRoute(service1, BlogPost("my-slug", 1))
+
+testRoute(service2, Login())
+testRoute(service2, Hello("world"))
+testRoute(service2, BlogPost("my-slug", 1))
 ```
 
 You can also check that requests matching none of your routes are not handled by the service:
@@ -74,7 +89,7 @@ You can also check that requests matching none of your routes are not handled by
 import org.http4s.{Method, Uri}
 
 def unhandled(method: Method, path: String) =
-  service
+  service1
     .run(Request[IO](method = method, uri = Uri(path = path)))
     .value
     .unsafeRunSync
