@@ -59,14 +59,14 @@ For a parameter of type `T`, you must have implicit `cats.Show[T]` and `org.http
 
 #### Optional query parameters
 
-Sometimes it may be useful to have query parameters with optional values, i.e. ones that may appear in the URL either of the following ways:
+Sometimes it may be useful to have query parameters with optional values, i.e. ones that may appear in the URL with or without a value:
 
 ```
 /path?key=value
 /path?key
 ```
 
-Query parameters with an optional value, i.e. ones that may appear in the URL as  can be specified using the `optionalQueryParam` method:
+These can be specified using the `optionalQueryParam` method:
 
 ```scala mdoc
 val routeWithQueryParam = GET / "path" :? optionalQueryParam[String]("key")
