@@ -29,10 +29,16 @@ class HomeSplash extends React.Component {
     );
 
     const ProjectTitle = () => (
-      <h2 className="projectTitle">
-        {siteConfig.title}
-        <small>{siteConfig.tagline}</small>
-      </h2>
+      <div>
+        <h2 className="projectTitle">
+          {siteConfig.title}
+          <small>{siteConfig.tagline}</small>
+        </h2>
+        <p>
+          Define your http4s application's routes as simple Scala values and use the built-in routing to match a
+          request's URL to a route and reverse routing to produce the URL of a route.
+        </p>
+      </div>
     );
 
     const PromoSection = props => (
