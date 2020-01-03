@@ -67,13 +67,13 @@
 <span class="hljs-comment">// 1. Built with http4s routing handler syntax</span>
 <span class="hljs-keyword">val</span> routing = <span class="hljs-type">Route</span>.httpRoutes[<span class="hljs-type">IO</span>](test.handle.with_(_ =&gt; _ =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>)))
 <span class="hljs-comment">// routing: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.Http$$$Lambda$24284/1989989861@35f9414b</span>
+<span class="hljs-comment">//   org.http4s.Http$$$Lambda$27188/395301295@3bd772be</span>
 <span class="hljs-comment">// )</span>
 
 <span class="hljs-comment">// 2. Built with http4s routing manual match syntax</span>
 <span class="hljs-keyword">val</span> routingManual = <span class="hljs-type">HttpRoutes</span>.of[<span class="hljs-type">IO</span>] { <span class="hljs-keyword">case</span> test(_) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>) }
 <span class="hljs-comment">// routingManual: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$24285/740315142@5b0c3f7d</span>
+<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$27189/1186443664@53862331</span>
 <span class="hljs-comment">// )</span>
 
 <span class="hljs-comment">// 3. Built with explicit URL matches using http4s' DSL</span>
@@ -81,7 +81,7 @@
   <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Root</span> / <span class="hljs-string">"test"</span> =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>)
 }
 <span class="hljs-comment">// http4s: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$24285/740315142@17041bbf</span>
+<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$27189/1186443664@485a6608</span>
 <span class="hljs-comment">// )</span>
 </code></pre>
 <p>Then ran the <a href="https://github.com/mblink/http4s-routing/blob/master/bench/src/main/scala/org/http4s/routing/bench/ServiceBenchmark.scala"><code>ServiceBenchmark</code></a> with the command:</p>
