@@ -26,7 +26,7 @@
 <span class="hljs-comment">// `IntVar` is an extractor, e.g. it conforms to</span>
 <span class="hljs-comment">// `def unapply(s: String): Option[Int]` for parsing URLs</span>
 <span class="hljs-type">GET</span> / <span class="hljs-string">"path"</span> / (<span class="hljs-string">"id"</span> -&gt; <span class="hljs-type">IntVar</span>)
-<span class="hljs-comment">// res0: Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, (Unit, Int)]{type PathParams = (Unit, Int);type QueryParams = Unit}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody} = /path/&lt;id: Int&gt;</span>
+<span class="hljs-comment">// res0: Route{type Params = (Unit, Int);type PathParams = (Unit, Int);type QueryStringParams = Unit} = /path/&lt;id: Int&gt;</span>
 </code></pre>
 <p>Adding query params is simple as well:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> cats.instances.boolean._
@@ -35,23 +35,23 @@
 <span class="hljs-comment">// Implies a `Show[Boolean]` and `Show[String]`, as well as</span>
 <span class="hljs-comment">// an `org.http4s.QueryParamDecoder` for each type</span>
 <span class="hljs-type">GET</span> / <span class="hljs-string">"path"</span> :? (<span class="hljs-string">"key1"</span> -&gt; <span class="hljs-type">Option</span>.empty[<span class="hljs-type">Boolean</span>]) &amp; (<span class="hljs-string">"key2"</span> -&gt; <span class="hljs-type">Option</span>.empty[<span class="hljs-type">String</span>])
-<span class="hljs-comment">// res1: Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, ((Unit, Boolean), String)]{type PathParams = Unit;type QueryParams = ((Unit, Boolean), String)}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody} = /path?&lt;key1: Boolean&gt;&amp;&lt;key2: String&gt;</span>
+<span class="hljs-comment">// res1: Route{type Params = ((Unit, Boolean), String);type PathParams = Unit;type QueryStringParams = ((Unit, Boolean), String)} = /path?&lt;key1: Boolean&gt;&amp;&lt;key2: String&gt;</span>
 </code></pre>
 <p>When building a <code>Route</code>, the <code>Params</code> type mentioned above is updated with every call to <code>/</code>, <code>?</code>, and <code>&amp;</code>:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> root: <span class="hljs-type">Route</span>[<span class="hljs-type">GET</span><span class="hljs-class">.<span class="hljs-keyword">type</span>, <span class="hljs-title">Unit</span>] </span>= <span class="hljs-type">GET</span>
-<span class="hljs-comment">// root: Route[GET.type, Unit] = /</span>
-<span class="hljs-keyword">val</span> path1: <span class="hljs-type">Route</span>[<span class="hljs-type">GET</span><span class="hljs-class">.<span class="hljs-keyword">type</span>, <span class="hljs-title">Unit</span>] </span>= root / <span class="hljs-string">"path"</span> <span class="hljs-comment">// Static path parts add no parameters</span>
-<span class="hljs-comment">// path1: Route[GET.type, Unit] = /path // Static path parts add no parameters</span>
-<span class="hljs-keyword">val</span> path2: <span class="hljs-type">Route</span>[<span class="hljs-type">GET</span><span class="hljs-class">.<span class="hljs-keyword">type</span>, (<span class="hljs-params"><span class="hljs-type">Unit</span>, <span class="hljs-type">Int</span></span>)] </span>= path1 / (<span class="hljs-string">"id"</span> -&gt; <span class="hljs-type">IntVar</span>)
-<span class="hljs-comment">// path2: Route[GET.type, (Unit, Int)] = /path/&lt;id: Int&gt;</span>
-<span class="hljs-keyword">val</span> path3: <span class="hljs-type">Route</span>[<span class="hljs-type">GET</span><span class="hljs-class">.<span class="hljs-keyword">type</span>, (<span class="hljs-params">(<span class="hljs-type">Unit</span>, <span class="hljs-type">Int</span></span>), <span class="hljs-title">Boolean</span>)] </span>= path2 :? (<span class="hljs-string">"key1"</span> -&gt; <span class="hljs-type">Option</span>.empty[<span class="hljs-type">Boolean</span>])
-<span class="hljs-comment">// path3: Route[GET.type, ((Unit, Int), Boolean)] = /path/&lt;id: Int&gt;?&lt;key1: Boolean&gt;</span>
-<span class="hljs-keyword">val</span> path4: <span class="hljs-type">Route</span>[<span class="hljs-type">GET</span><span class="hljs-class">.<span class="hljs-keyword">type</span>, (<span class="hljs-params">((<span class="hljs-type">Unit</span>, <span class="hljs-type">Int</span></span>), <span class="hljs-title">Boolean</span>), <span class="hljs-title">String</span>)] </span>= path3 &amp; (<span class="hljs-string">"key2"</span> -&gt; <span class="hljs-type">Option</span>.empty[<span class="hljs-type">String</span>])
-<span class="hljs-comment">// path4: Route[GET.type, (((Unit, Int), Boolean), String)] = /path/&lt;id: Int&gt;?&lt;key1: Boolean&gt;&amp;&lt;key2: String&gt;</span>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> root: <span class="hljs-type">Route</span> { <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Params</span> </span>= <span class="hljs-type">Unit</span> } = <span class="hljs-type">GET</span>
+<span class="hljs-comment">// root: Route{type Params = Unit} = /</span>
+<span class="hljs-keyword">val</span> path1: <span class="hljs-type">Route</span> { <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Params</span> </span>= <span class="hljs-type">Unit</span> } = root / <span class="hljs-string">"path"</span> <span class="hljs-comment">// Static path parts add no parameters</span>
+<span class="hljs-comment">// path1: Route{type Params = Unit} = /path // Static path parts add no parameters</span>
+<span class="hljs-keyword">val</span> path2: <span class="hljs-type">Route</span> { <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Params</span> </span>= (<span class="hljs-type">Unit</span>, <span class="hljs-type">Int</span>) } = path1 / (<span class="hljs-string">"id"</span> -&gt; <span class="hljs-type">IntVar</span>)
+<span class="hljs-comment">// path2: Route{type Params = (Unit, Int)} = /path/&lt;id: Int&gt;</span>
+<span class="hljs-keyword">val</span> path3: <span class="hljs-type">Route</span> { <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Params</span> </span>= ((<span class="hljs-type">Unit</span>, <span class="hljs-type">Int</span>), <span class="hljs-type">Boolean</span>) } = path2 :? (<span class="hljs-string">"key1"</span> -&gt; <span class="hljs-type">Option</span>.empty[<span class="hljs-type">Boolean</span>])
+<span class="hljs-comment">// path3: Route{type Params = ((Unit, Int), Boolean)} = /path/&lt;id: Int&gt;?&lt;key1: Boolean&gt;</span>
+<span class="hljs-keyword">val</span> path4: <span class="hljs-type">Route</span> { <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Params</span> </span>= (((<span class="hljs-type">Unit</span>, <span class="hljs-type">Int</span>), <span class="hljs-type">Boolean</span>), <span class="hljs-type">String</span>) } = path3 &amp; (<span class="hljs-string">"key2"</span> -&gt; <span class="hljs-type">Option</span>.empty[<span class="hljs-type">String</span>])
+<span class="hljs-comment">// path4: Route{type Params = (((Unit, Int), Boolean), String)} = /path/&lt;id: Int&gt;?&lt;key1: Boolean&gt;&amp;&lt;key2: String&gt;</span>
 </code></pre>
 <p>The <code>Params</code> type ends up as an increasingly nested <code>Tuple2</code>, but a simple macro lets us pass arguments the standard way:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-comment">// Using nested params</span>
-path4.applyRaw(((((), <span class="hljs-number">1</span>), <span class="hljs-literal">true</span>), <span class="hljs-string">"foo"</span>))
+path4.apply0(((((), <span class="hljs-number">1</span>), <span class="hljs-literal">true</span>), <span class="hljs-string">"foo"</span>))
 <span class="hljs-comment">// res2: Call = /path/1?key1=true&amp;key2=foo</span>
 
 <span class="hljs-comment">// Much better</span>

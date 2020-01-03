@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Benchmarks · http4s routing</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Routing is an important part of a web application so it&#x27;s important to understand the performance of our implementation. We put together a simple benchmark to test the performance of routing requests through a service built in three ways:"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Benchmarks · http4s routing"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mblink.github.io/http4s-routing/"/><meta property="og:description" content="Routing is an important part of a web application so it&#x27;s important to understand the performance of our implementation. We put together a simple benchmark to test the performance of routing requests through a service built in three ways:"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/http4s-routing/img/routing.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/http4s-routing/js/scrollSpy.js"></script><link rel="stylesheet" href="/http4s-routing/css/main.css"/><script src="/http4s-routing/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/http4s-routing/"><img class="logo" src="/http4s-routing/img/routing.png" alt="http4s routing"/><h2 class="headerTitleWithLogo">http4s routing</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/http4s-routing/docs/installation" target="_self">Docs</a></li><li class=""><a href="https://github.com/mblink/http4s-routing" target="_blank">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Performance</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Documentation</h3><ul class=""><li class="navListItem"><a class="navItem" href="/http4s-routing/docs/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/http4s-routing/docs/routes">Routes</a></li><li class="navListItem"><a class="navItem" href="/http4s-routing/docs/routing">Routing</a></li><li class="navListItem"><a class="navItem" href="/http4s-routing/docs/reverse-routing">Reverse Routing</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Performance</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/http4s-routing/docs/benchmarks">Benchmarks</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Benchmarks</h1></header><article><div><span><p>Routing is an important part of a web application so it's important to understand the performance of our implementation. We put together a simple benchmark to test the performance of routing requests through a service built in three ways:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> cats.effect.<span class="hljs-type">IO</span>
+<span class="hljs-keyword">import</span> org.http4s.<span class="hljs-type">HttpRoutes</span>
+<span class="hljs-keyword">import</span> org.http4s.dsl.io._
+<span class="hljs-keyword">import</span> org.http4s.routing._
+
+<span class="hljs-keyword">val</span> test = <span class="hljs-type">GET</span> / <span class="hljs-string">"test"</span>
+<span class="hljs-comment">// test: Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody} = /test</span>
+
+
+<span class="hljs-comment">// 1. Built with http4s routing handler syntax</span>
+<span class="hljs-keyword">val</span> routing = <span class="hljs-type">Route</span>.httpRoutes[<span class="hljs-type">IO</span>](test.handle.with_(_ =&gt; _ =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>)))
+<span class="hljs-comment">// routing: HttpRoutes[IO] = Kleisli(</span>
+<span class="hljs-comment">//   org.http4s.Http$$$Lambda$24284/1989989861@35f9414b</span>
+<span class="hljs-comment">// )</span>
+
+<span class="hljs-comment">// 2. Built with http4s routing manual match syntax</span>
+<span class="hljs-keyword">val</span> routingManual = <span class="hljs-type">HttpRoutes</span>.of[<span class="hljs-type">IO</span>] { <span class="hljs-keyword">case</span> test(_) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>) }
+<span class="hljs-comment">// routingManual: HttpRoutes[IO] = Kleisli(</span>
+<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$24285/740315142@5b0c3f7d</span>
+<span class="hljs-comment">// )</span>
+
+<span class="hljs-comment">// 3. Built with explicit URL matches using http4s' DSL</span>
+<span class="hljs-keyword">val</span> http4s = <span class="hljs-type">HttpRoutes</span>.of[<span class="hljs-type">IO</span>] {
+  <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Root</span> / <span class="hljs-string">"test"</span> =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>)
+}
+<span class="hljs-comment">// http4s: HttpRoutes[IO] = Kleisli(</span>
+<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$24285/740315142@17041bbf</span>
+<span class="hljs-comment">// )</span>
+</code></pre>
+<p>Then ran the <a href="https://github.com/mblink/http4s-routing/blob/master/bench/src/main/scala/org/http4s/routing/bench/ServiceBenchmark.scala"><code>ServiceBenchmark</code></a> with the command:</p>
+<pre><code class="hljs">jmh:run -i <span class="hljs-number">15</span> -wi <span class="hljs-number">15</span> -f1 -t1 .*
+</code></pre>
+<p>The results showed that while using http4s' DSL was the fastest option, the services using http4s routing weren't too far behind:</p>
+<pre><code class="hljs">Benchmark                        Mode  Cnt       Score      Error  Units
+ServiceBenchmark.http4s         thrpt   <span class="hljs-number">15</span>  <span class="hljs-number">133424.366</span> ± <span class="hljs-number">2732.459</span>  ops/s
+ServiceBenchmark.routing        thrpt   <span class="hljs-number">15</span>  <span class="hljs-number">121594.683</span> ± <span class="hljs-number">2412.116</span>  ops/s
+ServiceBenchmark.routingManual  thrpt   <span class="hljs-number">15</span>  <span class="hljs-number">116674.411</span> ± <span class="hljs-number">3518.031</span>  ops/s
+</code></pre>
+<p>You can <a href="https://github.com/mblink/http4s-routing/blob/master/bench/results.txt">view the full output of the JMH run here</a>.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/http4s-routing/docs/reverse-routing"><span class="arrow-prev">← </span><span>Reverse Routing</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer" style="background-color:#333333"><section class="sitemap"><div><h5>Docs</h5><a href="/http4s-routing/docs/installation">Installation</a></div><div><h5>Community</h5></div><div><h5>More</h5><a href="https://github.com/mblink/http4s-routing">GitHub</a></div></section><section class="copyright">Copyright © 2020 BondLink</section></footer></div></body></html>
