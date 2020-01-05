@@ -20,6 +20,12 @@ object Build {
     )
   )
 
+  def profileTraceOpts(baseDir: File, name: String): Seq[String] = {
+    val dir = baseDir / ".traces"
+    s"mkdir -p $dir".!!
+    Seq("-Yprofile-trace", s"$dir/$name.trace")
+  }
+
   val scala212_opts = Seq(
     "-Xfuture",
     "-Xlint:by-name-right-associative",
@@ -87,7 +93,7 @@ object Build {
       "-Ywarn-dead-code",
       "-Ywarn-numeric-widen",
       "-Ywarn-value-discard"
-    ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+    ) ++ profileTraceOpts(baseDirectory.value, name.value) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 12)) => scala212_opts ++ scala212_213_opts
       case Some((2, 13)) => scala212_213_opts
       case _ => Seq()
@@ -123,6 +129,8 @@ object Build {
   )
 
   val catsCore = "org.typelevel" %% "cats-core" % "2.1.0"
-  val http4sCore = "org.http4s" %% "http4s-core" % "0.21.0-M6"
-  val http4sDsl = "org.http4s" %% "http4s-dsl" % "0.21.0-M6"
+
+  val http4sVersion = "0.21.0-M6"
+  val http4sCore = "org.http4s" %% "http4s-core" % http4sVersion
+  val http4sDsl = "org.http4s" %% "http4s-dsl" % http4sVersion
 }

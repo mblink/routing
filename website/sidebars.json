@@ -6,8 +6,9 @@
       "routing",
       "reverse-routing"
     ],
-    "Performance": [
-      "benchmarks"
+    "More": [
+      "benchmarks",
+      "example"
     ]
   }
 }

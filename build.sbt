@@ -36,5 +36,20 @@ lazy val docs = project.in(file("http4s-routing-docs"))
   .dependsOn(http4sRouting)
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
 
+lazy val example = project.in(file("example"))
+  .settings(commonSettings)
+  .settings(
+    name := "http4s-routing-example",
+    libraryDependencies ++= Seq(
+      "io.circe" %% "circe-core" % "0.12.3",
+      "io.circe" %% "circe-generic" % "0.12.3",
+      "org.http4s" %% "http4s-circe" % http4sVersion,
+      "org.http4s" %% "http4s-blaze-server" % http4sVersion,
+      "org.slf4j" % "slf4j-api" % "1.7.30",
+      "org.slf4j" % "slf4j-simple" % "1.7.30"
+    )
+  )
+  .dependsOn(http4sRouting)
+
 lazy val githubRepoUrl = "https://github.com/mblink/http4s-routing"
 lazy val githubSrcUrl = s"$githubRepoUrl/blob/master/src/main/scala"

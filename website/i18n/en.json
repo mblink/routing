@@ -11,6 +11,9 @@
       "building-routes": {
         "title": "Building Routes"
       },
+      "example": {
+        "title": "Example"
+      },
       "forward-routing": {
         "title": "Forward Routing"
       },
@@ -36,7 +39,7 @@
     },
     "categories": {
       "Documentation": "Documentation",
-      "Performance": "Performance"
+      "More": "More"
     }
   },
   "pages-strings": {
