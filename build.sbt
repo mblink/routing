@@ -1,45 +1,88 @@
-import org.http4s.routing.Build._
+import java.io.File
+import _root_.routing.Build._
+import scala.sys.process._
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-lazy val http4sRouting = project.in(file("."))
+lazy val routing = project.in(file("."))
+  .settings(commonSettings)
+  .aggregate(core, http4s, play, example)
+
+lazy val core = project.in(file("core"))
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(testSettings)
   .settings(
-    name := "http4s-routing",
+    name := "routing-core",
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      catsCore,
+      catsCore % Optional,
+      izumiReflect,
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+    ),
+    sourceGenerators in Compile += Def.task {
+      val generators = new File("git rev-parse --show-toplevel".!!.trim) / "generators"
+      val srcManaged = (Compile / sourceManaged).value / "generated"
+
+      def gen(scalaF: String, rubyF: String) = {
+        println(s"Generating ${srcManaged / scalaF} with ${generators / rubyF}")
+        IO.write(srcManaged / scalaF, Seq("ruby", (generators / rubyF).toString).!!)
+        srcManaged / scalaF
+      }
+
+      Seq(
+        gen("NestableInstances.scala", "nestable_instances.rb"),
+        // gen("RouteMethods.scala", "route_methods.rb")
+      )
+    }
+  )
+
+lazy val http4s = project.in(file("http4s"))
+  .settings(commonSettings)
+  .settings(publishSettings)
+  .settings(testSettings)
+  .settings(
+    name := "routing-http4s",
+    libraryDependencies ++= Seq(
       http4sCore,
       http4sDsl
     )
   )
+  .dependsOn(core)
+
+lazy val play = project.in(file("play"))
+  .settings(commonSettings)
+  .settings(publishSettings)
+  .settings(testSettings)
+  .settings(
+    name := "routing-play",
+    libraryDependencies += playCore.value
+  )
+  .dependsOn(core)
 
 lazy val bench = project.in(file("bench"))
   .settings(commonSettings)
   .settings(name := "bench")
-  .dependsOn(http4sRouting)
+  .dependsOn(core, http4s, play)
   .enablePlugins(JmhPlugin)
 
-lazy val docs = project.in(file("http4s-routing-docs"))
+lazy val docs = project.in(file("routing-docs"))
+  .settings(commonSettings)
   .settings(
-    moduleName := "http4s-routing-docs",
+    moduleName := "routing-docs",
     mdocExtraArguments += "--no-link-hygiene",
     mdocVariables := Map(
-      "VERSION" -> (http4sRouting / version).value,
+      "VERSION" -> (core / version).value,
       "GITHUB_REPO_URL" -> githubRepoUrl,
-      "GITHUB_SRC_URL" -> githubSrcUrl,
-      "GITHUB_ROUTING_URL" -> s"$githubSrcUrl/org/http4s/routing"
+      "GITHUB_BLOB_URL" -> s"$githubRepoUrl/blob/master"
     )
   )
-  .dependsOn(http4sRouting)
+  .dependsOn(core, http4s, play)
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
 
 lazy val example = project.in(file("example"))
   .settings(commonSettings)
   .settings(
-    name := "http4s-routing-example",
+    name := "routing-example",
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-core" % "0.12.3",
       "io.circe" %% "circe-generic" % "0.12.3",
@@ -49,7 +92,6 @@ lazy val example = project.in(file("example"))
       "org.slf4j" % "slf4j-simple" % "1.7.30"
     )
   )
-  .dependsOn(http4sRouting)
+  .dependsOn(core, http4s, play)
 
-lazy val githubRepoUrl = "https://github.com/mblink/http4s-routing"
-lazy val githubSrcUrl = s"$githubRepoUrl/blob/master/src/main/scala"
+lazy val githubRepoUrl = "https://github.com/mblink/routing"

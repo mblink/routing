@@ -3,9 +3,10 @@ id: installation
 title: Installation
 ---
 
-http4s routing provides simple and type-safe forward and reverse routing for http4s. To get started, add the following to your SBT configuration:
+The `routing-core` package provides simple, type-safe, and framework-agnostic forward and reverse routing for HTTP
+applications. To get started, add the following to your SBT configuration:
 
 ```scala
-resolvers += Resolver.bintrayRepo("bondlink", "http4s-routing")
-libraryDependencies += "bondlink" %% "http4s-routing" % "@VERSION@"
+resolvers += Resolver.bintrayRepo("bondlink", "routing")
+libraryDependencies += "bondlink" %% "routing-core" % "@VERSION@"
 ```

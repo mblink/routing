@@ -1,5 +1,3 @@
-package org.http4s
-
 package object routing {
-  val currentVersion = "0.1.1"
+  val currentVersion = "0.2.0-LOCAL28"
 }

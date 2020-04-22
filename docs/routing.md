@@ -3,99 +3,31 @@ id: routing
 title: Routing
 ---
 
-Once you've built your `Route`s, they can be used to route http4s requests to specific application logic. Each route contains enough information to match it against a request and extract the relevant parameters from the request's path and query string, so all you need to do is specify the route-specific handling logic. Assuming you have the test routes:
+Once you've built your `Route`s, they can be used to route HTTP requests to specific application logic. Each route
+contains enough information to match it against a request and extract the relevant parameters from the request's path
+and query string, so all you need to do is specify the route-specific handling logic. Assuming you have the test routes:
 
 ```scala mdoc
-import cats.instances.int._
-import cats.instances.string._
-import org.http4s.dsl.io._
-import org.http4s.routing._
+import routing._
 
-val Login = GET / "login"
-val Hello = GET / "hello" / ("name" -> StringVar)
-val BlogPost = GET / "post" / ("slug" -> StringVar) :? queryParam[Int]("id")
+val Login = Method.GET / "login"
+val Hello = Method.GET / "hello" / pathVar[String]("name")
+val BlogPost = Method.GET / "post" / pathVar[String]("slug") :? queryParam[Int]("id")
 ```
 
-Then you can specify the handling logic for a given route by calling `handle.with.logic_`, which takes a function of the type:
+Then you can specify the handling logic for a given route by calling `handle.with_`. The argument passed to `with_`
+should be a function of the type `Params => Out` where `Params` is a tuple of the route's parameters and `Out` is any
+type you want to target with your handler.
 
-```scala
-// where `P` is a tuple of the route's parameter types
-Request[F] => P => F[Response[F]]
-```
-
-Here's how you could handle the routes above:
+Here's how you could handle the routes above, simply returning a `String` for each route:
 
 ```scala mdoc
-import cats.effect.IO
-import org.http4s.Request
-
-val handledLogin = Login.handle.with_[IO](_ => _ => Ok("Login page"))
-val handledHello = Hello.handle.with_[IO](_ => name => Ok(s"Hello, $name"))
-val handledBlogPost = BlogPost.handle.with_((req: Request[IO]) => { case (slug, id) =>
-  Ok(s"Blog post with id: $id, slug: $slug found at ${req.uri}")
-})
-```
-
-And finally, you can compose your handled routes into a service by passing them to `Route.httpRoutes`:
-
-```scala mdoc
-import cats.effect.IO
-import org.http4s.HttpRoutes
-
-val service1: HttpRoutes[IO] = Route.httpRoutes(
-  handledLogin,
-  handledHello,
-  handledBlogPost
-)
-```
-
-If you prefer, you can build an `HttpRoutes` manually by matching on your `Route`s:
-
-```scala mdoc
-val service2: HttpRoutes[IO] = HttpRoutes.of {
-  case Login(_) => Ok("Login page")
-  case Hello(name) => Ok(s"Hello, $name")
-  case req @ BlogPost(slug, id) =>
-    Ok(s"Blog post with id: $id, slug: $slug found at ${req.uri}")
+val handledLogin = Login.handle.with_(_ => "Login page")
+val handledHello = Hello.handle.with_(name => s"Hello, $name")
+val handledBlogPost = BlogPost.handle.with_ { case (slug, id) =>
+  s"Blog post with id: $id, slug: $slug found"
 }
 ```
 
-You can confirm that routes are matched correctly by passing some test requests to the service:
-
-```scala mdoc
-import org.http4s.Request
-
-def testRoute(service: HttpRoutes[IO], call: Call) =
-  service
-    .run(Request[IO](method = call.route.method, uri = call.uri))
-    .value
-    .unsafeRunSync
-    .get
-    .as[String]
-    .unsafeRunSync
-
-testRoute(service1, Login())
-testRoute(service1, Hello("world"))
-testRoute(service1, BlogPost("my-slug", 1))
-
-testRoute(service2, Login())
-testRoute(service2, Hello("world"))
-testRoute(service2, BlogPost("my-slug", 1))
-```
-
-You can also check that requests matching none of your routes are not handled by the service:
-
-```scala mdoc
-import org.http4s.{Method, Uri}
-
-def unhandled(method: Method, path: String) =
-  service1
-    .run(Request[IO](method = method, uri = Uri(path = path)))
-    .value
-    .unsafeRunSync
-
-unhandled(GET, "/fake")
-
-// Not handled by `Hello` because the method doesn't match
-unhandled(POST, "/hello/world")
-```
+Of course the actual output type of your handlers will be dictated by the HTTP application framework you've chosen.
+See the [implementations documentation](implementations.md) for more examples.

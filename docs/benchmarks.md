@@ -9,7 +9,8 @@ Routing is an important part of a web application so it's important to understan
 import cats.effect.IO
 import org.http4s.HttpRoutes
 import org.http4s.dsl.io._
-import org.http4s.routing._
+import _root_.routing._
+import _root_.routing.http4s._
 
 val test = GET / "test"
 
@@ -18,7 +19,7 @@ val test = GET / "test"
 val routing = Route.httpRoutes[IO](test.handle.with_(_ => _ => Ok("test")))
 
 // 2. Built with http4s routing manual match syntax
-val routingManual = HttpRoutes.of[IO] { case test(_) => Ok("test") }
+val routingManual = Route.httpRoutes.of[IO] { case test(_) => Ok("test") }
 
 // 3. Built with explicit URL matches using http4s' DSL
 val http4s = HttpRoutes.of[IO] {

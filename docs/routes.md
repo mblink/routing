@@ -3,74 +3,67 @@ id: routes
 title: Routes
 ---
 
-A [`Route`](@GITHUB_ROUTING_URL@/Route.scala) is the set of a URL's path parts (i.e. the parts separated by `/`) and its query string pairs. It may have zero or more parameters, where the type of each parameter can be written to and parsed from a `String`. A path part is either a static `String` or a parameter, while a query string pair is a tuple of a `String` key and a parameter.
+A [`Route`](@GITHUB_BLOB_URL@/core/src/main/scala/routing/Route.scala) is the set of a URL's path parts (i.e. the parts separated by `/`) and its query string pairs. It may have zero or more parameters, where the type of each parameter can be written to and parsed from a `String`. A path part is either a static `String` or a parameter, while a query string pair is a tuple of a `String` key and a parameter.
 
 ## Building routes
 
 The most basic route is the root URL, `/`.
 
 ```scala mdoc
-import org.http4s.routing._
-import org.http4s.dsl.io._
+import routing._
 
-val home = root(GET)
+val home = root(Method.GET)
 ```
 
-More complex routes can be built using the provided DSL, which should look similar to http4s' DSL.
+More complex routes can be built using the provided DSL.
 
 ### Building the path
 
 Static path parts can be specified as `String`s:
 
 ```scala mdoc
-GET / "part1" / "part2"
+Method.GET / "part1" / "part2"
 ```
 
-Path parameters can be specified with a `String` key and a reference to an extractor value for the parameter type:
+Path parameters can be specified by passing a type and a `String` key to the `pathVar` method:
 
 ```scala mdoc
-import cats.instances.int._
-
-val edit = GET / "edit" / ("id" -> IntVar)
+val edit = Method.GET / "edit" / pathVar[Int]("id")
+val hello = Method.GET / "hello" / pathVar[String]("name")
 ```
 
-For a parameter of type `T`, you must have an implicit `cats.Show[T]` instance, and the extractor value specified should implement `def unapply(s: String): Option[T]` as `IntVar` does.
-
-*Note: You can use the provided `StringVar` value for `String` path parameters:*
-
-```scala mdoc
-import cats.instances.string._
-
-val hello = GET / "hello" / ("name" -> StringVar)
-```
+For a parameter of type `T`, you must have implicit `routing.util.Show[T]` and `routing.extractor.PathExtractor[T]`
+instances defined. Instances for `String`, `Int`, `Long`, `Boolean`, and `UUID` are provided.
 
 ### Building the query string
 
-Query parameters can be specified by passing a `String` key and a type paramter to the `queryParam` method:
+Query parameters can be specified by passing a `String` key and a type parameter to the `queryParam` method:
 
 ```scala mdoc
-import cats.instances.boolean._
-import cats.instances.string._
-
-val test = GET / "path" :? queryParam[Boolean]("key1") & queryParam[String]("key2")
+val test = Method.GET / "path" :? queryParam[Boolean]("key1") & queryParam[String]("key2")
 ```
 
-For a parameter of type `T`, you must have implicit `cats.Show[T]` and `org.http4s.QueryParamDecoder[T]` instances.
+For a parameter of type `T`, you must have implicit `routing.util.Show[T]` and `routing.extractor.QueryExtractor[T]`
+instances defined.
 
 #### Optional query parameters
 
-Sometimes it may be useful to have query parameters with optional values, i.e. ones that may appear in the URL with or without a value:
-
-```
-/path?key=value
-/path?key
-```
-
-These can be specified using the `optionalQueryParam` method:
+Query parameters with optional values, i.e. ones that may appear in the URL with or without a value, can be specified
+using the `optionalQueryParam` method:
 
 ```scala mdoc
-val routeWithQueryParam = GET / "path" :? optionalQueryParam[String]("key")
+val routeWithQueryParam = Method.GET / "path" :? optionalQueryParam[String]("key")
+routeWithQueryParam(Some("value"))
+routeWithQueryParam(None)
+```
 
-routeWithQueryParam.uri(Some("value")).renderString
-routeWithQueryParam.uri(None).renderString
+#### Multi query parameters
+
+Similarly, query parameters that may apperar in the URL zero or more times can be specified using the `multiQueryParam`
+method:
+
+```scala mdoc
+val routeWithMultiParam = Method.GET / "path" :? multiQueryParam[Int]("id")
+routeWithMultiParam(Nil)
+routeWithMultiParam(List(1, 2))
 ```

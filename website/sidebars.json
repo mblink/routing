@@ -4,6 +4,15 @@
       "installation",
       "routes",
       "routing",
+      {
+        "type": "subcategory",
+        "label": "Implementations",
+        "ids": [
+          "implementations",
+          "implementations/http4s",
+          "implementations/play"
+        ]
+      },
       "reverse-routing"
     ],
     "More": [

@@ -1,19 +1,19 @@
 // See https://docusaurus.io/docs/site-config for all the possible
 // site configuration options.
 
-const repoUrl = 'https://github.com/mblink/http4s-routing';
+const repoUrl = 'https://github.com/mblink/routing';
 
 const siteConfig = {
-  title: 'http4s routing', // Title for your website.
-  tagline: 'Simple and type-safe forward and reverse routing for http4s',
+  title: 'routing', // Title for your website.
+  tagline: 'Simple, type-safe, and framework-agnostic forward and reverse routing',
   url: 'https://mblink.github.io', // Your website URL
-  baseUrl: '/http4s-routing/', // Base URL for your project */
+  baseUrl: '/routing/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
 
   // Used for publishing and more
-  projectName: 'http4s-routing',
+  projectName: 'routing',
   organizationName: 'mblink',
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
@@ -52,7 +52,7 @@ const siteConfig = {
   // This copyright info is used in /core/Footer.js and blog RSS/Atom feeds.
   copyright: `Copyright © ${new Date().getFullYear()} BondLink`,
 
-  customDocsPath: 'http4s-routing-docs/target/mdoc',
+  customDocsPath: 'routing-docs/target/mdoc',
 
   highlight: {
     // Highlight.js theme to use for syntax highlighting in code blocks.
