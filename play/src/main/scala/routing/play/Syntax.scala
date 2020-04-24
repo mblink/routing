@@ -3,7 +3,6 @@ package play
 
 import _root_.play.api.mvc.{Call => PlayCall, Handler => PlayHandler, RequestHeader => PlayRequest}
 import _root_.play.api.routing.{Router => PlayRouter}
-import routing.extractor.DestructuredRequest
 import routing.util.Show
 import scala.annotation.tailrec
 
@@ -29,9 +28,6 @@ object syntax {
   trait MkRouter {
     def apply(handlers: Handled[PlayHandler]*): PlayRouter =
       PlayRouter.from(Function.unlift(tryRoutes(_: PlayRequest, handlers)))
-
-    def of(pf: PartialFunction[DestructuredRequest.Aux[PlayRequest, String, QueryMap], PlayHandler]): PlayRouter =
-      PlayRouter.from(Function.unlift((req: PlayRequest) => pf.lift(req)))
   }
 
   implicit class PlayRouteObjectOps(val route: Route.type) extends AnyVal {

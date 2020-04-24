@@ -40,8 +40,8 @@ with QueryBuilder[M, P] { self =>
     pathParts(params).foreach { p =>
       b.append('/')
       p match {
-        case m: PathPart.Multi => b.append(m.show.split('/').map(urlEncode).mkString("/"))
-        case s: PathPart.Single => b.append(urlEncode(s.show))
+        case m: PathPart.Multi => b.append(m.show.split('/').map(pathUrlEncode).mkString("/"))
+        case s: PathPart.Single => b.append(pathUrlEncode(s.show))
       }
     }
     b.toString
@@ -67,16 +67,12 @@ with QueryBuilder[M, P] { self =>
   def applyRaw(params: Params): Call = callRaw(params)
   def apply(params: Any*): Call = macro macros.ApplyNested.impl
 
-  def unapply0(request: DestructuredRequest)(
-    implicit P: ExtractPathPart[request.ForwardPath],
-    Q: ExtractQueryPart[request.ForwardQuery],
-    R: RootPath[request.ForwardPath]
-  ): Option[Params] = {
+  def unapply0[Request](request: Request)(implicit R: ExtractRequest[Request]): Option[Params] = {
     val m = method
-    request.parts match {
+    R.parts(request) match {
       case Some((`m`, p, q)) =>
-        val root = R()
-        (matchPath(p), matchQuery(q)) match {
+        val root = R.rootPath()
+        (matchPath(p)(R.extractPath), matchQuery(q)(R.extractQuery)) match {
           case (Some((`root`, pp)), Some((_, qp))) => Some(mkParams(pp, qp))
           case _ => None
         }
@@ -84,12 +80,7 @@ with QueryBuilder[M, P] { self =>
     }
   }
 
-  def unapply[A](request: DestructuredRequest)(
-    implicit N: Nestable[A, Params],
-    P: ExtractPathPart[request.ForwardPath],
-    Q: ExtractQueryPart[request.ForwardQuery],
-    R: RootPath[request.ForwardPath]
-  ): Option[A] =
+  def unapply[Request, A](request: Request)(implicit R: ExtractRequest[Request], N: Nestable[A, Params]): Option[A] =
     unapply0(request).map(N.unnest(_))
 }
 

@@ -43,19 +43,16 @@ val service1: HttpRoutes[IO] = Route.httpRoutes(
 )
 ```
 
-If you prefer, you can call `Route.httpRoutes.of` with a partial function that matches on your `Route`s manually:
+If you prefer, you can call `HttpRoutes.of` with a partial function that matches on your `Route`s manually:
 
 ```scala mdoc
-val service2: HttpRoutes[IO] = Route.httpRoutes.of {
+val service2: HttpRoutes[IO] = HttpRoutes.of {
   case Login(_) => Ok("Login page")
   case Hello(name) => Ok(s"Hello, $name")
   case req @ BlogPost(slug, id) =>
-    Ok(s"Blog post with id: $id, slug: $slug found at ${req.request.uri}")
+    Ok(s"Blog post with id: $id, slug: $slug found at ${req.uri}")
 }
 ```
-
-*Note: the request captured in the third route is of type `routing.extractor.DestructuredRequest`. The original
-`org.http4s.Request[IO]` can be accessed with the `request` attribute as above.*
 
 You can confirm that routes are matched correctly by passing some test requests to the service:
 

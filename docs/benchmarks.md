@@ -19,7 +19,7 @@ val test = GET / "test"
 val routing = Route.httpRoutes[IO](test.handle.with_(_ => _ => Ok("test")))
 
 // 2. Built with http4s routing manual match syntax
-val routingManual = Route.httpRoutes.of[IO] { case test(_) => Ok("test") }
+val routingManual = HttpRoutes.of[IO] { case test(_) => Ok("test") }
 
 // 3. Built with explicit URL matches using http4s' DSL
 val http4s = HttpRoutes.of[IO] {

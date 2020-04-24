@@ -40,7 +40,7 @@ object helper {
     route5.handle.with_ { case (s, i) => _ => route5Res(s, i) }
   )
 
-  val routingManualService = Route.httpRoutes.of[IO] {
+  val routingManualService = HttpRoutes.of[IO] {
     case route1(_) => route1Res()
     case route2(param) => route2Res(param)
     case route3(param) => route3Res(param)

@@ -5,16 +5,6 @@ import _root_.play.api.mvc.RequestHeader
 import _root_.play.api.routing.sird.{PathExtractor => _, _}
 
 package object play {
-  implicit def playDestructuredRequest(r: RequestHeader): DestructuredRequest.Aux[RequestHeader, String, QueryMap] =
-    new DestructuredRequest {
-      type Request = RequestHeader
-      type ForwardPath = String
-      type ForwardQuery = QueryMap
-
-      lazy val request = r
-      lazy val parts = Method.fromString(r.method).map((_, r.path, r.queryString))
-    }
-
   implicit val playRootPath: RootPath[String] =
     new RootPath[String] {
       def apply(): String = "/"
@@ -40,6 +30,20 @@ package object play {
     new ExtractQueryPart[QueryMap] {
       def apply[A](query: QueryMap, key: String, extract: QueryExtractor[A]): Option[(A, QueryMap)] =
         extract.extract(key, query).map(_ -> query)
+    }
+
+  implicit def playExtractRequest: ExtractRequest.Aux[RequestHeader, String, QueryMap] =
+    new ExtractRequest[RequestHeader] {
+      type ForwardPath = String
+      type ForwardQuery = QueryMap
+
+      def parts(request: RequestHeader): Option[(Method, String, QueryMap)] =
+        Method.fromString(request.method).map((_, request.path,
+          request.queryString.map { case (k, v) => k -> v.map(queryUrlDecode) }))
+
+      lazy val rootPath = playRootPath
+      lazy val extractPath = playExtractPathPart
+      lazy val extractQuery = playExtractQueryPart
     }
 
   implicit def toPlayCallOps(call: Call): syntax.PlayCallOps = new syntax.PlayCallOps(call)

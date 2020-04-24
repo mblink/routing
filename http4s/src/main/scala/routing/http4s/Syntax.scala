@@ -3,11 +3,7 @@ package http4s
 
 import cats.{Applicative, Defer}
 import cats.data.OptionT
-import cats.instances.option._
-import cats.syntax.traverse._
 import org.{http4s => h}
-import org.http4s.dsl.impl.{Path => DslPath}
-import routing.extractor.DestructuredRequest
 import routing.util.Nestable
 import scala.annotation.tailrec
 
@@ -55,9 +51,6 @@ object syntax {
   trait MkHttpRoutes {
     def apply[F[_]: Applicative: Defer](handlers: Handled[h.Request[F] => F[h.Response[F]]]*): h.HttpRoutes[F] =
       h.HttpRoutes[F](tryRoutes(_, handlers))
-
-    def of[F[_]: Applicative: Defer](pf: PartialFunction[DestructuredRequest.Aux[h.Request[F], DslPath, QueryMap], F[h.Response[F]]]): h.HttpRoutes[F] =
-      h.HttpRoutes[F](req => OptionT(Defer[F].defer(pf.lift(req).sequence)))
   }
 
   implicit class Http4sRouteObjectOps(val route: Route.type) extends AnyVal {

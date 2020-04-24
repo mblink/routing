@@ -47,7 +47,7 @@ lazy val http4s = project.in(file("http4s"))
       http4sDsl
     )
   )
-  .dependsOn(core)
+  .dependsOn(core % "compile->compile;test->test")
 
 lazy val play = project.in(file("play"))
   .settings(commonSettings)
@@ -57,7 +57,7 @@ lazy val play = project.in(file("play"))
     name := "routing-play",
     libraryDependencies += playCore.value
   )
-  .dependsOn(core)
+  .dependsOn(core % "compile->compile;test->test")
 
 lazy val bench = project.in(file("bench"))
   .settings(commonSettings)

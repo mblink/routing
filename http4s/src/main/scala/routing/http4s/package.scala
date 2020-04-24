@@ -6,16 +6,6 @@ import org.http4s.dsl.impl.{:?, /:, +&, ->, Path => DslPath, Root => DslRoot}
 import routing.util.dummy._
 
 package object http4s {
-  implicit def http4sDestructuredRequest[F[_]](r: Http4sRequest[F]): DestructuredRequest.Aux[Http4sRequest[F], DslPath, QueryMap] =
-    new DestructuredRequest {
-      type Request = Http4sRequest[F]
-      type ForwardPath = DslPath
-      type ForwardQuery = QueryMap
-
-      lazy val request = r
-      lazy val parts = r match { case m -> p :? q => Method.fromString(m.name).map((_, p, q)) }
-    }
-
   implicit val http4sRootPath: RootPath[DslPath] =
     new RootPath[DslPath] {
       def apply(): DslPath = DslRoot
@@ -45,6 +35,21 @@ package object http4s {
         query match {
           case m +& rest => extract.extract(key, m).map(_ -> rest)
         }
+    }
+
+  implicit def http4sExtractRequest[F[_]]: ExtractRequest.Aux[Http4sRequest[F], DslPath, QueryMap] =
+    new ExtractRequest[Http4sRequest[F]] {
+      type ForwardPath = DslPath
+      type ForwardQuery = QueryMap
+
+      def parts(request: Http4sRequest[F]): Option[(Method, DslPath, QueryMap)] =
+        request match {
+          case m -> p :? q =>
+            Method.fromString(m.name).map((_, p, q.map { case (k, v) => k -> v.map(queryUrlDecode) }))
+        }
+      lazy val rootPath = http4sRootPath
+      lazy val extractPath = http4sExtractPathPart
+      lazy val extractQuery = http4sExtractQueryPart
     }
 
   implicit def toHttp4sMethodOps(method: Method): syntax.Http4sMethodOps = new syntax.Http4sMethodOps(method)

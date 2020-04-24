@@ -43,10 +43,10 @@ val router1: Router = Route.router(
 )
 ```
 
-If you prefer, you can call `Route.router.of` with a partial function that matches on your `Route`s manually:
+If you prefer, you can call `Router.from` with a partial function that matches on your `Route`s manually:
 
 ```scala mdoc
-val router2: Router = Route.router.of {
+val router2: Router = Router.from {
   case Login(_) => action(Results.Ok("Login page"))
   case Hello(name) => action(Results.Ok(s"Hello, $name"))
   case BlogPost(slug, id) =>
