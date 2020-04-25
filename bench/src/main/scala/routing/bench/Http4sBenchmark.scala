@@ -2,13 +2,13 @@ package routing
 package bench
 
 import cats.effect.IO
+import izumi.reflect.macrortti.LTT
 import org.http4s._
 import org.http4s.dsl.io._
 import org.openjdk.jmh.annotations._
 import routing.http4s._
-import izumi.reflect.macrortti.LTT
 
-object helper {
+object http4sHelper {
   object Id extends QueryParamDecoderMatcher[Int]("id")
   object Enabled extends QueryParamDecoderMatcher[Boolean]("enabled")
 
@@ -70,10 +70,10 @@ object helper {
     routes.run(reqs.next).value.flatMap(_.get.as[String]).unsafeRunSync
 }
 
-class ServiceBenchmark {
-  import helper._
+class Http4sBenchmark {
+  import http4sHelper._
 
-  @Benchmark def http4s: String = run(http4sService)
+  // @Benchmark def http4s: String = run(http4sService)
   @Benchmark def routing: String = run(routingService)
-  @Benchmark def routingManual: String = run(routingManualService)
+  // @Benchmark def routingManual: String = run(routingManualService)
 }

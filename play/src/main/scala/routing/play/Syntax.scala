@@ -14,11 +14,11 @@ object syntax {
   @tailrec
   private def tryRoutes(
     request: PlayRequest,
-    handlers: collection.Seq[Handled[PlayHandler]]
+    handlers: List[Handled[PlayHandler]]
   ): Option[PlayHandler] =
     handlers match {
-      case Seq() => None
-      case handler +: rest =>
+      case Nil => None
+      case handler :: rest =>
         handler.route.unapplyNested(request) match {
           case Some(params) => Some(handler.handleNested(params))
           case None => tryRoutes(request, rest)
@@ -27,7 +27,7 @@ object syntax {
 
   trait MkRouter {
     def apply(handlers: Handled[PlayHandler]*): PlayRouter =
-      PlayRouter.from(Function.unlift(tryRoutes(_: PlayRequest, handlers)))
+      PlayRouter.from(Function.unlift(tryRoutes(_: PlayRequest, handlers.toList)))
   }
 
   implicit class PlayRouteObjectOps(val route: Route.type) extends AnyVal {

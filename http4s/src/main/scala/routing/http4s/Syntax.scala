@@ -37,11 +37,11 @@ object syntax {
   @tailrec
   private def tryRoutes[F[_]: Applicative](
     request: h.Request[F],
-    handlers: collection.Seq[Handled[h.Request[F] => F[h.Response[F]]]]
+    handlers: List[Handled[h.Request[F] => F[h.Response[F]]]]
   ): OptionT[F, h.Response[F]] =
     handlers match {
-      case Seq() => OptionT.none[F, h.Response[F]]
-      case handler +: rest =>
+      case Nil => OptionT.none[F, h.Response[F]]
+      case handler :: rest =>
         handler.route.unapplyNested(request) match {
           case Some(params) => OptionT.liftF(handler.handleNested(params)(request))
           case None => tryRoutes(request, rest)
@@ -50,7 +50,7 @@ object syntax {
 
   trait MkHttpRoutes {
     def apply[F[_]: Applicative: Defer](handlers: Handled[h.Request[F] => F[h.Response[F]]]*): h.HttpRoutes[F] =
-      h.HttpRoutes[F](tryRoutes(_, handlers))
+      h.HttpRoutes[F](tryRoutes(_, handlers.toList))
   }
 
   implicit class Http4sRouteObjectOps(val route: Route.type) extends AnyVal {
