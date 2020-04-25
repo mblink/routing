@@ -7,7 +7,8 @@ import routing.part._
 import routing.util._
 
 abstract class Route[M <: Method, P]
-extends PathBuilder[M, P]
+extends RouteMethods[M, P]
+with PathBuilder[M, P]
 with QueryBuilder[M, P] { self =>
   final type Method = M
   final type Params = P
@@ -46,26 +47,20 @@ with QueryBuilder[M, P] { self =>
     }
     b.toString
   }
-  def path(params: Any*): ReversePath = macro macros.ApplyNested.impl
 
   def queryRaw(params: Params): ReverseQuery = queryParts(params).flatMap(_.show)
-  def query(params: Any*): ReverseQuery = macro macros.ApplyNested.impl
 
   def uriRaw(params: Params): ReverseUri = ReverseUri(method, pathRaw(params), queryRaw(params))
-  def uri(params: Any*): ReverseUri = macro macros.ApplyNested.impl
 
   def urlRaw(params: Params): ReverseUri = uriRaw(params)
-  def url(params: Any*): ReverseUri = macro macros.ApplyNested.impl
 
   def callRaw(params0: Params): Call = new Call {
     type Params = self.Params
     val route: self.type = self
     lazy val params = params0
   }
-  def call(params: Any*): Call = macro macros.ApplyNested.impl
 
   def applyRaw(params: Params): Call = callRaw(params)
-  def apply(params: Any*): Call = macro macros.ApplyNested.impl
 
   def unapplyNested[Request](request: Request)(implicit R: ExtractRequest[Request]): Option[Params] = {
     val m = method

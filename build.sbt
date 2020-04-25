@@ -16,8 +16,7 @@ lazy val core = project.in(file("core"))
     name := "routing-core",
     libraryDependencies ++= Seq(
       catsCore % Optional,
-      izumiReflect,
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+      izumiReflect
     ),
     sourceGenerators in Compile += Def.task {
       val generators = new File("git rev-parse --show-toplevel".!!.trim) / "generators"
@@ -31,7 +30,7 @@ lazy val core = project.in(file("core"))
 
       Seq(
         gen("NestableInstances.scala", "nestable_instances.rb"),
-        // gen("RouteMethods.scala", "route_methods.rb")
+        gen("RouteMethods.scala", "route_methods.rb")
       )
     }
   )
