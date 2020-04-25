@@ -104,3 +104,7 @@ unhandled(Method.GET, "/fake")
 // Not handled by `Hello` because the method doesn't match
 unhandled(Method.POST, "/hello/world")
 ```
+
+```scala mdoc:invisible
+actorSystem.terminate
+```

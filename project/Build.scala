@@ -7,18 +7,8 @@ import sbt.Keys._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.12.11", "2.13.1")
+  lazy val scalaVersions = Seq("2.12.11", "2.13.2")
   lazy val silencerVersion = "1.6.0"
-
-  val splainSettings = Seq(
-    addCompilerPlugin("io.tryp" % "splain" % "0.5.1" cross CrossVersion.patch),
-    scalacOptions ++= Seq(
-      "-P:splain:all",
-      "-P:splain:foundreq:false",
-      "-P:splain:keepmodules:500",
-      "-P:splain:rewrite:^((([^\\.]+\\.)*)([^\\.]+))\\.Type$/$1"
-    )
-  )
 
   def profileTraceOpts(baseDir: File, name: String): Seq[String] = {
     val dir = baseDir / ".traces"
@@ -33,7 +23,7 @@ object Build {
       case _ => Seq()
     }
 
-  val commonSettings = splainSettings ++ Seq(
+  val commonSettings = Seq(
     organization := "bondlink",
     crossScalaVersions := scalaVersions,
     scalaVersion := scalaVersions.find(_.startsWith("2.13")).get,

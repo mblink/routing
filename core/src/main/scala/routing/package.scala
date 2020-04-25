@@ -25,5 +25,5 @@ package object routing extends routing.Handled.Ops {
   private[routing] def queryUrlDecode(s: String): String = URLDecoder.decode(s, utf8)
   private[routing] def queryUrlEncode(s: String): String = URLEncoder.encode(s, utf8)
 
-  private[routing] def pathUrlEncode(s: String): String = queryUrlEncode(s).replaceAllLiterally("+", "%20")
+  private[routing] def pathUrlEncode(s: String): String = queryUrlEncode(s).replace("+", "%20")
 }
