@@ -19,7 +19,7 @@ object syntax {
     handlers match {
       case Seq() => None
       case handler +: rest =>
-        handler.route.unapply0(request) match {
+        handler.route.unapplyNested(request) match {
           case Some(params) => Some(handler.handleNested(params))
           case None => tryRoutes(request, rest)
         }

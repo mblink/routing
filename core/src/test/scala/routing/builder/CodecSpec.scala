@@ -66,7 +66,7 @@ abstract class CodecSpec(name: String) extends Properties(s"$name.codec") {
   ): Prop =
     matches(s"$raw decoding",
       Some(((), str.patch(raw))),
-      route.unapply0(mkReq(mkUri(str.patch(encoded)))))
+      route.unapplyNested(mkReq(mkUri(str.patch(encoded)))))
 
   def testEncode(route: Route[Method.GET.type, (Unit, String)])(
     mkExpectedUri: String => String,

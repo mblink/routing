@@ -31,7 +31,7 @@ object syntax {
 
   implicit class Http4sRouteOps[M <: Method, P](val route: Route[M, P]) extends AnyVal {
     def unapply[F[_], A](request: h.Request[F])(implicit N: Nestable[A, P]): Option[A] =
-      route.unapply0(request).map(N.unnest(_))
+      route.unapplyNested(request).map(N.unnest(_))
   }
 
   @tailrec
@@ -42,7 +42,7 @@ object syntax {
     handlers match {
       case Seq() => OptionT.none[F, h.Response[F]]
       case handler +: rest =>
-        handler.route.unapply0(request) match {
+        handler.route.unapplyNested(request) match {
           case Some(params) => OptionT.liftF(handler.handleNested(params)(request))
           case None => tryRoutes(request, rest)
         }

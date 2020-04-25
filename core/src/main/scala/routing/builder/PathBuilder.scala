@@ -51,7 +51,7 @@ trait PathBuilder[M <: Method, P] { self: Route[M, P] =>
       identity _,
       self.mkParams(_, _),
       _ => PathPart.single(s),
-      PathExtractor.stringPathExtractor(_.filter(_ == s)),
+      PathExtractor.stringPathExtractor(Some(_).filter(_ == s)),
       (pp, _) => pp,
       None)
 

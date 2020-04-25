@@ -67,7 +67,7 @@ with QueryBuilder[M, P] { self =>
   def applyRaw(params: Params): Call = callRaw(params)
   def apply(params: Any*): Call = macro macros.ApplyNested.impl
 
-  def unapply0[Request](request: Request)(implicit R: ExtractRequest[Request]): Option[Params] = {
+  def unapplyNested[Request](request: Request)(implicit R: ExtractRequest[Request]): Option[Params] = {
     val m = method
     R.parts(request) match {
       case Some((`m`, p, q)) =>
@@ -81,7 +81,7 @@ with QueryBuilder[M, P] { self =>
   }
 
   def unapply[Request, A](request: Request)(implicit R: ExtractRequest[Request], N: Nestable[A, Params]): Option[A] =
-    unapply0(request).map(N.unnest(_))
+    unapplyNested(request).map(N.unnest(_))
 }
 
 object Route {
