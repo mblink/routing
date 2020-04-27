@@ -73,7 +73,7 @@ object http4sHelper {
 class Http4sBenchmark {
   import http4sHelper._
 
-  // @Benchmark def http4s: String = run(http4sService)
+  @Benchmark def http4s: String = run(http4sService)
   @Benchmark def routing: String = run(routingService)
-  // @Benchmark def routingManual: String = run(routingManualService)
+  @Benchmark def routingManual: String = run(routingManualService)
 }
