@@ -6,7 +6,8 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 lazy val routing = project.in(file("."))
   .settings(commonSettings)
-  .aggregate(core, http4s, play, example)
+  .settings(noPublishSettings)
+  .aggregate(core, http4s, play, bench, example)
 
 lazy val core = project.in(file("core"))
   .settings(commonSettings)
@@ -60,6 +61,7 @@ lazy val play = project.in(file("play"))
 
 lazy val bench = project.in(file("bench"))
   .settings(commonSettings)
+  .settings(noPublishSettings)
   .settings(name := "bench")
   .dependsOn(core, http4s, play)
   .enablePlugins(JmhPlugin)
@@ -80,6 +82,7 @@ lazy val docs = project.in(file("routing-docs"))
 
 lazy val example = project.in(file("example"))
   .settings(commonSettings)
+  .settings(noPublishSettings)
   .settings(
     name := "routing-example",
     libraryDependencies ++= Seq(
@@ -89,7 +92,8 @@ lazy val example = project.in(file("example"))
       "org.http4s" %% "http4s-blaze-server" % http4sVersion,
       "org.slf4j" % "slf4j-api" % "1.7.30",
       "org.slf4j" % "slf4j-simple" % "1.7.30"
-    )
+    ),
+    bintrayRelease := {}
   )
   .dependsOn(core, http4s, play)
 

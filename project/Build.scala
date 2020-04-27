@@ -48,6 +48,12 @@ object Build {
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
   )
 
+  val noPublishSettings = Seq(
+    publish := {},
+    publishLocal := {},
+    bintrayRelease := {}
+  )
+
   val scalacheckVersion = "1.14.3"
   val scalacheckDep = "org.scalacheck" %% "scalacheck" % scalacheckVersion
 
