@@ -8,7 +8,7 @@ lazy val routing = project.in(file("."))
   .settings(commonSettings)
   .settings(noPublishSettings)
   .settings(crossScalaVersions := Seq())
-  .aggregate(core, http4s, play, bench, example)
+  .aggregate(core, http4s, play, example)
 
 lazy val core = project.in(file("core"))
   .settings(commonSettings)
@@ -63,10 +63,7 @@ lazy val play = project.in(file("play"))
 lazy val bench = project.in(file("bench"))
   .settings(commonSettings)
   .settings(noPublishSettings)
-  .settings(
-    name := "bench",
-    crossScalaVersions := crossScalaVersions.value.filter(_.startsWith("2.13"))
-  )
+  .settings(name := "bench")
   .dependsOn(core, http4s, play)
   .enablePlugins(JmhPlugin)
 
