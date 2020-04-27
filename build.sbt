@@ -7,6 +7,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 lazy val routing = project.in(file("."))
   .settings(commonSettings)
   .settings(noPublishSettings)
+  .settings(crossScalaVersions := Seq())
   .aggregate(core, http4s, play, bench, example)
 
 lazy val core = project.in(file("core"))
@@ -62,7 +63,10 @@ lazy val play = project.in(file("play"))
 lazy val bench = project.in(file("bench"))
   .settings(commonSettings)
   .settings(noPublishSettings)
-  .settings(name := "bench")
+  .settings(
+    name := "bench",
+    crossScalaVersions := crossScalaVersions.value.filter(_.startsWith("2.13"))
+  )
   .dependsOn(core, http4s, play)
   .enablePlugins(JmhPlugin)
 
