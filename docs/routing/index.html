@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Routing · http4s routing</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Once you&#x27;ve built your `Route`s, they can be used to route http4s requests to specific application logic. Each route contains enough information to match it against a request and extract the relevant parameters from the request&#x27;s path and query string, so all you need to do is specify the route-specific handling logic. Assuming you have the test routes:"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Routing · http4s routing"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mblink.github.io/http4s-routing/"/><meta property="og:description" content="Once you&#x27;ve built your `Route`s, they can be used to route http4s requests to specific application logic. Each route contains enough information to match it against a request and extract the relevant parameters from the request&#x27;s path and query string, so all you need to do is specify the route-specific handling logic. Assuming you have the test routes:"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/http4s-routing/img/routing.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/http4s-routing/js/scrollSpy.js"></script><link rel="stylesheet" href="/http4s-routing/css/main.css"/><script src="/http4s-routing/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/http4s-routing/"><img class="logo" src="/http4s-routing/img/routing.png" alt="http4s routing"/><h2 class="headerTitleWithLogo">http4s routing</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/http4s-routing/docs/installation" target="_self">Docs</a></li><li class=""><a href="https://github.com/mblink/http4s-routing" target="_blank">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Documentation</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Documentation</h3><ul class=""><li class="navListItem"><a class="navItem" href="/http4s-routing/docs/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/http4s-routing/docs/routes">Routes</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/http4s-routing/docs/routing">Routing</a></li><li class="navListItem"><a class="navItem" href="/http4s-routing/docs/reverse-routing">Reverse Routing</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">More</h3><ul class=""><li class="navListItem"><a class="navItem" href="/http4s-routing/docs/benchmarks">Benchmarks</a></li><li class="navListItem"><a class="navItem" href="/http4s-routing/docs/example">Example</a></li></ul></div></div></section></div><script>
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Routing · routing</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Once you&#x27;ve built your `Route`s, they can be used to route HTTP requests to specific application logic. Each route"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Routing · routing"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mblink.github.io/routing/"/><meta property="og:description" content="Once you&#x27;ve built your `Route`s, they can be used to route HTTP requests to specific application logic. Each route"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/routing/img/routing.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/routing/js/scrollSpy.js"></script><link rel="stylesheet" href="/routing/css/main.css"/><script src="/routing/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/routing/"><img class="logo" src="/routing/img/routing.png" alt="routing"/><h2 class="headerTitleWithLogo">routing</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/routing/docs/installation" target="_self">Docs</a></li><li class=""><a href="https://github.com/mblink/routing" target="_blank">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Documentation</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Documentation</h3><ul class=""><li class="navListItem"><a class="navItem" href="/routing/docs/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/routes">Routes</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/routing/docs/routing">Routing</a></li><div class="navGroup subNavGroup"><h4 class="navGroupSubcategoryTitle">Implementations</h4><ul><li class="navListItem"><a class="navItem" href="/routing/docs/implementations">Choosing an implementation</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/implementations/http4s">http4s</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/implementations/play">Play Framework</a></li></ul></div><li class="navListItem"><a class="navItem" href="/routing/docs/reverse-routing">Reverse Routing</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">More</h3><ul class=""><li class="navListItem"><a class="navItem" href="/routing/docs/benchmarks">Benchmarks</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/example">Example</a></li></ul></div></div></section></div><script>
             var coll = document.getElementsByClassName('collapsible');
             var checkActiveCategory = true;
             for (var i = 0; i < coll.length; i++) {
@@ -54,100 +54,31 @@
                 };
               }
             });
-        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Routing</h1></header><article><div><span><p>Once you've built your <code>Route</code>s, they can be used to route http4s requests to specific application logic. Each route contains enough information to match it against a request and extract the relevant parameters from the request's path and query string, so all you need to do is specify the route-specific handling logic. Assuming you have the test routes:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> cats.instances.int._
-<span class="hljs-keyword">import</span> cats.instances.string._
-<span class="hljs-keyword">import</span> org.http4s.dsl.io._
-<span class="hljs-keyword">import</span> org.http4s.routing._
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Routing</h1></header><article><div><span><p>Once you've built your <code>Route</code>s, they can be used to route HTTP requests to specific application logic. Each route
+contains enough information to match it against a request and extract the relevant parameters from the request's path
+and query string, so all you need to do is specify the route-specific handling logic. Assuming you have the test routes:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> routing._
 
-<span class="hljs-keyword">val</span> <span class="hljs-type">Login</span> = <span class="hljs-type">GET</span> / <span class="hljs-string">"login"</span>
-<span class="hljs-comment">// Login: Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody} = /login</span>
-<span class="hljs-keyword">val</span> <span class="hljs-type">Hello</span> = <span class="hljs-type">GET</span> / <span class="hljs-string">"hello"</span> / (<span class="hljs-string">"name"</span> -&gt; <span class="hljs-type">StringVar</span>)
-<span class="hljs-comment">// Hello: Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody} = /hello/&lt;name: String&gt;</span>
-<span class="hljs-keyword">val</span> <span class="hljs-type">BlogPost</span> = <span class="hljs-type">GET</span> / <span class="hljs-string">"post"</span> / (<span class="hljs-string">"slug"</span> -&gt; <span class="hljs-type">StringVar</span>) :? queryParam[<span class="hljs-type">Int</span>](<span class="hljs-string">"id"</span>)
-<span class="hljs-comment">// BlogPost: Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody} = /post/&lt;slug: String&gt;?&lt;id: Int&gt;</span>
+<span class="hljs-keyword">val</span> <span class="hljs-type">Login</span> = <span class="hljs-type">Method</span>.<span class="hljs-type">GET</span> / <span class="hljs-string">"login"</span>
+<span class="hljs-comment">// Login: Route[Method.GET.type, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = routing.Method.GET.type} = /login</span>
+<span class="hljs-keyword">val</span> <span class="hljs-type">Hello</span> = <span class="hljs-type">Method</span>.<span class="hljs-type">GET</span> / <span class="hljs-string">"hello"</span> / pathVar[<span class="hljs-type">String</span>](<span class="hljs-string">"name"</span>)
+<span class="hljs-comment">// Hello: Route[Method.GET.type, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = routing.Method.GET.type} = /hello/&lt;name: String&gt;</span>
+<span class="hljs-keyword">val</span> <span class="hljs-type">BlogPost</span> = <span class="hljs-type">Method</span>.<span class="hljs-type">GET</span> / <span class="hljs-string">"post"</span> / pathVar[<span class="hljs-type">String</span>](<span class="hljs-string">"slug"</span>) :? queryParam[<span class="hljs-type">Int</span>](<span class="hljs-string">"id"</span>)
+<span class="hljs-comment">// BlogPost: Route[Method.GET.type, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = routing.Method.GET.type} = /post/&lt;slug: String&gt;?&lt;id: Int&gt;</span>
 </code></pre>
-<p>Then you can specify the handling logic for a given route by calling <code>handle.with.logic_</code>, which takes a function of the type:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-comment">// where `P` is a tuple of the route's parameter types</span>
-<span class="hljs-type">Request</span>[<span class="hljs-type">F</span>] =&gt; <span class="hljs-type">P</span> =&gt; <span class="hljs-type">F</span>[<span class="hljs-type">Response</span>[<span class="hljs-type">F</span>]]
-</code></pre>
-<p>Here's how you could handle the routes above:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> cats.effect.<span class="hljs-type">IO</span>
-<span class="hljs-keyword">import</span> org.http4s.<span class="hljs-type">Request</span>
-
-<span class="hljs-keyword">val</span> handledLogin = <span class="hljs-type">Login</span>.handle.with_[<span class="hljs-type">IO</span>](_ =&gt; _ =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"Login page"</span>))
-<span class="hljs-comment">// handledLogin: Handled.Aux[IO, org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, Unit, Unit, Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody}] = org.http4s.routing.Handled$Ops$RouteHandlerOps$With$$anon$1@10c953cc</span>
-<span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle.with_[<span class="hljs-type">IO</span>](_ =&gt; name =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>))
-<span class="hljs-comment">// handledHello: Handled.Aux[IO, org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, String, (Unit, String), Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody}] = org.http4s.routing.Handled$Ops$RouteHandlerOps$With$$anon$1@7fcd42a2</span>
-<span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle.with_((req: <span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>]) =&gt; { <span class="hljs-keyword">case</span> (slug, id) =&gt;
-  <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>)
-})
-<span class="hljs-comment">// handledBlogPost: Handled.Aux[IO, org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, (String, Int), ((Unit, String), Int), Route[org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = org.http4s.Method with org.http4s.Method.Semantics.Safe with org.http4s.Method.PermitsBody}] = org.http4s.routing.Handled$Ops$RouteHandlerOps$With$$anon$1@62ee3366</span>
-</code></pre>
-<p>And finally, you can compose your handled routes into a service by passing them to <code>Route.httpRoutes</code>:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> cats.effect.<span class="hljs-type">IO</span>
-<span class="hljs-keyword">import</span> org.http4s.<span class="hljs-type">HttpRoutes</span>
-
-<span class="hljs-keyword">val</span> service1: <span class="hljs-type">HttpRoutes</span>[<span class="hljs-type">IO</span>] = <span class="hljs-type">Route</span>.httpRoutes(
-  handledLogin,
-  handledHello,
-  handledBlogPost
-)
-<span class="hljs-comment">// service1: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.Http$$$Lambda$16574/1507257495@465ffffe</span>
-<span class="hljs-comment">// )</span>
-</code></pre>
-<p>If you prefer, you can build an <code>HttpRoutes</code> manually by matching on your <code>Route</code>s:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> service2: <span class="hljs-type">HttpRoutes</span>[<span class="hljs-type">IO</span>] = <span class="hljs-type">HttpRoutes</span>.of {
-  <span class="hljs-keyword">case</span> <span class="hljs-type">Login</span>(_) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"Login page"</span>)
-  <span class="hljs-keyword">case</span> <span class="hljs-type">Hello</span>(name) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>)
-  <span class="hljs-keyword">case</span> req @ <span class="hljs-type">BlogPost</span>(slug, id) =&gt;
-    <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>)
+<p>Then you can specify the handling logic for a given route by calling <code>handle.with_</code>. The argument passed to <code>with_</code>
+should be a function of the type <code>Params =&gt; Out</code> where <code>Params</code> is a tuple of the route's parameters and <code>Out</code> is any
+type you want to target with your handler.</p>
+<p>Here's how you could handle the routes above, simply returning a <code>String</code> for each route:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> handledLogin = <span class="hljs-type">Login</span>.handle.with_(_ =&gt; <span class="hljs-string">"Login page"</span>)
+<span class="hljs-comment">// handledLogin: Handled.Aux[Method.GET.type, Unit, Unit, Route[Method.GET.type, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = routing.Method.GET.type}, String] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@616c0991</span>
+<span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle.with_(name =&gt; <span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>)
+<span class="hljs-comment">// handledHello: Handled.Aux[Method.GET.type, String, (Unit, String), Route[Method.GET.type, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = routing.Method.GET.type}, String] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@48ad214f</span>
+<span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle.with_ { <span class="hljs-keyword">case</span> (slug, id) =&gt;
+  <span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found"</span>
 }
-<span class="hljs-comment">// service2: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$16575/682619860@1c5293ca</span>
-<span class="hljs-comment">// )</span>
+<span class="hljs-comment">// handledBlogPost: Handled.Aux[Method.GET.type, (String, Int), ((Unit, String), Int), Route[Method.GET.type, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = routing.Method.GET.type}, String] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@1b4dcd62</span>
 </code></pre>
-<p>You can confirm that routes are matched correctly by passing some test requests to the service:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.http4s.<span class="hljs-type">Request</span>
-
-<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">testRoute</span></span>(service: <span class="hljs-type">HttpRoutes</span>[<span class="hljs-type">IO</span>], call: <span class="hljs-type">Call</span>) =
-  service
-    .run(<span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>](method = call.route.method, uri = call.uri))
-    .value
-    .unsafeRunSync
-    .get
-    .as[<span class="hljs-type">String</span>]
-    .unsafeRunSync
-
-testRoute(service1, <span class="hljs-type">Login</span>())
-<span class="hljs-comment">// res0: String = "Login page"</span>
-testRoute(service1, <span class="hljs-type">Hello</span>(<span class="hljs-string">"world"</span>))
-<span class="hljs-comment">// res1: String = "Hello, world"</span>
-testRoute(service1, <span class="hljs-type">BlogPost</span>(<span class="hljs-string">"my-slug"</span>, <span class="hljs-number">1</span>))
-<span class="hljs-comment">// res2: String = "Blog post with id: 1, slug: my-slug found at /post/my-slug?id=1"</span>
-
-testRoute(service2, <span class="hljs-type">Login</span>())
-<span class="hljs-comment">// res3: String = "Login page"</span>
-testRoute(service2, <span class="hljs-type">Hello</span>(<span class="hljs-string">"world"</span>))
-<span class="hljs-comment">// res4: String = "Hello, world"</span>
-testRoute(service2, <span class="hljs-type">BlogPost</span>(<span class="hljs-string">"my-slug"</span>, <span class="hljs-number">1</span>))
-<span class="hljs-comment">// res5: String = "Blog post with id: 1, slug: my-slug found at /post/my-slug?id=1"</span>
-</code></pre>
-<p>You can also check that requests matching none of your routes are not handled by the service:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.http4s.{<span class="hljs-type">Method</span>, <span class="hljs-type">Uri</span>}
-
-<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">unhandled</span></span>(method: <span class="hljs-type">Method</span>, path: <span class="hljs-type">String</span>) =
-  service1
-    .run(<span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>](method = method, uri = <span class="hljs-type">Uri</span>(path = path)))
-    .value
-    .unsafeRunSync
-
-unhandled(<span class="hljs-type">GET</span>, <span class="hljs-string">"/fake"</span>)
-<span class="hljs-comment">// res6: Option[org.http4s.Response[IO]] = None</span>
-
-<span class="hljs-comment">// Not handled by `Hello` because the method doesn't match</span>
-unhandled(<span class="hljs-type">POST</span>, <span class="hljs-string">"/hello/world"</span>)
-<span class="hljs-comment">// res7: Option[org.http4s.Response[IO]] = None</span>
-</code></pre>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/http4s-routing/docs/routes"><span class="arrow-prev">← </span><span>Routes</span></a><a class="docs-next button" href="/http4s-routing/docs/reverse-routing"><span>Reverse Routing</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer" style="background-color:#333333"><section class="sitemap"><div><h5>Docs</h5><a href="/http4s-routing/docs/installation">Installation</a></div><div><h5>Community</h5></div><div><h5>More</h5><a href="https://github.com/mblink/http4s-routing">GitHub</a></div></section><section class="copyright">Copyright © 2020 BondLink</section></footer></div></body></html>
+<p>Of course the actual output type of your handlers will be dictated by the HTTP application framework you've chosen.
+See the <a href="/routing/docs/implementations">implementations documentation</a> for more examples.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/routing/docs/routes"><span class="arrow-prev">← </span><span>Routes</span></a><a class="docs-next button" href="/routing/docs/implementations"><span>Choosing an implementation</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer" style="background-color:#333333"><section class="sitemap"><div><h5>Docs</h5><a href="/routing/docs/installation">Installation</a></div><div><h5>Community</h5></div><div><h5>More</h5><a href="https://github.com/mblink/routing">GitHub</a></div></section><section class="copyright">Copyright © 2020 BondLink</section></footer></div></body></html>
