@@ -68,7 +68,7 @@ object Build {
   val catsCore = "org.typelevel" %% "cats-core" % "2.1.1"
   val izumiReflect = "dev.zio" %% "izumi-reflect" % "0.12.0-M1"
 
-  val http4sVersion = "0.21.3"
+  val http4sVersion = "0.21.4"
   val http4sCore = "org.http4s" %% "http4s-core" % http4sVersion
   val http4sDsl = "org.http4s" %% "http4s-dsl" % http4sVersion
 
