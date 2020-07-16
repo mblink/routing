@@ -65,7 +65,7 @@ trait PathBuilder[M <: Method, P] { self: Route[M, P] =>
       (_, _),
       Some(tt))
 
-  def */(t: (String, RestOfPath.type)): Route.Aux[Method, (PathParams, String), QueryParams, (Params, String)] { type Method = self.Method } =
+  def /(t: (String, RestOfPath.type)): Route.Aux[Method, (PathParams, String), QueryParams, (Params, String)] { type Method = self.Method } =
     new Route[self.Method, (Params, String)] {
       type PathParams = (self.PathParams, String)
       type QueryParams = self.QueryParams
