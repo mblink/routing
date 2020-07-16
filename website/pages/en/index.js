@@ -35,8 +35,8 @@ class HomeSplash extends React.Component {
           <small>{siteConfig.tagline}</small>
         </h2>
         <p>
-          Define your http4s application's routes as simple Scala values and use the built-in routing to match a
-          request's URL to a route and reverse routing to produce the URL of a route.
+          Define your HTTP application's routes as simple Scala values, produce a route's URL with reverse routing,
+          and use the provided http4s and Play Framework implementations to match and handle a request.
         </p>
       </div>
     );

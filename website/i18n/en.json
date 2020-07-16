@@ -3,28 +3,28 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "Simple and type-safe forward and reverse routing for http4s",
+    "tagline": "Simple, type-safe, and framework-agnostic forward and reverse routing",
     "docs": {
       "benchmarks": {
         "title": "Benchmarks"
       },
-      "building-routes": {
-        "title": "Building Routes"
-      },
       "example": {
         "title": "Example"
       },
-      "forward-routing": {
-        "title": "Forward Routing"
+      "implementations": {
+        "title": "Choosing an implementation"
+      },
+      "implementations/http4s": {
+        "title": "http4s"
+      },
+      "implementations/play": {
+        "title": "Play Framework"
       },
       "installation": {
         "title": "Installation"
       },
       "reverse-routing": {
         "title": "Reverse Routing"
-      },
-      "route": {
-        "title": "Route"
       },
       "routes": {
         "title": "Routes"

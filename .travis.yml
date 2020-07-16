@@ -1,0 +1,18 @@
+sudo: false
+language: scala
+scala:
+  - 2.12.11
+  - 2.13.2
+jdk:
+  - openjdk8
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION $([ "$TRAVIS_SCALA_VERSION" = '2.13.2' ] && echo 'test; docs/mdoc' || echo 'test')
+
+cache:
+  directories:
+    - "$HOME/.coursier/cache"
+    - "$HOME/.ivy2/cache"
+    - "$HOME/.sbt/boot"
+before_cache:
+  - find $HOME/.sbt -name "*.lock" | xargs rm
+  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
