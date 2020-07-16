@@ -56,7 +56,7 @@ lazy val play = project.in(file("play"))
   .settings(testSettings)
   .settings(
     name := "routing-play",
-    libraryDependencies += playCore.value
+    libraryDependencies += playCore
   )
   .dependsOn(core % "compile->compile;test->test")
 

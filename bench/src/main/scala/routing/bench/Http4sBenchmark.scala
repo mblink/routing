@@ -2,7 +2,7 @@ package routing
 package bench
 
 import cats.effect.IO
-import izumi.reflect.macrortti.LTT
+import izumi.reflect.macrortti.LightTypeTag
 import org.http4s._
 import org.http4s.dsl.io._
 import org.openjdk.jmh.annotations._

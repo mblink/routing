@@ -66,16 +66,11 @@ object Build {
   )
 
   val catsCore = "org.typelevel" %% "cats-core" % "2.1.1"
-  val izumiReflect = "dev.zio" %% "izumi-reflect" % "0.12.0-M1"
+  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.0.0-M4"
 
-  val http4sVersion = "0.21.4"
+  val http4sVersion = "0.21.6"
   val http4sCore = "org.http4s" %% "http4s-core" % http4sVersion
   val http4sDsl = "org.http4s" %% "http4s-dsl" % http4sVersion
 
-  val playCore = Def.setting {
-    "com.typesafe.play" %% "play" % (CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 12)) => "2.6.25"
-      case Some((2, 13)) => "2.8.1"
-    })
-  }
+  val playCore = "com.typesafe.play" %% "play" % "2.8.1"
 }

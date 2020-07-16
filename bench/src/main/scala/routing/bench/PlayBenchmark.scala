@@ -2,7 +2,7 @@ package routing
 package bench
 
 import akka.actor.ActorSystem
-import izumi.reflect.macrortti.LTT
+import izumi.reflect.macrortti.LightTypeTag
 import org.openjdk.jmh.annotations._
 import _root_.play.api.libs.typedmap.TypedMap
 import _root_.play.api.mvc.{ActionBuilder, EssentialAction, Headers, RequestHeader, Results}

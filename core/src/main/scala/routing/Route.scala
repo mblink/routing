@@ -1,6 +1,6 @@
 package routing
 
-import izumi.reflect.Tags.Tag
+import izumi.reflect.Tag
 import routing.builder._
 import routing.extractor._
 import routing.part._
