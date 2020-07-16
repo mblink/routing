@@ -8,6 +8,10 @@ trait PathExtractor[A] {
   def extract(path: String): Option[A]
 }
 
+// Dumb duplicate trait to force callers to acknowledge that the String they're
+// extracting from is the rest of the path and may contain multiple path segments
+trait RestOfPathExtractor[A] extends PathExtractor[A]
+
 object PathExtractor {
   def apply[A](implicit p: PathExtractor[A]): PathExtractor[A] = p
 

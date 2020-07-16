@@ -13,8 +13,7 @@ package object routing extends routing.Handled.Ops {
 
   def pathVar[A](name: String): (String, Option[A]) = name -> None
 
-  case object RestOfPath
-  def restOfPath(name: String): (String, RestOfPath.type) = name -> RestOfPath
+  def restOfPath[A](name: String): (String, builder.RestOfPath[A]) = name -> builder.RestOfPath()
 
   def queryParam[A](key: String): (String, Option[A]) = key -> None
   def multiQueryParam[A](key: String): (String, Option[List[A]]) = key -> None

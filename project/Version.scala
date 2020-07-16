@@ -1,3 +1,3 @@
 package object routing {
-  val currentVersion = "0.2.0-RC4"
+  val currentVersion = "0.2.0-RC5"
 }

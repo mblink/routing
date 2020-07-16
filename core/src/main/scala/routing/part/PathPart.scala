@@ -17,9 +17,9 @@ object PathPart extends UrlPart.Companion[PathPart] {
     lazy val show = s.show(a)
   }
 
-  def multi(s: String): Multi { type T = String } = new Multi {
-    type T = String
-    val value = s
-    lazy val show = s
+  def multi[A](a: A)(implicit s: Show[A]): Multi { type T = A } = new Multi {
+    type T = A
+    val value = a
+    lazy val show = s.show(a)
   }
 }

@@ -6,6 +6,8 @@ import routing.extractor._
 import routing.part._
 import routing.util.Show
 
+case class RestOfPath[A]()
+
 trait PathBuilder[M <: Method, P] { self: Route[M, P] =>
   private def nextPath[PP, PS, A: Tag](
     name: Either[String, String],
@@ -55,7 +57,7 @@ trait PathBuilder[M <: Method, P] { self: Route[M, P] =>
       (pp, _) => pp,
       None)
 
-  def /[V: Show](t: (String, Option[V]))(implicit s: Show[V], tt: Tag[V], P: PathExtractor[V]): Route.Aux[Method, (PathParams, V), QueryParams, (Params, V)] { type Method = self.Method } =
+  def /[V](t: (String, Option[V]))(implicit s: Show[V], tt: Tag[V], P: PathExtractor[V]): Route.Aux[Method, (PathParams, V), QueryParams, (Params, V)] { type Method = self.Method } =
     nextPath[(PathParams, V), (Params, V), V](
       Right(t._1),
       _._1,
@@ -65,27 +67,29 @@ trait PathBuilder[M <: Method, P] { self: Route[M, P] =>
       (_, _),
       Some(tt))
 
-  def /(t: (String, RestOfPath.type)): Route.Aux[Method, (PathParams, String), QueryParams, (Params, String)] { type Method = self.Method } =
-    new Route[self.Method, (Params, String)] {
-      type PathParams = (self.PathParams, String)
+  def /[V](t: (String, RestOfPath[V]))(implicit s: Show[V], tt: Tag[V], PX: RestOfPathExtractor[V]): Route.Aux[Method, (PathParams, V), QueryParams, (Params, V)] { type Method = self.Method } =
+    new Route[self.Method, (Params, V)] {
+      type PathParams = (self.PathParams, V)
       type QueryParams = self.QueryParams
 
       def mkParams(pp: PathParams, qp: QueryParams): Params = (self.mkParams(pp._1, qp), pp._2)
 
-      lazy val show = self.show |+| Route.shownPath[String](Right(t._1 + "*"))
+      lazy val show = self.show |+| Route.shownPath[V](Right(t._1 + "*"))
 
       lazy val method = self.method
-      def pathParts(params: Params): Vector[PathPart] = self.pathParts(params._1) :+ PathPart.multi(params._2)
-      def queryParts(params: Params): Vector[QueryPart] = self.queryParts(params._1)
+      def pathParts(params: Params): Vector[PathPart] =
+        self.pathParts(params._1) :+ PathPart.multi((t._1, params._2))(Show.show(x => s.show(x._2)))
+      def queryParts(params: Params): Vector[QueryPart] =
+        self.queryParts(params._1)
 
-      lazy val paramTpes = self.paramTpes :+ Tag[String]
+      lazy val paramTpes = self.paramTpes :+ tt
 
       def matchPath[ForwardPath](path: ForwardPath)(
         implicit P: ExtractPathPart[ForwardPath]
       ): Option[(ForwardPath, PathParams)] =
         self.matchPath(path).flatMap { case (p, ps) =>
           P.rest(p) match {
-            case Some((s, rest)) => Some((rest, (ps, s)))
+            case Some((s, rest)) => PX.extract(s).map(a => (rest, (ps, a)))
             case _ => None
           }
         }
