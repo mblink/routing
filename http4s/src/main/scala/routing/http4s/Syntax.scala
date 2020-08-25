@@ -26,7 +26,7 @@ object syntax {
 
   implicit class Http4sReverseUriOps(val uri: ReverseUri) extends AnyVal {
     def toHttp4s: h.Uri =
-      h.Uri(path = uri.path, query = (new Http4sReverseQueryOps(uri.query)).toHttp4s)
+      h.Uri(path = h.Uri.Path.fromString(uri.path), query = (new Http4sReverseQueryOps(uri.query)).toHttp4s)
   }
 
   implicit class Http4sRouteOps[M <: Method, P](val route: Route[M, P]) extends AnyVal {

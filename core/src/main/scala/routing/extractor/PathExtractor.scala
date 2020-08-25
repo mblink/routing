@@ -24,7 +24,7 @@ object PathExtractor {
       def extract(path: String): Option[String] = f(path)
     }
 
-  implicit val stringPathExtractor: PathExtractor[String] = stringPathExtractor(Some(_))
+  implicit val stringPathExtractor: PathExtractor[String] = stringPathExtractor(Some(_).filter(_.nonEmpty))
   implicit val intPathExtractor: PathExtractor[Int] = inst(s => Try(s.toInt))
   implicit val longPathExtractor: PathExtractor[Long] = inst(s => Try(s.toLong))
   implicit val booleanPathExtractor: PathExtractor[Boolean] = inst(s => Try(s.toBoolean))

@@ -28,7 +28,8 @@ sealed trait QueryBuilderLP[M <: Method, P] { self: Route[M, P] =>
     lazy val paramTpes = self.paramTpes :+ tt
 
     def matchPath[ForwardPath](path: ForwardPath)(
-      implicit P: ExtractPathPart[ForwardPath]
+      implicit P: ExtractPathPart[ForwardPath],
+      R: RootPath[ForwardPath]
     ): Option[(ForwardPath, PathParams)] = self.matchPath(path)
 
     def matchQuery[ForwardQuery](params: ForwardQuery)(

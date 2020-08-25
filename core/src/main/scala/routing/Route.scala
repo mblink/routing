@@ -19,7 +19,8 @@ with QueryBuilder[M, P] { self =>
   def mkParams(pp: PathParams, qp: QueryParams): Params
 
   def matchPath[ForwardPath](path: ForwardPath)(
-    implicit P: ExtractPathPart[ForwardPath]
+    implicit P: ExtractPathPart[ForwardPath],
+    R: RootPath[ForwardPath]
   ): Option[(ForwardPath, PathParams)]
 
   def matchQuery[ForwardQuery](params: ForwardQuery)(
@@ -67,7 +68,7 @@ with QueryBuilder[M, P] { self =>
     R.parts(request) match {
       case Some((`m`, p, q)) =>
         val root = R.rootPath()
-        (matchPath(p)(R.extractPath), matchQuery(q)(R.extractQuery)) match {
+        (matchPath(p)(R.extractPath, R.rootPath), matchQuery(q)(R.extractQuery)) match {
           case (Some((`root`, pp)), Some((_, qp))) => Some(mkParams(pp, qp))
           case _ => None
         }
@@ -77,6 +78,9 @@ with QueryBuilder[M, P] { self =>
 
   def unapply[Request, A](request: Request)(implicit R: ExtractRequest[Request], N: Nestable[A, Params]): Option[A] =
     unapplyNested(request).map(N.unnest(_))
+
+  def withFallback(other: Route[Method, Params]): Route.Aux[Method, self.PathParams, self.QueryParams, Params] =
+    new Route.WithFallback[Method, Params, self.type, other.type](self, other) {}
 }
 
 object Route {
@@ -85,25 +89,7 @@ object Route {
     type QueryParams = QP
   }
 
-  abstract class From[M <: Method, P](val r: Route[M, P]) extends Route[M, P] {
-    type PathParams = r.PathParams
-    type QueryParams = r.QueryParams
-
-    def mkParams(pp: PathParams, qp: QueryParams): Params = r.mkParams(pp, qp)
-    def matchPath[ForwardPath](path: ForwardPath)(
-      implicit P: ExtractPathPart[ForwardPath]
-    ): Option[(ForwardPath, PathParams)] = r.matchPath(path)
-    def matchQuery[ForwardQuery](params: ForwardQuery)(
-      implicit Q: ExtractQueryPart[ForwardQuery]
-    ): Option[(ForwardQuery, QueryParams)] = r.matchQuery(params)
-    def method: Method = r.method
-    def paramTpes: Vector[Tag[_]] = r.paramTpes
-    def pathParts(params: Params): Vector[PathPart] = r.pathParts(params)
-    def queryParts(params: Params): Vector[QueryPart] = r.queryParts(params)
-    def show: Shown = r.show
-  }
-
-  def empty[M <: Method](m: M): Aux[M, Unit, Unit, Unit] = new Route[M, Unit] { self =>
+  abstract class Root[M <: Method](val method: M) extends Route[M, Unit] {
     type PathParams = Unit
     type QueryParams = Unit
 
@@ -111,21 +97,65 @@ object Route {
 
     lazy val show = Shown(Vector(), Vector())
 
-    lazy val method = m
     def pathParts(u: Unit) = Vector()
     def queryParts(u: Unit) = Vector()
 
     lazy val paramTpes = Vector()
 
     def matchPath[ForwardPath](path: ForwardPath)(
-      implicit P: ExtractPathPart[ForwardPath]
+      implicit P: ExtractPathPart[ForwardPath],
+      R: RootPath[ForwardPath]
     ): Option[(ForwardPath, PathParams)] =
-      Some((path, ()))
+      Some((path, ())).filter(_._1 == R())
 
     def matchQuery[ForwardQuery](query: ForwardQuery)(
       implicit Q: ExtractQueryPart[ForwardQuery]
     ): Option[(ForwardQuery, QueryParams)] =
       Some((query, ()))
+  }
+
+  def root[M <: Method](m: M): Aux[M, Unit, Unit, Unit] = new Root[M](m) {}
+
+  abstract class Iso[M <: Method, PI, PO](val r: Route[M, PI])(io: PI => PO, oi: PO => PI) extends Route[M, PO] {
+    type PathParams = r.PathParams
+    type QueryParams = r.QueryParams
+
+    def mkParams(pp: PathParams, qp: QueryParams): Params = io(r.mkParams(pp, qp))
+    def matchPath[ForwardPath](path: ForwardPath)(
+      implicit P: ExtractPathPart[ForwardPath],
+      R: RootPath[ForwardPath]
+    ): Option[(ForwardPath, PathParams)] = r.matchPath(path)
+    def matchQuery[ForwardQuery](params: ForwardQuery)(
+      implicit Q: ExtractQueryPart[ForwardQuery]
+    ): Option[(ForwardQuery, QueryParams)] = r.matchQuery(params)
+    def method: Method = r.method
+    def paramTpes: Vector[Tag[_]] = r.paramTpes
+    def pathParts(params: Params): Vector[PathPart] = r.pathParts(oi(params))
+    def queryParts(params: Params): Vector[QueryPart] = r.queryParts(oi(params))
+    def show: Shown = r.show
+
+    override def unapplyNested[R](request: R)(implicit R: ExtractRequest[R]): Option[Params] =
+      r.unapplyNested(request).map(io)
+  }
+
+  abstract class From[M <: Method, P](r: Route[M, P]) extends Iso[M, P, P](r)(identity, identity)
+
+  abstract class WithFallback[M <: Method, P, R1 <: Route[M, P], R2 <: Route[M, P]](val main: R1, val fallback: R2) extends Route[M, P] {
+    type PathParams = main.PathParams
+    type QueryParams = main.QueryParams
+
+    def mkParams(pp: PathParams, qp: QueryParams): Params = main.mkParams(pp, qp)
+    def method: Method = main.method
+    def paramTpes: Vector[Tag[_]] = main.paramTpes
+    def pathParts(params: Params): Vector[PathPart] = main.pathParts(params)
+    def queryParts(params: Params): Vector[QueryPart] = main.queryParts(params)
+    def show: Shown = main.show
+
+    def matchPath[FP](path: FP)(implicit P: ExtractPathPart[FP], R: RootPath[FP]): Option[(FP, PathParams)] = main.matchPath(path)
+    def matchQuery[FQ](params: FQ)(implicit Q: ExtractQueryPart[FQ]): Option[(FQ, QueryParams)] = main.matchQuery(params)
+
+    override def unapplyNested[R](request: R)(implicit R: ExtractRequest[R]): Option[Params] =
+      main.unapplyNested(request).orElse(fallback.unapplyNested(request))
   }
 
   case class Shown(pathParts: Vector[String], queryParts: Vector[String]) { self =>

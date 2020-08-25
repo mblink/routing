@@ -7,9 +7,9 @@ package object routing extends routing.Handled.Ops {
   type ReversePath = String
   type ReverseQuery = Vector[(String, Option[String])]
 
-  implicit def methodToRoute[M <: Method](m: M): Route.Aux[M, Unit, Unit, Unit] = Route.empty(m)
+  implicit def methodToRoute[M <: Method](m: M): Route.Aux[M, Unit, Unit, Unit] = Route.root(m)
 
-  def root[M <: Method](m: M): Route.Aux[M, Unit, Unit, Unit] = Route.empty(m)
+  def root[M <: Method](m: M): Route.Aux[M, Unit, Unit, Unit] = Route.root(m)
 
   def pathVar[A](name: String): (String, Option[A]) = name -> None
 
