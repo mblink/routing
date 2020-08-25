@@ -19,8 +19,7 @@ with QueryBuilder[M, P] { self =>
   def mkParams(pp: PathParams, qp: QueryParams): Params
 
   def matchPath[ForwardPath](path: ForwardPath)(
-    implicit P: ExtractPathPart[ForwardPath],
-    R: RootPath[ForwardPath]
+    implicit P: ExtractPathPart[ForwardPath]
   ): Option[(ForwardPath, PathParams)]
 
   def matchQuery[ForwardQuery](params: ForwardQuery)(
@@ -68,7 +67,7 @@ with QueryBuilder[M, P] { self =>
     R.parts(request) match {
       case Some((`m`, p, q)) =>
         val root = R.rootPath()
-        (matchPath(p)(R.extractPath, R.rootPath), matchQuery(q)(R.extractQuery)) match {
+        (matchPath(p)(R.extractPath), matchQuery(q)(R.extractQuery)) match {
           case (Some((`root`, pp)), Some((_, qp))) => Some(mkParams(pp, qp))
           case _ => None
         }
@@ -103,10 +102,9 @@ object Route {
     lazy val paramTpes = Vector()
 
     def matchPath[ForwardPath](path: ForwardPath)(
-      implicit P: ExtractPathPart[ForwardPath],
-      R: RootPath[ForwardPath]
+      implicit P: ExtractPathPart[ForwardPath]
     ): Option[(ForwardPath, PathParams)] =
-      Some((path, ())).filter(_._1 == R())
+      Some((path, ()))
 
     def matchQuery[ForwardQuery](query: ForwardQuery)(
       implicit Q: ExtractQueryPart[ForwardQuery]
@@ -122,8 +120,7 @@ object Route {
 
     def mkParams(pp: PathParams, qp: QueryParams): Params = io(r.mkParams(pp, qp))
     def matchPath[ForwardPath](path: ForwardPath)(
-      implicit P: ExtractPathPart[ForwardPath],
-      R: RootPath[ForwardPath]
+      implicit P: ExtractPathPart[ForwardPath]
     ): Option[(ForwardPath, PathParams)] = r.matchPath(path)
     def matchQuery[ForwardQuery](params: ForwardQuery)(
       implicit Q: ExtractQueryPart[ForwardQuery]
@@ -151,7 +148,7 @@ object Route {
     def queryParts(params: Params): Vector[QueryPart] = main.queryParts(params)
     def show: Shown = main.show
 
-    def matchPath[FP](path: FP)(implicit P: ExtractPathPart[FP], R: RootPath[FP]): Option[(FP, PathParams)] = main.matchPath(path)
+    def matchPath[FP](path: FP)(implicit P: ExtractPathPart[FP]): Option[(FP, PathParams)] = main.matchPath(path)
     def matchQuery[FQ](params: FQ)(implicit Q: ExtractQueryPart[FQ]): Option[(FQ, QueryParams)] = main.matchQuery(params)
 
     override def unapplyNested[R](request: R)(implicit R: ExtractRequest[R]): Option[Params] =

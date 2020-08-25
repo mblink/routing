@@ -32,8 +32,7 @@ trait PathBuilder[M <: Method, P] { self: Route[M, P] =>
     lazy val paramTpes = self.paramTpes ++ paramTpe
 
     def matchPath[ForwardPath](path: ForwardPath)(
-      implicit P: ExtractPathPart[ForwardPath],
-      R: RootPath[ForwardPath]
+      implicit P: ExtractPathPart[ForwardPath]
     ): Option[(ForwardPath, PP)] =
       self.matchPath(path).flatMap { case (p, ps) =>
         P(p, extract) match {
@@ -86,8 +85,7 @@ trait PathBuilder[M <: Method, P] { self: Route[M, P] =>
       lazy val paramTpes = self.paramTpes :+ tt
 
       def matchPath[ForwardPath](path: ForwardPath)(
-        implicit P: ExtractPathPart[ForwardPath],
-        R: RootPath[ForwardPath]
+        implicit P: ExtractPathPart[ForwardPath]
       ): Option[(ForwardPath, PathParams)] =
         self.matchPath(path).flatMap { case (p, ps) =>
           P.rest(p) match {

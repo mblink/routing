@@ -20,8 +20,10 @@ object ReverseUri {
     Show.show { u =>
       val b = new StringBuilder("")
 
-      if (!u.path.startsWith("/")) b.append('/')
-      b.append(u.path)
+      if (u.path.nonEmpty && !u.path.startsWith("/")) {
+        b.append('/')
+        b.append(u.path)
+      } else b.append(u.path)
 
       u.query match {
         case Vector() => ()
