@@ -38,8 +38,10 @@ package object play {
       type ForwardQuery = QueryMap
 
       def parts(request: RequestHeader): Option[(Method, String, QueryMap)] =
-        Method.fromString(request.method).map((_, request.path,
-          request.queryString.map { case (k, v) => k -> v.map(queryUrlDecode) }))
+        Method.fromString(request.method).map((_, request.path match {
+          case "" => playRootPath()
+          case p => p
+        }, request.queryString.map { case (k, v) => k -> v.map(queryUrlDecode) }))
 
       lazy val rootPath = playRootPath
       lazy val extractPath = playExtractPathPart
