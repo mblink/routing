@@ -65,8 +65,8 @@ object Build {
         .getOrElse(Seq())
   )
 
-  val catsCore = "org.typelevel" %% "cats-core" % "2.1.1"
-  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.0.0-M5"
+  val catsCore = "org.typelevel" %% "cats-core" % "2.2.0"
+  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.0.0-M9"
 
   val http4sVersion = "1.0.0-M4"
   val http4sCore = "org.http4s" %% "http4s-core" % http4sVersion
