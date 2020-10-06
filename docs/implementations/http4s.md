@@ -59,14 +59,13 @@ You can confirm that routes are matched correctly by passing some test requests 
 ```scala mdoc
 import org.http4s.Request
 
-def testRoute(service: HttpRoutes[IO], call: Call) =
+def testRoute(service: HttpRoutes[IO], call: Call): String =
   service
     .run(Request[IO](method = call.method.toHttp4s, uri = call.uri.toHttp4s))
+    .semiflatMap(_.as[String])
     .value
-    .unsafeRunSync
+    .unsafeRunSync()
     .get
-    .as[String]
-    .unsafeRunSync
 
 testRoute(service1, Login())
 testRoute(service1, Hello("world"))
@@ -86,7 +85,7 @@ def unhandled(method: Method, path: String) =
   service1
     .run(Request[IO](method = method, uri = Uri(path = Uri.Path.fromString(path))))
     .value
-    .unsafeRunSync
+    .unsafeRunSync()
 
 unhandled(GET, "/fake")
 

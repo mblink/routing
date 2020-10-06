@@ -78,7 +78,7 @@ def fakeRequest(u: ReverseUri): RequestHeader =
     def version: String = ""
   }
 
-def testRoute(router: Router, call: Call) = {
+def testRoute(router: Router, call: Call): String = {
   val request: RequestHeader = fakeRequest(call.uri)
   val handler: EssentialAction = router.handlerFor(request).collect { case a: EssentialAction => a }.get
   Await.result(handler(request).run().flatMap(_.body.consumeData).map(_.utf8String), 1.second)
@@ -106,5 +106,5 @@ unhandled(Method.POST, "/hello/world")
 ```
 
 ```scala mdoc:invisible
-actorSystem.terminate
+actorSystem.terminate()
 ```
