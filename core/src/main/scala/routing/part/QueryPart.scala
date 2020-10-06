@@ -24,12 +24,12 @@ trait QueryPartBase {
 }
 
 trait QueryPartOptional extends QueryPartBase {
-  def inst[A](t: (String, Option[A]))(implicit s: Show[A], @unused d: Dummy1): QueryPart.Aux[Option[A]] =
+  def inst[A](t: (String, Option[A]))(implicit s: Show[A], d: Dummy1): QueryPart.Aux[Option[A]] =
     inst(t, t._2.map(a => kv(t._1 -> a)).toVector)
 }
 
 trait QueryPartMulti extends QueryPartOptional with UrlPart.Companion[QueryPart] {
-  def inst[A](t: (String, List[A]))(implicit s: Show[A], @unused d: Dummy2): QueryPart.Aux[List[A]] =
+  def inst[A](t: (String, List[A]))(implicit s: Show[A], d: Dummy2): QueryPart.Aux[List[A]] =
     inst(t, t._2.map(a => kv(t._1 -> a)).toVector)
 }
 
