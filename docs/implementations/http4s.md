@@ -84,7 +84,7 @@ import org.http4s.{Method, Uri}
 
 def unhandled(method: Method, path: String) =
   service1
-    .run(Request[IO](method = method, uri = Uri(path = path)))
+    .run(Request[IO](method = method, uri = Uri(path = Uri.Path.fromString(path))))
     .value
     .unsafeRunSync
 

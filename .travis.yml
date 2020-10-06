@@ -1,12 +1,12 @@
 sudo: false
 language: scala
 scala:
-  - 2.12.11
-  - 2.13.2
+  - 2.12.12
+  - 2.13.3
 jdk:
   - openjdk8
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION $([ "$TRAVIS_SCALA_VERSION" = '2.13.2' ] && echo 'test; docs/mdoc' || echo 'test')
+  - sbt ++$TRAVIS_SCALA_VERSION $([ "$TRAVIS_SCALA_VERSION" != ${TRAVIS_SCALA_VERSION#2.13}" ] && echo 'test; docs/mdoc' || echo 'test')
 
 cache:
   directories:
