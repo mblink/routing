@@ -44,8 +44,7 @@ package object http4s {
 
       def parts(request: Http4sRequest[F]): Option[(Method, DslPath, QueryMap)] =
         request match {
-          case m -> p :? q =>
-            Method.fromString(m.name).map((_, p, q.map { case (k, v) => k -> v.map(queryUrlDecode) }))
+          case m -> p :? q => Method.fromString(m.name).map((_, p, q))
         }
       lazy val rootPath = http4sRootPath
       lazy val extractPath = http4sExtractPathPart

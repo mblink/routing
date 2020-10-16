@@ -41,7 +41,7 @@ package object play {
         Method.fromString(request.method).map((_, request.path match {
           case "" => playRootPath()
           case p => p
-        }, request.queryString.map { case (k, v) => k -> v.map(queryUrlDecode) }))
+        }, request.queryString))
 
       lazy val rootPath = playRootPath
       lazy val extractPath = playExtractPathPart
