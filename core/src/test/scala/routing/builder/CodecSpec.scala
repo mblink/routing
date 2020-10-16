@@ -90,7 +90,7 @@ abstract class CodecSpec(name: String) extends Properties(s"$name.codec") {
   def testQuery() =
     queryEncodedChars.foreach { case (raw, encoded) =>
       // TODO - add tests that spin up a fake server to test that each implementation library
-      // handles query decoding properly on its down
+      // handles query decoding properly on its own
       // property(s"decodes '$raw' in query") = forAll((s: Str) =>
       //   testDecode(queryRoute)(x => ReverseUri(Method.GET, "/", Vector("x" -> Some(x))), s, raw, encoded))
 
