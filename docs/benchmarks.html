@@ -68,13 +68,13 @@ We put together a simple benchmark to test the performance of routing requests t
 <span class="hljs-comment">// 1. Built with routing handler syntax</span>
 <span class="hljs-keyword">val</span> routing = <span class="hljs-type">Route</span>.httpRoutes[<span class="hljs-type">IO</span>](test.handle.with_(_ =&gt; _ =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>)))
 <span class="hljs-comment">// routing: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.Http$$$Lambda$19597/1984167590@30684304</span>
+<span class="hljs-comment">//   org.http4s.Http$$$Lambda$7258/278578315@51ebf91c</span>
 <span class="hljs-comment">// )</span>
 
 <span class="hljs-comment">// 2. Built with routing manual match syntax</span>
 <span class="hljs-keyword">val</span> routingManual = <span class="hljs-type">HttpRoutes</span>.of[<span class="hljs-type">IO</span>] { <span class="hljs-keyword">case</span> test(_) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>) }
 <span class="hljs-comment">// routingManual: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$19598/421607865@423b0814</span>
+<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$7259/1024212265@3965bca2</span>
 <span class="hljs-comment">// )</span>
 
 <span class="hljs-comment">// 3. Built with explicit URL matches using the http4s DSL</span>
@@ -82,7 +82,7 @@ We put together a simple benchmark to test the performance of routing requests t
   <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Root</span> / <span class="hljs-string">"test"</span> =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>)
 }
 <span class="hljs-comment">// http4s: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$19598/421607865@1fd70157</span>
+<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$7259/1024212265@3ffe0697</span>
 <span class="hljs-comment">// )</span>
 </code></pre>
 <p>Then ran the benchmarks with the command:</p>

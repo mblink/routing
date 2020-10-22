@@ -71,13 +71,13 @@ should be a function of the type <code>Params =&gt; Out</code> where <code>Param
 type you want to target with your handler.</p>
 <p>Here's how you could handle the routes above, simply returning a <code>String</code> for each route:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> handledLogin = <span class="hljs-type">Login</span>.handle.with_(_ =&gt; <span class="hljs-string">"Login page"</span>)
-<span class="hljs-comment">// handledLogin: Handled.Aux[Method.GET.type, Unit, Unit, Route[Method.GET.type, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = routing.Method.GET.type}, String] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@616c0991</span>
+<span class="hljs-comment">// handledLogin: Handled.Aux[Method.GET.type, Unit, Unit, Route[Method.GET.type, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = routing.Method.GET.type}, String] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@701e236</span>
 <span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle.with_(name =&gt; <span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>)
-<span class="hljs-comment">// handledHello: Handled.Aux[Method.GET.type, String, (Unit, String), Route[Method.GET.type, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = routing.Method.GET.type}, String] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@48ad214f</span>
+<span class="hljs-comment">// handledHello: Handled.Aux[Method.GET.type, String, (Unit, String), Route[Method.GET.type, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = routing.Method.GET.type}, String] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@7cea03b3</span>
 <span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle.with_ { <span class="hljs-keyword">case</span> (slug, id) =&gt;
   <span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found"</span>
 }
-<span class="hljs-comment">// handledBlogPost: Handled.Aux[Method.GET.type, (String, Int), ((Unit, String), Int), Route[Method.GET.type, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = routing.Method.GET.type}, String] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@1b4dcd62</span>
+<span class="hljs-comment">// handledBlogPost: Handled.Aux[Method.GET.type, (String, Int), ((Unit, String), Int), Route[Method.GET.type, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = routing.Method.GET.type}, String] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@7ef08980</span>
 </code></pre>
 <p>Of course the actual output type of your handlers will be dictated by the HTTP application framework you've chosen.
 See the <a href="/routing/docs/implementations">implementations documentation</a> for more examples.</p>

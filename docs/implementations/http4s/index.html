@@ -72,13 +72,13 @@
 <span class="hljs-keyword">import</span> routing.http4s._
 
 <span class="hljs-keyword">val</span> handledLogin = <span class="hljs-type">Login</span>.handle.with_(_ =&gt; (_: <span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>]) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"Login page"</span>))
-<span class="hljs-comment">// handledLogin: Handled.Aux[Method.GET.type, Unit, Unit, Route[Method.GET.type, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = routing.Method.GET.type}, Request[IO] =&gt; IO[Response[IO]]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@399de1f2</span>
+<span class="hljs-comment">// handledLogin: Handled.Aux[Method.GET.type, Unit, Unit, Route[Method.GET.type, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = routing.Method.GET.type}, Request[IO] =&gt; IO[Response[IO]]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@76738eb7</span>
 <span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle.with_(name =&gt; (_: <span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>]) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>))
-<span class="hljs-comment">// handledHello: Handled.Aux[Method.GET.type, String, (Unit, String), Route[Method.GET.type, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = routing.Method.GET.type}, Request[IO] =&gt; IO[Response[IO]]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@2ae1c65d</span>
+<span class="hljs-comment">// handledHello: Handled.Aux[Method.GET.type, String, (Unit, String), Route[Method.GET.type, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = routing.Method.GET.type}, Request[IO] =&gt; IO[Response[IO]]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@3439351a</span>
 <span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle.with_ { <span class="hljs-keyword">case</span> (slug, id) =&gt; (req: <span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>]) =&gt;
   <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>)
 }
-<span class="hljs-comment">// handledBlogPost: Handled.Aux[Method.GET.type, (String, Int), ((Unit, String), Int), Route[Method.GET.type, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = routing.Method.GET.type}, Request[IO] =&gt; IO[Response[IO]]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@ad1fe34</span>
+<span class="hljs-comment">// handledBlogPost: Handled.Aux[Method.GET.type, (String, Int), ((Unit, String), Int), Route[Method.GET.type, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = routing.Method.GET.type}, Request[IO] =&gt; IO[Response[IO]]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@55adae7e</span>
 </code></pre>
 <p>Handled routes can be composed into an http4s service by passing them to <code>Route.httpRoutes</code>:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> cats.effect.<span class="hljs-type">IO</span>
@@ -90,7 +90,7 @@
   handledBlogPost
 )
 <span class="hljs-comment">// service1: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.Http$$$Lambda$19597/1984167590@60271fac</span>
+<span class="hljs-comment">//   org.http4s.Http$$$Lambda$7258/278578315@18ad88dd</span>
 <span class="hljs-comment">// )</span>
 </code></pre>
 <p>If you prefer, you can call <code>HttpRoutes.of</code> with a partial function that matches on your <code>Route</code>s manually:</p>
@@ -101,20 +101,19 @@
     <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>)
 }
 <span class="hljs-comment">// service2: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$19598/421607865@3663f02b</span>
+<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$7259/1024212265@7241bb49</span>
 <span class="hljs-comment">// )</span>
 </code></pre>
 <p>You can confirm that routes are matched correctly by passing some test requests to the service:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.http4s.<span class="hljs-type">Request</span>
 
-<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">testRoute</span></span>(service: <span class="hljs-type">HttpRoutes</span>[<span class="hljs-type">IO</span>], call: <span class="hljs-type">Call</span>) =
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">testRoute</span></span>(service: <span class="hljs-type">HttpRoutes</span>[<span class="hljs-type">IO</span>], call: <span class="hljs-type">Call</span>): <span class="hljs-type">String</span> =
   service
     .run(<span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>](method = call.method.toHttp4s, uri = call.uri.toHttp4s))
+    .semiflatMap(_.as[<span class="hljs-type">String</span>])
     .value
-    .unsafeRunSync
+    .unsafeRunSync()
     .get
-    .as[<span class="hljs-type">String</span>]
-    .unsafeRunSync
 
 testRoute(service1, <span class="hljs-type">Login</span>())
 <span class="hljs-comment">// res0: String = "Login page"</span>
@@ -135,9 +134,9 @@ testRoute(service2, <span class="hljs-type">BlogPost</span>(<span class="hljs-st
 
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">unhandled</span></span>(method: <span class="hljs-type">Method</span>, path: <span class="hljs-type">String</span>) =
   service1
-    .run(<span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>](method = method, uri = <span class="hljs-type">Uri</span>(path = path)))
+    .run(<span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>](method = method, uri = <span class="hljs-type">Uri</span>(path = <span class="hljs-type">Uri</span>.<span class="hljs-type">Path</span>.fromString(path))))
     .value
-    .unsafeRunSync
+    .unsafeRunSync()
 
 unhandled(<span class="hljs-type">GET</span>, <span class="hljs-string">"/fake"</span>)
 <span class="hljs-comment">// res6: Option[Response[IO]] = None</span>

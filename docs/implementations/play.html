@@ -71,16 +71,16 @@
 <span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">ExecutionContext</span>.<span class="hljs-type">Implicits</span>.global
 
 <span class="hljs-keyword">val</span> action = <span class="hljs-keyword">new</span> <span class="hljs-type">ActionBuilder</span>.<span class="hljs-type">IgnoringBody</span>()
-<span class="hljs-comment">// action: ActionBuilder.IgnoringBody = play.api.mvc.ActionBuilder$IgnoringBody@21f25c</span>
+<span class="hljs-comment">// action: ActionBuilder.IgnoringBody = play.api.mvc.ActionBuilder$IgnoringBody@28033ea9</span>
 
 <span class="hljs-keyword">val</span> handledLogin = <span class="hljs-type">Login</span>.handle.with_(_ =&gt; action(<span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">"Login page"</span>)))
-<span class="hljs-comment">// handledLogin: Handled.Aux[Method.GET.type, Unit, Unit, Route[Method.GET.type, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@4e6276cf</span>
+<span class="hljs-comment">// handledLogin: Handled.Aux[Method.GET.type, Unit, Unit, Route[Method.GET.type, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@3122ec9f</span>
 <span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle.with_(name =&gt; action(<span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>)))
-<span class="hljs-comment">// handledHello: Handled.Aux[Method.GET.type, String, (Unit, String), Route[Method.GET.type, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@32b2b625</span>
+<span class="hljs-comment">// handledHello: Handled.Aux[Method.GET.type, String, (Unit, String), Route[Method.GET.type, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@6a03a107</span>
 <span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle.with_ { <span class="hljs-keyword">case</span> (slug, id) =&gt;
   action(req =&gt; <span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>))
 }
-<span class="hljs-comment">// handledBlogPost: Handled.Aux[Method.GET.type, (String, Int), ((Unit, String), Int), Route[Method.GET.type, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@351137a3</span>
+<span class="hljs-comment">// handledBlogPost: Handled.Aux[Method.GET.type, (String, Int), ((Unit, String), Int), Route[Method.GET.type, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@1de08990</span>
 </code></pre>
 <p>Handled routes can be composed into a play <code>Router</code> by passing them to <code>Route.router</code>:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> _root_.play.api.routing.<span class="hljs-type">Router</span>
@@ -90,7 +90,7 @@
   handledHello,
   handledBlogPost
 )
-<span class="hljs-comment">// router1: Router = play.api.routing.SimpleRouterImpl@3a2d804f</span>
+<span class="hljs-comment">// router1: Router = play.api.routing.SimpleRouterImpl@2c271af3</span>
 </code></pre>
 <p>If you prefer, you can call <code>Router.from</code> with a partial function that matches on your <code>Route</code>s manually:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> router2: <span class="hljs-type">Router</span> = <span class="hljs-type">Router</span>.from {
@@ -99,7 +99,7 @@
   <span class="hljs-keyword">case</span> <span class="hljs-type">BlogPost</span>(slug, id) =&gt;
     action(req =&gt; <span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>))
 }
-<span class="hljs-comment">// router2: Router = play.api.routing.SimpleRouterImpl@67245dcb</span>
+<span class="hljs-comment">// router2: Router = play.api.routing.SimpleRouterImpl@ac75dfc</span>
 </code></pre>
 <p>You can confirm that routes are matched correctly by passing some test requests to the router:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">ActorSystem</span>
@@ -124,7 +124,7 @@
     <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">version</span></span>: <span class="hljs-type">String</span> = <span class="hljs-string">""</span>
   }
 
-<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">testRoute</span></span>(router: <span class="hljs-type">Router</span>, call: <span class="hljs-type">Call</span>) = {
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">testRoute</span></span>(router: <span class="hljs-type">Router</span>, call: <span class="hljs-type">Call</span>): <span class="hljs-type">String</span> = {
   <span class="hljs-keyword">val</span> request: <span class="hljs-type">RequestHeader</span> = fakeRequest(call.uri)
   <span class="hljs-keyword">val</span> handler: <span class="hljs-type">EssentialAction</span> = router.handlerFor(request).collect { <span class="hljs-keyword">case</span> a: <span class="hljs-type">EssentialAction</span> =&gt; a }.get
   <span class="hljs-type">Await</span>.result(handler(request).run().flatMap(_.body.consumeData).map(_.utf8String), <span class="hljs-number">1.</span>second)
