@@ -7,7 +7,7 @@ import sbt.Keys._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.12.12", "2.13.3")
+  lazy val scalaVersions = Seq("2.12.12", "2.13.4")
 
   def profileTraceOpts(baseDir: File, name: String): Seq[String] = {
     val dir = baseDir / ".traces"
@@ -15,21 +15,22 @@ object Build {
     Seq("-Yprofile-trace", s"$dir/$name.trace")
   }
 
-  def scalaVersionSpecificFolders(srcName: String, srcBaseDir: java.io.File, scalaVersion: String): Seq[java.io.File] =
+  def foldScalaV[A](scalaVersion: String)(_212: => A, _213: => A): A =
     CrossVersion.partialVersion(scalaVersion) match {
-      case Some((2, 12)) => Seq(srcBaseDir / srcName / "scala-2.12")
-      case Some((2, 13)) => Seq(srcBaseDir / srcName / "scala-2.13")
-      case _ => Seq()
+      case Some((2, 12)) => _212
+      case Some((2, 13)) => _213
     }
+
+  def scalaVersionSpecificFolders(srcName: String, srcBaseDir: java.io.File, scalaVersion: String): Seq[java.io.File] =
+    Seq(srcBaseDir / srcName / s"scala-${foldScalaV(scalaVersion)("2.12", "2.13")}")
 
   val commonSettings = Seq(
     organization := "bondlink",
     crossScalaVersions := scalaVersions,
     scalaVersion := scalaVersions.find(_.startsWith("2.13")).get,
     version := currentVersion,
-    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full),
-    scalacOptions ~= (_.filterNot(Set("explicits", "implicits", "params")
-      .flatMap(s => Set(s"-Wunused:$s", s"-Ywarn-unused:$s")).contains(_))),
+    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.1" cross CrossVersion.full),
+    scalacOptions ++= foldScalaV(scalaVersion.value)(Seq(), Seq("-Xlint:strict-unsealed-patmat")),
     // scalacOptions ++= profileTraceOpts(baseDirectory.value, name.value),
     unmanagedSourceDirectories in Compile ++= scalaVersionSpecificFolders("main", baseDirectory.value, scalaVersion.value),
     unmanagedSourceDirectories in Test ++= scalaVersionSpecificFolders("test", baseDirectory.value, scalaVersion.value),
@@ -64,12 +65,12 @@ object Build {
         .getOrElse(Seq())
   )
 
-  val catsCore = "org.typelevel" %% "cats-core" % "2.2.0"
-  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.0.0-M9"
+  val catsCore = "org.typelevel" %% "cats-core" % "2.3.0"
+  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.0.0-M11"
 
-  val http4sVersion = "1.0.0-M4"
+  val http4sVersion = "1.0.0-M8"
   val http4sCore = "org.http4s" %% "http4s-core" % http4sVersion
   val http4sDsl = "org.http4s" %% "http4s-dsl" % http4sVersion
 
-  val playCore = "com.typesafe.play" %% "play" % "2.8.1"
+  val playCore = "com.typesafe.play" %% "play" % "2.8.2"
 }

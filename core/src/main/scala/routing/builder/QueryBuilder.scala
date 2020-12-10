@@ -53,7 +53,7 @@ trait QueryBuilder[M <: Method, P] extends QueryBuilderLP[M, P] { self: Route[M,
   def :?[A: Show: Tag](t: (String, Option[Option[A]]))(implicit Q: OptionalQueryExtractor[A]): Route.Aux[Method, PathParams, (QueryParams, Option[A]), (Params, Option[A])] { type Method = self.Method } =
     nextQS[Option[A]](t._1, a => QueryPart.inst((t._1, a)), Q)
 
-  def &[A: Show: Tag: OptionalQueryExtractor](t: (String, Option[Option[A]]))(implicit d: Dummy1): Route.Aux[Method, PathParams, (QueryParams, Option[A]), (Params, Option[A])] { type Method = self.Method } =
+  def &[A: Show: Tag: OptionalQueryExtractor](t: (String, Option[Option[A]]))(implicit @uu d: Dummy1): Route.Aux[Method, PathParams, (QueryParams, Option[A]), (Params, Option[A])] { type Method = self.Method } =
     :?(t)
 
   def :?[A: Show: Tag](t: (String, Option[List[A]]))(implicit Q: MultiQueryExtractor[A]): Route.Aux[Method, PathParams, (QueryParams, List[A]), (Params, List[A])] { type Method = self.Method } =
