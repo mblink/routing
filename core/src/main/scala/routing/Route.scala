@@ -78,7 +78,7 @@ with QueryBuilder[M, P] { self =>
   def unapply[Request, A](request: Request)(implicit R: ExtractRequest[Request], N: Nestable[A, Params]): Option[A] =
     unapplyNested(request).map(N.unnest(_))
 
-  def withFallback(other: Route[Method, Params]): Route.Aux[Method, self.PathParams, self.QueryParams, Params] =
+  def withFallback(other: Route[Method, Params]): Route.WithFallback[Method, Params, self.type, other.type] =
     new Route.WithFallback[Method, Params, self.type, other.type](self, other) {}
 }
 

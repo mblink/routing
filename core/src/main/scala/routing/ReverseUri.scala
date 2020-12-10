@@ -26,7 +26,6 @@ object ReverseUri {
       } else b.append(u.path)
 
       u.query match {
-        case Vector() => ()
         case h +: rest =>
           b.append('?')
           appendQueryPair(b, h)
@@ -34,6 +33,7 @@ object ReverseUri {
             b.append('&')
             appendQueryPair(b, t)
           }
+        case _ => ()
       }
 
       b.toString

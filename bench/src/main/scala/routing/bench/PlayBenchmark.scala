@@ -2,7 +2,7 @@ package routing
 package bench
 
 import akka.actor.ActorSystem
-import izumi.reflect.macrortti.LightTypeTag
+import izumi.reflect.macrortti._
 import org.openjdk.jmh.annotations._
 import _root_.play.api.libs.typedmap.TypedMap
 import _root_.play.api.mvc.{ActionBuilder, EssentialAction, Headers, RequestHeader, Results}
@@ -54,6 +54,7 @@ object playHelper {
     case route5(param, id) => route5Res(param, id)
   }
 
+  @annotation.nowarn("msg=match may not be exhaustive")
   def testParams(r: Route[_, _]): r.Params =
     r.paramTpes.foldLeft((): Any)((acc, tt) => (acc, tt.tag match {
       case t if t =:= LTT[Int] => 1
@@ -86,7 +87,7 @@ object playHelper {
   )).flatten.iterator
 
   @inline def run(router: Router): String = {
-    val request = reqs.next
+    val request = reqs.next()
     Await.result(
       router.handlerFor(request).collect { case a: EssentialAction => a }.get
         .apply(request).run().flatMap(_.body.consumeData).map(_.utf8String),
@@ -98,7 +99,7 @@ object playHelper {
 class PlayBenchmark {
   import playHelper._
 
-  @TearDown(Level.Trial) def teardown(): Unit = Await.result(actorSystem.terminate.map(_ => ()), Duration.Inf)
+  @TearDown(Level.Trial) def teardown(): Unit = Await.result(actorSystem.terminate().map(_ => ()), Duration.Inf)
 
   @Benchmark def play: String = run(playService)
   @Benchmark def routing: String = run(routingService)

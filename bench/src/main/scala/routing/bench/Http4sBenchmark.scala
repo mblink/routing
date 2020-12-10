@@ -2,7 +2,7 @@ package routing
 package bench
 
 import cats.effect.IO
-import izumi.reflect.macrortti.LightTypeTag
+import izumi.reflect.macrortti._
 import org.http4s._
 import org.http4s.dsl.io._
 import org.openjdk.jmh.annotations._
@@ -48,6 +48,7 @@ object http4sHelper {
     case route5(param, id) => route5Res(param, id)
   }
 
+  @annotation.nowarn("msg=match may not be exhaustive")
   def testParams(r: Route[_, _]): r.Params =
     r.paramTpes.foldLeft((): Any)((acc, tt) => (acc, tt.tag match {
       case t if t =:= LTT[Int] => 1
@@ -67,7 +68,7 @@ object http4sHelper {
   )).flatten.iterator
 
   @inline def run(routes: HttpRoutes[IO]): String =
-    routes.run(reqs.next).value.flatMap(_.get.as[String]).unsafeRunSync
+    routes.run(reqs.next()).value.flatMap(_.get.as[String]).unsafeRunSync()
 }
 
 class Http4sBenchmark {
