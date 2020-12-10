@@ -18,4 +18,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: sbt test
-        run: - sbt ++$SCALA_VERSION $([ "$SCALA_VERSION" != "${SCALA_VERSION#2.13}" ] && echo 'test; docs/mdoc' || echo 'test')
+        run: sbt ++$SCALA_VERSION $([ "$SCALA_VERSION" != "${SCALA_VERSION#2.13}" ] && echo 'test; docs/mdoc' || echo 'test')
