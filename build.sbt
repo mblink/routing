@@ -8,9 +8,9 @@ lazy val routing = project.in(file("."))
   .settings(commonSettings)
   .settings(noPublishSettings)
   .settings(crossScalaVersions := Seq())
-  .aggregate(core, http4s, play, example)
+  .aggregate(core.jvm, core.js, http4s.jvm, http4s.js, play, example)
 
-lazy val core = project.in(file("core"))
+lazy val core = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure).in(file("core"))
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(testSettings)
@@ -37,7 +37,7 @@ lazy val core = project.in(file("core"))
     }
   )
 
-lazy val http4s = project.in(file("http4s"))
+lazy val http4s = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure).in(file("http4s"))
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(testSettings)
@@ -58,13 +58,13 @@ lazy val play = project.in(file("play"))
     name := "routing-play",
     libraryDependencies += playCore
   )
-  .dependsOn(core % "compile->compile;test->test")
+  .dependsOn(core.jvm % "compile->compile;test->test")
 
 lazy val bench = project.in(file("bench"))
   .settings(commonSettings)
   .settings(noPublishSettings)
   .settings(name := "bench")
-  .dependsOn(core, http4s, play)
+  .dependsOn(core.jvm, http4s.jvm, play)
   .enablePlugins(JmhPlugin)
 
 lazy val docs = project.in(file("routing-docs"))
@@ -73,12 +73,12 @@ lazy val docs = project.in(file("routing-docs"))
     moduleName := "routing-docs",
     mdocExtraArguments += "--no-link-hygiene",
     mdocVariables := Map(
-      "VERSION" -> (core / version).value,
+      "VERSION" -> (core.jvm / version).value,
       "GITHUB_REPO_URL" -> githubRepoUrl,
       "GITHUB_BLOB_URL" -> s"$githubRepoUrl/blob/master"
     )
   )
-  .dependsOn(core, http4s, play)
+  .dependsOn(core.jvm, http4s.jvm, play)
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
 
 lazy val example = project.in(file("example"))
@@ -96,6 +96,6 @@ lazy val example = project.in(file("example"))
     ),
     bintrayRelease := {}
   )
-  .dependsOn(core, http4s, play)
+  .dependsOn(core.jvm, http4s.jvm, play)
 
 lazy val githubRepoUrl = "https://github.com/mblink/routing"
