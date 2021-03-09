@@ -42,23 +42,48 @@ sealed trait QueryBuilderLP[M <: Method, P] { self: Route[M, P] =>
       }
   }
 
-  def :?[A: Show: Tag](t: (String, Option[A]))(implicit Q: QueryExtractor[A]): Route.Aux[Method, PathParams, (QueryParams, A), (Params, A)] { type Method = self.Method } =
+  def :?[A](t: (String, Option[A]))(
+    implicit Q: QueryExtractor[A],
+    show: Show[A],
+    tag: Tag[A]
+  ): Route.Aux[Method, PathParams, (QueryParams, A), (Params, A)] { type Method = self.Method } =
     nextQS[A](t._1, a => QueryPart.inst((t._1, a)), Q)
 
-  def &[A: Show: Tag: QueryExtractor](t: (String, Option[A])): Route.Aux[Method, PathParams, (QueryParams, A), (Params, A)] { type Method = self.Method } =
+  def &[A](t: (String, Option[A]))(
+    implicit Q: QueryExtractor[A],
+    show: Show[A],
+    tag: Tag[A]
+  ): Route.Aux[Method, PathParams, (QueryParams, A), (Params, A)] { type Method = self.Method } =
     :?(t)
 }
 
 trait QueryBuilder[M <: Method, P] extends QueryBuilderLP[M, P] { self: Route[M, P] =>
-  def :?[A: Show: Tag](t: (String, Option[Option[A]]))(implicit Q: OptionalQueryExtractor[A]): Route.Aux[Method, PathParams, (QueryParams, Option[A]), (Params, Option[A])] { type Method = self.Method } =
+  def :?[A](t: (String, Option[Option[A]]))(
+    implicit Q: OptionalQueryExtractor[A],
+    show: Show[A],
+    tag: Tag[Option[A]]
+  ): Route.Aux[Method, PathParams, (QueryParams, Option[A]), (Params, Option[A])] { type Method = self.Method } =
     nextQS[Option[A]](t._1, a => QueryPart.inst((t._1, a)), Q)
 
-  def &[A: Show: Tag: OptionalQueryExtractor](t: (String, Option[Option[A]]))(implicit @uu d: Dummy1): Route.Aux[Method, PathParams, (QueryParams, Option[A]), (Params, Option[A])] { type Method = self.Method } =
+  def &[A](t: (String, Option[Option[A]]))(
+    implicit Q: OptionalQueryExtractor[A],
+    show: Show[A],
+    tag: Tag[Option[A]],
+    @uu d: Dummy1
+  ): Route.Aux[Method, PathParams, (QueryParams, Option[A]), (Params, Option[A])] { type Method = self.Method } =
     :?(t)
 
-  def :?[A: Show: Tag](t: (String, Option[List[A]]))(implicit Q: MultiQueryExtractor[A]): Route.Aux[Method, PathParams, (QueryParams, List[A]), (Params, List[A])] { type Method = self.Method } =
+  def :?[A](t: (String, Option[List[A]]))(
+    implicit Q: MultiQueryExtractor[A],
+    show: Show[A],
+    tag: Tag[List[A]]
+  ): Route.Aux[Method, PathParams, (QueryParams, List[A]), (Params, List[A])] { type Method = self.Method } =
     nextQS[List[A]](t._1, a => QueryPart.inst((t._1, a)), Q)
 
-  def &[A: Show: Tag](t: (String, Option[List[A]]))(implicit Q: MultiQueryExtractor[A]): Route.Aux[Method, PathParams, (QueryParams, List[A]), (Params, List[A])] { type Method = self.Method } =
+  def &[A](t: (String, Option[List[A]]))(
+    implicit Q: MultiQueryExtractor[A],
+    show: Show[A],
+    tag: Tag[List[A]]
+  ): Route.Aux[Method, PathParams, (QueryParams, List[A]), (Params, List[A])] { type Method = self.Method } =
     :?(t)
 }

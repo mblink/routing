@@ -7,7 +7,7 @@ import sbtgitpublish.GitPublishKeys._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.12.12", "2.13.4")
+  lazy val scalaVersions = Seq("2.12.13", "2.13.5")
 
   def profileTraceOpts(baseDir: File, name: String): Seq[String] = {
     val dir = baseDir / ".traces"
@@ -29,7 +29,7 @@ object Build {
     crossScalaVersions := scalaVersions,
     scalaVersion := scalaVersions.find(_.startsWith("2.13")).get,
     version := currentVersion,
-    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.1" cross CrossVersion.full),
+    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersion.full),
     scalacOptions ++= foldScalaV(scalaVersion.value)(Seq(), Seq("-Xlint:strict-unsealed-patmat")),
     // scalacOptions ++= profileTraceOpts(baseDirectory.value, name.value),
     unmanagedSourceDirectories in Compile ++= scalaVersionSpecificFolders("main", baseDirectory.value, scalaVersion.value),
@@ -52,7 +52,7 @@ object Build {
     gitRelease := {}
   )
 
-  val scalacheckVersion = "1.14.3"
+  val scalacheckVersion = "1.15.3"
   val scalacheckDep = "org.scalacheck" %% "scalacheck" % scalacheckVersion
 
   val testSettings = Seq(

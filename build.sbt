@@ -4,11 +4,7 @@ import scala.sys.process._
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-lazy val routing = project.in(file("."))
-  .settings(commonSettings)
-  .settings(noPublishSettings)
-  .settings(crossScalaVersions := Seq())
-  .aggregate(core, http4s, play, example)
+noPublishSettings
 
 lazy val core = project.in(file("core"))
   .settings(commonSettings)
@@ -69,6 +65,7 @@ lazy val bench = project.in(file("bench"))
 
 lazy val docs = project.in(file("routing-docs"))
   .settings(commonSettings)
+  .settings(noPublishSettings)
   .settings(
     moduleName := "routing-docs",
     mdocExtraArguments += "--no-link-hygiene",

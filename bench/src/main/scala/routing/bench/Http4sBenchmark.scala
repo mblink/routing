@@ -2,6 +2,7 @@ package routing
 package bench
 
 import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import izumi.reflect.macrortti._
 import org.http4s._
 import org.http4s.dsl.io._
