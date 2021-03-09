@@ -1,9 +1,9 @@
 package routing
 
-import bintray.BintrayKeys._
 import java.io.File
 import sbt._
 import sbt.Keys._
+import sbtgitpublish.GitPublishKeys._
 import scala.sys.process._
 
 object Build {
@@ -42,16 +42,14 @@ object Build {
 
   val publishSettings = Seq(
     skip in publish := false,
-    bintrayOrganization := Some("bondlink"),
-    bintrayRepository := "routing",
-    bintrayReleaseOnPublish in ThisBuild := false,
-    licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+    licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
+    gitPublishDir := file("/src/maven-repo")
   )
 
   val noPublishSettings = Seq(
     publish := {},
     publishLocal := {},
-    bintrayRelease := {}
+    gitRelease := {}
   )
 
   val scalacheckVersion = "1.14.3"
@@ -65,10 +63,10 @@ object Build {
         .getOrElse(Seq())
   )
 
-  val catsCore = "org.typelevel" %% "cats-core" % "2.3.0"
-  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.0.0-M11"
+  val catsCore = "org.typelevel" %% "cats-core" % "2.4.2"
+  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.0.0-M16"
 
-  val http4sVersion = "1.0.0-M8"
+  val http4sVersion = "1.0.0-M19"
   val http4sCore = "org.http4s" %% "http4s-core" % http4sVersion
   val http4sDsl = "org.http4s" %% "http4s-dsl" % http4sVersion
 
