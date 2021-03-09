@@ -71,16 +71,16 @@
 <span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">ExecutionContext</span>.<span class="hljs-type">Implicits</span>.global
 
 <span class="hljs-keyword">val</span> action = <span class="hljs-keyword">new</span> <span class="hljs-type">ActionBuilder</span>.<span class="hljs-type">IgnoringBody</span>()
-<span class="hljs-comment">// action: ActionBuilder.IgnoringBody = play.api.mvc.ActionBuilder$IgnoringBody@28033ea9</span>
+<span class="hljs-comment">// action: ActionBuilder.IgnoringBody = play.api.mvc.ActionBuilder$IgnoringBody@22a6da01</span>
 
 <span class="hljs-keyword">val</span> handledLogin = <span class="hljs-type">Login</span>.handle.with_(_ =&gt; action(<span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">"Login page"</span>)))
-<span class="hljs-comment">// handledLogin: Handled.Aux[Method.GET.type, Unit, Unit, Route[Method.GET.type, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@3122ec9f</span>
+<span class="hljs-comment">// handledLogin: Handled.Aux[Method.GET.type, Unit, Unit, Route[Method.GET.type, Unit]{type PathParams = Unit;type QueryParams = Unit}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@249fa12a</span>
 <span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle.with_(name =&gt; action(<span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>)))
-<span class="hljs-comment">// handledHello: Handled.Aux[Method.GET.type, String, (Unit, String), Route[Method.GET.type, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@6a03a107</span>
+<span class="hljs-comment">// handledHello: Handled.Aux[Method.GET.type, String, (Unit, String), Route[Method.GET.type, (Unit, String)]{type PathParams = (Unit, String);type QueryParams = Unit}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@304a2bbf</span>
 <span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle.with_ { <span class="hljs-keyword">case</span> (slug, id) =&gt;
   action(req =&gt; <span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>))
 }
-<span class="hljs-comment">// handledBlogPost: Handled.Aux[Method.GET.type, (String, Int), ((Unit, String), Int), Route[Method.GET.type, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@1de08990</span>
+<span class="hljs-comment">// handledBlogPost: Handled.Aux[Method.GET.type, (String, Int), ((Unit, String), Int), Route[Method.GET.type, ((Unit, String), Int)]{type PathParams = (Unit, String);type QueryParams = (Unit, Int)}{type Method = routing.Method.GET.type}, &lt;none&gt;.&lt;root&gt;.play.api.mvc.Action[&lt;none&gt;.&lt;root&gt;.play.api.mvc.AnyContent]] = routing.Handled$Ops$RouteHandlerOps$With$$anon$2@547fe798</span>
 </code></pre>
 <p>Handled routes can be composed into a play <code>Router</code> by passing them to <code>Route.router</code>:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> _root_.play.api.routing.<span class="hljs-type">Router</span>
@@ -90,7 +90,7 @@
   handledHello,
   handledBlogPost
 )
-<span class="hljs-comment">// router1: Router = play.api.routing.SimpleRouterImpl@2c271af3</span>
+<span class="hljs-comment">// router1: Router = play.api.routing.SimpleRouterImpl@409d59c4</span>
 </code></pre>
 <p>If you prefer, you can call <code>Router.from</code> with a partial function that matches on your <code>Route</code>s manually:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> router2: <span class="hljs-type">Router</span> = <span class="hljs-type">Router</span>.from {
@@ -99,7 +99,7 @@
   <span class="hljs-keyword">case</span> <span class="hljs-type">BlogPost</span>(slug, id) =&gt;
     action(req =&gt; <span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>))
 }
-<span class="hljs-comment">// router2: Router = play.api.routing.SimpleRouterImpl@ac75dfc</span>
+<span class="hljs-comment">// router2: Router = play.api.routing.SimpleRouterImpl@19d2360c</span>
 </code></pre>
 <p>You can confirm that routes are matched correctly by passing some test requests to the router:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">ActorSystem</span>
@@ -155,4 +155,4 @@ unhandled(<span class="hljs-type">Method</span>.<span class="hljs-type">GET</spa
 unhandled(<span class="hljs-type">Method</span>.<span class="hljs-type">POST</span>, <span class="hljs-string">"/hello/world"</span>)
 <span class="hljs-comment">// res7: Option[&lt;none&gt;.&lt;root&gt;.play.api.mvc.Handler] = None</span>
 </code></pre>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/routing/docs/implementations/http4s"><span class="arrow-prev">← </span><span>http4s</span></a><a class="docs-next button" href="/routing/docs/reverse-routing"><span>Reverse Routing</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer" style="background-color:#333333"><section class="sitemap"><div><h5>Docs</h5><a href="/routing/docs/installation">Installation</a></div><div><h5>Community</h5></div><div><h5>More</h5><a href="https://github.com/mblink/routing">GitHub</a></div></section><section class="copyright">Copyright © 2020 BondLink</section></footer></div></body></html>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/routing/docs/implementations/http4s"><span class="arrow-prev">← </span><span>http4s</span></a><a class="docs-next button" href="/routing/docs/reverse-routing"><span>Reverse Routing</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer" style="background-color:#333333"><section class="sitemap"><div><h5>Docs</h5><a href="/routing/docs/installation">Installation</a></div><div><h5>Community</h5></div><div><h5>More</h5><a href="https://github.com/mblink/routing">GitHub</a></div></section><section class="copyright">Copyright © 2021 BondLink</section></footer></div></body></html>

@@ -68,13 +68,13 @@ We put together a simple benchmark to test the performance of routing requests t
 <span class="hljs-comment">// 1. Built with routing handler syntax</span>
 <span class="hljs-keyword">val</span> routing = <span class="hljs-type">Route</span>.httpRoutes[<span class="hljs-type">IO</span>](test.handle.with_(_ =&gt; _ =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>)))
 <span class="hljs-comment">// routing: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.Http$$$Lambda$7258/278578315@51ebf91c</span>
+<span class="hljs-comment">//   org.http4s.Http$$$Lambda$9031/825959478@1e9d691a</span>
 <span class="hljs-comment">// )</span>
 
 <span class="hljs-comment">// 2. Built with routing manual match syntax</span>
 <span class="hljs-keyword">val</span> routingManual = <span class="hljs-type">HttpRoutes</span>.of[<span class="hljs-type">IO</span>] { <span class="hljs-keyword">case</span> test(_) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>) }
 <span class="hljs-comment">// routingManual: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$7259/1024212265@3965bca2</span>
+<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$9032/1933831534@531bd066</span>
 <span class="hljs-comment">// )</span>
 
 <span class="hljs-comment">// 3. Built with explicit URL matches using the http4s DSL</span>
@@ -82,7 +82,7 @@ We put together a simple benchmark to test the performance of routing requests t
   <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Root</span> / <span class="hljs-string">"test"</span> =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>)
 }
 <span class="hljs-comment">// http4s: HttpRoutes[IO] = Kleisli(</span>
-<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$7259/1024212265@3ffe0697</span>
+<span class="hljs-comment">//   org.http4s.HttpRoutes$$$Lambda$9032/1933831534@350cf299</span>
 <span class="hljs-comment">// )</span>
 </code></pre>
 <p>Then ran the benchmarks with the command:</p>
@@ -104,4 +104,4 @@ ServiceBenchmark.routing        thrpt   <span class="hljs-number">15</span>  <sp
 ServiceBenchmark.routingManual  thrpt   <span class="hljs-number">15</span>  <span class="hljs-number">116674.411</span> ± <span class="hljs-number">3518.031</span>  ops/s
 </code></pre>
 <p>You can <a href="https://github.com/mblink/routing/blob/master/bench/results.txt">view the full output of the JMH run here</a>.</p>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/routing/docs/reverse-routing"><span class="arrow-prev">← </span><span>Reverse Routing</span></a><a class="docs-next button" href="/routing/docs/example"><span>Example</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer" style="background-color:#333333"><section class="sitemap"><div><h5>Docs</h5><a href="/routing/docs/installation">Installation</a></div><div><h5>Community</h5></div><div><h5>More</h5><a href="https://github.com/mblink/routing">GitHub</a></div></section><section class="copyright">Copyright © 2020 BondLink</section></footer></div></body></html>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/routing/docs/reverse-routing"><span class="arrow-prev">← </span><span>Reverse Routing</span></a><a class="docs-next button" href="/routing/docs/example"><span>Example</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer" style="background-color:#333333"><section class="sitemap"><div><h5>Docs</h5><a href="/routing/docs/installation">Installation</a></div><div><h5>Community</h5></div><div><h5>More</h5><a href="https://github.com/mblink/routing">GitHub</a></div></section><section class="copyright">Copyright © 2021 BondLink</section></footer></div></body></html>
