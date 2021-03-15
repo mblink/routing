@@ -51,27 +51,33 @@ object Build {
     gitRelease := {}
   )
 
-  def projSettings(platform: String, srcDirSuffixes: Seq[String] = Seq(), extra: Project => Project = identity): Project => Project =
-    extra.andThen(_.settings(
+  val platforms = Map(
+    "js" -> Left[VirtualAxis.js.type, VirtualAxis.jvm.type](VirtualAxis.js),
+    "jvm" -> Right[VirtualAxis.js.type, VirtualAxis.jvm.type](VirtualAxis.jvm)
+  )
+  type ProjSettings = Either[VirtualAxis.js.type, VirtualAxis.jvm.type] => Project => Project
+
+  def projSettings(platform: String, srcDirSuffixes: Seq[String], extra: ProjSettings): Project => Project =
+    extra(platforms(platform)).andThen(_.settings(
       unmanagedSourceDirectories in Compile ++=
         (platform +: srcDirSuffixes.flatMap(s => Seq(s, s"$s-$platform")))
           .map(suffix => sourceDirectory.value / "main" / s"scala-$suffix")
     ))
 
   def sjsProj(f: Project => Project): Project => Project =
-    f.andThen(_.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin))
+    f.andThen(_.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin).disablePlugins(mdoc.MdocPlugin))
 
-  def proj[A](matrix: ProjectMatrix, nme: String, extraSettings: Project => Project = identity) =
+  def proj[A](matrix: ProjectMatrix, nme: String, extraSettings: ProjSettings = _ => identity) =
     matrix
       .settings(name := s"routing-$nme")
       .settings(commonSettings)
       .settings(testSettings)
-      .customRow(scalaVersions = scalaVersions, axisValues = Seq(VirtualAxis.jvm), projSettings("jvm", extra = extraSettings))
-      .customRow(scalaVersions = scalaVersions, axisValues = Seq(VirtualAxis.js), sjsProj(projSettings("js", extra = extraSettings)))
+      .customRow(scalaVersions = scalaVersions, axisValues = Seq(VirtualAxis.jvm), projSettings("jvm", Seq(), extraSettings))
+      .customRow(scalaVersions = scalaVersions, axisValues = Seq(VirtualAxis.js), sjsProj(projSettings("js", Seq(), extraSettings)))
 
   def proj[V <: VirtualAxis](matrix: ProjectMatrix, nme: String, axes: List[(V, String)])(
     srcDirSuffixes: (V, String) => Seq[String],
-    extraSettings: (V, String) => Project => Project
+    extraSettings: (V, String) => ProjSettings
   ) =
     axes.foldLeft(matrix
       .settings(name := s"routing-$nme")
@@ -87,12 +93,12 @@ object Build {
   def foldHttp4sV[A](version: String)(on_1M: => A, other: => A): A =
     if (isHttp4sV1Milestone(version)) on_1M else other
 
-  def http4sProj(matrix: ProjectMatrix, nme: String)(proc: (Http4sAxis, String) => Project => Project) =
+  def http4sProj(matrix: ProjectMatrix, nme: String)(proc: (Http4sAxis, String) => ProjSettings) =
     proj(matrix, nme, http4sVersions)(
       (axis, version) => Seq(version, if (isHttp4sV1Milestone(version)) http4sV1Milestone else axis.suffix),
-      (axis, version) => proc(axis, version).andThen(_.settings(
+      (axis, version) => proc(axis, version).andThen(_.andThen(_.settings(
         moduleName := s"${name.value}_${axis.suffix}"
-      )))
+      ))))
 
   val scalacheckVersion = "1.15.3"
   val scalacheckDep = "org.scalacheck" %% "scalacheck" % scalacheckVersion

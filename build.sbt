@@ -31,7 +31,7 @@ lazy val core = proj(projectMatrix.in(file("core")), "core")
     }
   )
 
-lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")((_, version) => _.settings(
+lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")((_, version) => _ => _.settings(
   libraryDependencies ++= Seq(
     http4sDep("core", version),
     http4sDep("dsl", version)
@@ -45,7 +45,7 @@ lazy val play = proj(projectMatrix.in(file("play")), "play")
   .settings(libraryDependencies += playCore)
   .dependsOn(core % "compile->compile;test->test")
 
-lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench")((_, _) => identity)
+lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench")((_, _) => _ => identity)
   .settings(noPublishSettings)
   .dependsOn(core, http4s, play)
   .enablePlugins(JmhPlugin)
@@ -55,29 +55,27 @@ def http4sImplDoc(dir: File, axis: Http4sAxis, version: String): (File, String) 
   (dir / "implementations" / f, s"http4s-${axis.suffix}.md")
 }
 
-lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs")((axis, version) => _.settings(
-  mdocExtraArguments ++= {
-    val (_, http4sFile) = http4sImplDoc(mdocIn.value, axis, version)
-    Seq("--include", "**.md", "--include", http4sFile) ++
-      (mdocIn.value / "implementations").listFiles.map(_.toString.stripPrefix(s"${mdocIn.value}/")).flatMap { f =>
-        val fn = f.split('/').last
-        if (fn.startsWith("http4s-") && fn != http4sFile) Seq("--exclude", f) else Seq()
-      }
-  },
-  mdocVariables ++= Map("HTTP4S_VERSION" -> axis.suffix)
-))
-  .settings(noPublishSettings)
-  .settings(
-    moduleName := "routing-docs",
-    mdocExtraArguments += "--no-link-hygiene",
+lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs")((axis, version) => _.fold(
+  _ => identity,
+  _ => _.settings(
+    mdocExtraArguments ++= "--no-link-hygiene" +: {
+      val (_, http4sFile) = http4sImplDoc(mdocIn.value, axis, version)
+      Seq("--include", "**.md", "--include", http4sFile) ++
+        (mdocIn.value / "implementations").listFiles.map(_.toString.stripPrefix(s"${mdocIn.value}/")).flatMap { f =>
+          val fn = f.split('/').last
+          if (fn.startsWith("http4s-") && fn != http4sFile) Seq("--exclude", f) else Seq()
+        }
+    },
     mdocVariables ++= Map(
       "VERSION" -> currentVersion,
+      "HTTP4S_VERSION" -> axis.suffix,
       "GITHUB_REPO_URL" -> githubRepoUrl,
       "GITHUB_BLOB_URL" -> s"$githubRepoUrl/blob/master"
     )
-  )
+  ).enablePlugins(MdocPlugin))
+)
+  .settings(noPublishSettings)
   .dependsOn(core, http4s, play)
-  .enablePlugins(MdocPlugin, DocusaurusPlugin)
 
 lazy val buildDocsSite = taskKey[Unit]("Build documentation site for publishing to GitHub pages")
 buildDocsSite := Def.taskDyn {
@@ -103,7 +101,7 @@ buildDocsSite := Def.taskDyn {
   }
 }.value
 
-lazy val example = http4sProj(projectMatrix.in(file("example")), "example")((_, version) => _.settings(
+lazy val example = http4sProj(projectMatrix.in(file("example")), "example")((_, version) => _ => _.settings(
   libraryDependencies ++= Seq(
     http4sDep("circe", version),
     http4sDep("blaze-server", version)
