@@ -1,6 +1,6 @@
 ---
 id: http4s-0.21
-title: http4s 0.21
+title: http4s 0.21 (latest stable)
 ---
 
 To use your routes in a project using http4s @HTTP4S_VERSION@, add the following to your `build.sbt`:

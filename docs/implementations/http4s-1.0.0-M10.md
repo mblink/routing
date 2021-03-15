@@ -1,6 +1,6 @@
 ---
 id: http4s-1.0.0-M10
-title: http4s 1.0.0-M10
+title: http4s 1.0.0-M10 (latest on cats-effect 2)
 ---
 
 To use your routes in a project using http4s @HTTP4S_VERSION@, add the following to your `build.sbt`:

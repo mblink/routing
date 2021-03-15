@@ -51,8 +51,8 @@ lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench")((_, _) => 
   .enablePlugins(JmhPlugin)
 
 def http4sImplDoc(dir: File, axis: Http4sAxis, version: String): (File, String) = {
-  val f = s"http4s-${foldHttp4sV(version)(version, axis.suffix)}.md"
-  (dir / "implementations" / f, s"http4s-${foldHttp4sV(version)(version, axis.suffix)}.md")
+  val f = s"http4s-${axis.suffix}.md"
+  (dir / "implementations" / f, s"http4s-${axis.suffix}.md")
 }
 
 lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs")((axis, version) => _.settings(
@@ -64,7 +64,7 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
         if (fn.startsWith("http4s-") && fn != http4sFile) Seq("--exclude", f) else Seq()
       }
   },
-  mdocVariables ++= Map("HTTP4S_VERSION" -> foldHttp4sV(version)(version, axis.suffix))
+  mdocVariables ++= Map("HTTP4S_VERSION" -> axis.suffix)
 ))
   .settings(noPublishSettings)
   .settings(
@@ -91,7 +91,7 @@ buildDocsSite := Def.taskDyn {
       IO.delete(out)
       IO.copyDirectory((projs.last._1 / mdocOut).value, out)
       IO.copy(http4sVersions.dropRight(1).map { case (axis, version) =>
-        val (srcFile, relFile) = http4sImplDoc(target / s"${foldHttp4sV(version)(version, axis.suffix)}-jvm-2.13" / "mdoc", axis, version)
+        val (srcFile, relFile) = http4sImplDoc(target / s"${axis.suffix}-jvm-2.13" / "mdoc", axis, version)
         println(s"$srcFile -> ${new File(s"$out/implementations/$relFile")}")
         srcFile -> new File(s"$out/implementations/$relFile")
       })

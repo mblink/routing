@@ -58,13 +58,16 @@ object Build {
           .map(suffix => sourceDirectory.value / "main" / s"scala-$suffix")
     ))
 
+  def sjsProj(f: Project => Project): Project => Project =
+    f.andThen(_.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin))
+
   def proj[A](matrix: ProjectMatrix, nme: String, extraSettings: Project => Project = identity) =
     matrix
       .settings(name := s"routing-$nme")
       .settings(commonSettings)
       .settings(testSettings)
       .customRow(scalaVersions = scalaVersions, axisValues = Seq(VirtualAxis.jvm), projSettings("jvm", extra = extraSettings))
-      .customRow(scalaVersions = scalaVersions, axisValues = Seq(VirtualAxis.js), projSettings("js", extra = extraSettings))
+      .customRow(scalaVersions = scalaVersions, axisValues = Seq(VirtualAxis.js), sjsProj(projSettings("js", extra = extraSettings)))
 
   def proj[V <: VirtualAxis](matrix: ProjectMatrix, nme: String, axes: List[(V, String)])(
     srcDirSuffixes: (V, String) => Seq[String],
@@ -78,7 +81,7 @@ object Build {
         .customRow(scalaVersions = scalaVersions, axisValues = Seq(axis, VirtualAxis.jvm),
           projSettings("jvm", srcDirSuffixes(axis, version), extraSettings(axis, version)))
         .customRow(scalaVersions = scalaVersions, axisValues = Seq(axis, VirtualAxis.js),
-          projSettings("js", srcDirSuffixes(axis, version), extraSettings(axis, version)))
+          sjsProj(projSettings("js", srcDirSuffixes(axis, version), extraSettings(axis, version))))
       }
 
   def foldHttp4sV[A](version: String)(on_1M: => A, other: => A): A =
@@ -86,8 +89,10 @@ object Build {
 
   def http4sProj(matrix: ProjectMatrix, nme: String)(proc: (Http4sAxis, String) => Project => Project) =
     proj(matrix, nme, http4sVersions)(
-      (axis, version) => Seq(version, foldHttp4sV(version)(http4sV1Milestone, axis.suffix)),
-      proc)
+      (axis, version) => Seq(version, if (isHttp4sV1Milestone(version)) http4sV1Milestone else axis.suffix),
+      (axis, version) => proc(axis, version).andThen(_.settings(
+        moduleName := s"${name.value}_${axis.suffix}"
+      )))
 
   val scalacheckVersion = "1.15.3"
   val scalacheckDep = "org.scalacheck" %% "scalacheck" % scalacheckVersion
