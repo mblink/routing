@@ -65,7 +65,7 @@ object Build {
     ))
 
   def sjsProj(f: Project => Project): Project => Project =
-    f.andThen(_.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin).disablePlugins(mdoc.MdocPlugin))
+    f.andThen(_.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin))
 
   def proj[A](matrix: ProjectMatrix, nme: String, extraSettings: ProjSettings = _ => identity) =
     matrix
