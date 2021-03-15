@@ -1,7 +1,13 @@
 ---
-id: http4s
-title: http4s
+id: http4s-1.0.0-M19
+title: http4s 1.0.0-M19
 ---
+
+To use your routes in a project using http4s @HTTP4S_VERSION@, add the following to your `build.sbt`:
+
+```scala
+libraryDependencies += "bondlink" %% "routing-http4s_@HTTP4S_VERSION@" % "@VERSION@"
+```
 
 http4s handlers will be of the shape `Params => org.http4s.Request[F] => F[org.http4s.Response[F]]`
 
@@ -23,9 +29,9 @@ import org.http4s.{Request, Response}
 import org.http4s.dsl.io._
 import routing.http4s._
 
-val handledLogin = Login.handle.with_(_ => (_: Request[IO]) => Ok("Login page"))
-val handledHello = Hello.handle.with_(name => (_: Request[IO]) => Ok(s"Hello, $name"))
-val handledBlogPost = BlogPost.handle.with_ { case (slug, id) => (req: Request[IO]) =>
+val handledLogin = Login.handle(_ => (_: Request[IO]) => Ok("Login page"))
+val handledHello = Hello.handle(name => (_: Request[IO]) => Ok(s"Hello, $name"))
+val handledBlogPost = BlogPost.handle { case (slug, id) => (req: Request[IO]) =>
   Ok(s"Blog post with id: $id, slug: $slug found at ${req.uri}")
 }
 ```

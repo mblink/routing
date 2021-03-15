@@ -58,17 +58,17 @@ abstract class CodecSpec(name: String) extends Properties(s"$name.codec") {
   def mkReq(u: ReverseUri): Request
   implicit def extractRequest: ExtractRequest[Request]
 
-  def testDecode(route: Route[Method.GET.type, (Unit, String)])(
+  def testDecode(route: Route[Method.GET.type, String])(
     mkUri: String => ReverseUri,
     str: Str,
     raw: Char,
     encoded: String
   ): Prop =
     matches(s"$raw decoding",
-      Some(((), str.patch(raw))),
-      route.unapplyNested(mkReq(mkUri(str.patch(encoded)))))
+      Some(str.patch(raw)),
+      route.unapply(mkReq(mkUri(str.patch(encoded)))))
 
-  def testEncode(route: Route[Method.GET.type, (Unit, String)])(
+  def testEncode(route: Route[Method.GET.type, String])(
     mkExpectedUri: String => String,
     str: Str,
     raw: Char,

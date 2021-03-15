@@ -15,16 +15,16 @@ val Hello = Method.GET / "hello" / pathVar[String]("name")
 val BlogPost = Method.GET / "post" / pathVar[String]("slug") :? queryParam[Int]("id")
 ```
 
-Then you can specify the handling logic for a given route by calling `handle.with_`. The argument passed to `with_`
+Then you can specify the handling logic for a given route by calling `.handle`. The argument passed to `with_`
 should be a function of the type `Params => Out` where `Params` is a tuple of the route's parameters and `Out` is any
 type you want to target with your handler.
 
 Here's how you could handle the routes above, simply returning a `String` for each route:
 
 ```scala mdoc
-val handledLogin = Login.handle.with_(_ => "Login page")
-val handledHello = Hello.handle.with_(name => s"Hello, $name")
-val handledBlogPost = BlogPost.handle.with_ { case (slug, id) =>
+val handledLogin = Login.handle(_ => "Login page")
+val handledHello = Hello.handle(name => s"Hello, $name")
+val handledBlogPost = BlogPost.handle { case (slug, id) =>
   s"Blog post with id: $id, slug: $slug found"
 }
 ```

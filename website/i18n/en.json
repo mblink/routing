@@ -14,8 +14,14 @@
       "implementations": {
         "title": "Choosing an implementation"
       },
-      "implementations/http4s": {
-        "title": "http4s"
+      "implementations/http4s-0.21": {
+        "title": "http4s 0.21"
+      },
+      "implementations/http4s-1.0.0-M10": {
+        "title": "http4s 1.0.0-M10"
+      },
+      "implementations/http4s-1.0.0-M19": {
+        "title": "http4s 1.0.0-M19"
       },
       "implementations/play": {
         "title": "Play Framework"

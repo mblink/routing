@@ -12,6 +12,8 @@ package object play {
 
   implicit val playExtractPathPart: ExtractPathPart[String] =
     new ExtractPathPart[String] {
+      val rootPath: RootPath[String] = playRootPath
+
       def apply[A](path: String, extract: PathExtractor[A]): Option[(A, String)] =
         path match {
           case p"/$s" => extract.extract(s).map(_ -> "/")
@@ -19,9 +21,9 @@ package object play {
           case _ => None
         }
 
-      def rest(path: String): Option[(String, String)] =
+      def apply[A](path: String, extract: RestOfPathExtractor[A]): Option[A] =
         path match {
-          case p"/$rest*" => Some(rest -> "/")
+          case p"/$s*" => extract.extract(s)
           case _ => None
         }
     }

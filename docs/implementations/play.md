@@ -3,6 +3,12 @@ id: play
 title: Play Framework
 ---
 
+To use your routes in a project using the Play framework, add the following to your `build.sbt`:
+
+```scala
+libraryDependencies += "bondlink" %% "routing-play" % "@VERSION@"
+```
+
 Play handlers will be of the shape `Params => play.api.mvc.Handler`
 
 First let's rebuild our example routes.
@@ -24,9 +30,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 val action = new ActionBuilder.IgnoringBody()
 
-val handledLogin = Login.handle.with_(_ => action(Results.Ok("Login page")))
-val handledHello = Hello.handle.with_(name => action(Results.Ok(s"Hello, $name")))
-val handledBlogPost = BlogPost.handle.with_ { case (slug, id) =>
+val handledLogin = Login.handle(_ => action(Results.Ok("Login page")))
+val handledHello = Hello.handle(name => action(Results.Ok(s"Hello, $name")))
+val handledBlogPost = BlogPost.handle { case (slug, id) =>
   action(req => Results.Ok(s"Blog post with id: $id, slug: $slug found at ${req.uri}"))
 }
 ```

@@ -22,26 +22,18 @@ object QueryExtractor {
   implicit val longQueryExtractor: QueryExtractor[Long] = inst(s => Try(s.toLong))
   implicit val booleanQueryExtractor: QueryExtractor[Boolean] = inst(s => Try(s.toBoolean))
   implicit val uuidQueryExtractor: QueryExtractor[UUID] = inst(s => Try(UUID.fromString(s)))
-}
 
-trait OptionalQueryExtractor[A] extends QueryExtractor[Option[A]]
-
-object OptionalQueryExtractor {
-  implicit def fromQueryExtractor[A](implicit q: QueryExtractor[A]): OptionalQueryExtractor[A] =
-    new OptionalQueryExtractor[A] {
+  implicit def optionalQueryExtractor[A](implicit q: QueryExtractor[A]): QueryExtractor[Option[A]] =
+    new QueryExtractor[Option[A]] {
       def extract(key: String, query: QueryMap): Option[Option[A]] =
         query.get(key).flatMap(_.headOption) match {
           case Some(_) => q.extract(key, query).map(Some(_))
           case None => Some(None)
         }
     }
-}
 
-trait MultiQueryExtractor[A] extends QueryExtractor[List[A]]
-
-object MultiQueryExtractor {
-  implicit def fromQueryExtractor[A](implicit q: QueryExtractor[A]): MultiQueryExtractor[A] =
-    new MultiQueryExtractor[A] {
+  implicit def multiQueryExtractor[A](implicit q: QueryExtractor[A]): QueryExtractor[List[A]] =
+    new QueryExtractor[List[A]] {
       @tailrec
       private def go(acc: Option[List[A]], k: String, vs: List[String]): Option[List[A]] =
         (acc, vs) match {

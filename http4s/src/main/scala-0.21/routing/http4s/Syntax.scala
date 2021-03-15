@@ -4,7 +4,6 @@ package http4s
 import cats.{Applicative, Defer}
 import cats.data.OptionT
 import org.{http4s => h}
-import routing.util.Nestable
 import scala.annotation.tailrec
 
 object syntax {
@@ -26,12 +25,7 @@ object syntax {
 
   implicit class Http4sReverseUriOps(val uri: ReverseUri) extends AnyVal {
     def toHttp4s: h.Uri =
-      h.Uri(path = h.Uri.Path.fromString(uri.path), query = (new Http4sReverseQueryOps(uri.query)).toHttp4s)
-  }
-
-  implicit class Http4sRouteOps[M <: Method, P](val route: Route[M, P]) extends AnyVal {
-    def unapply[F[_], A](request: h.Request[F])(implicit N: Nestable[A, P]): Option[A] =
-      route.unapplyNested(request).map(N.unnest(_))
+      h.Uri(path = uri.path, query = (new Http4sReverseQueryOps(uri.query)).toHttp4s)
   }
 
   @tailrec
@@ -42,8 +36,8 @@ object syntax {
     handlers match {
       case Nil => OptionT.none[F, h.Response[F]]
       case handler :: rest =>
-        handler.route.unapplyNested(request) match {
-          case Some(params) => OptionT.liftF(handler.handleNested(params)(request))
+        handler.route.unapply(request) match {
+          case Some(params) => OptionT.liftF(handler.handle(params)(request))
           case None => tryRoutes(request, rest)
         }
     }

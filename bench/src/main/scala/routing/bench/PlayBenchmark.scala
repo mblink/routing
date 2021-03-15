@@ -2,10 +2,9 @@ package routing
 package bench
 
 import akka.actor.ActorSystem
-import izumi.reflect.macrortti._
 import org.openjdk.jmh.annotations._
 import _root_.play.api.libs.typedmap.TypedMap
-import _root_.play.api.mvc.{ActionBuilder, EssentialAction, Headers, RequestHeader, Results}
+import _root_.play.api.mvc.{ActionBuilder, EssentialAction, Handler, Headers, RequestHeader, Results}
 import _root_.play.api.mvc.request.{RemoteConnection, RequestTarget}
 import _root_.play.api.routing.Router
 import _root_.play.api.routing.sird._
@@ -14,21 +13,11 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object playHelper {
+object playHelper extends BenchmarkHelper[RequestHeader, Handler, Router] {
   implicit val actorSystem: ActorSystem = ActorSystem.create()
   val action = new ActionBuilder.IgnoringBody()
 
-  val route1 = Method.GET / "route1"
-  val route2 = Method.GET / "route2" / pathVar[String]("param")
-  val route3 = Method.POST / "route3" / pathVar[Int]("param")
-  val route4 = Method.GET / "route4" / "part" :? queryParam[Boolean]("enabled")
-  val route5 = Method.POST / pathVar[String]("param") / "route5" :? queryParam[Int]("id")
-
-  val route1Res = () => action(Results.Ok("route 1"))
-  val route2Res = (p: String) => action(Results.Ok(s"route 2: $p"))
-  val route3Res = (i: Int) => action(Results.Ok(s"route 3: $i"))
-  val route4Res = (b: Boolean) => action(Results.Ok(s"route 4: $b"))
-  val route5Res = (s: String, i: Int) => action(Results.Ok(s"route 5: $s, $i"))
+  def actionRes(s: String): Handler = action(Results.Ok(s))
 
   val playService = Router.from {
     case GET(p"/route1") => route1Res()
@@ -38,31 +27,10 @@ object playHelper {
     case POST(p"/$param/route5" ? q"id=${int(id)}") => route5Res(param, id)
   }
 
-  val routingService = Route.router(
-    route1.handle.with_(_ => route1Res()),
-    route2.handle.with_(x => route2Res(x)),
-    route3.handle.with_(x => route3Res(x)),
-    route4.handle.with_(x => route4Res(x)),
-    route5.handle.with_ { case (s, i) => route5Res(s, i) }
-  )
+  def router(handlers: Handled[Handler]*): Router = Route.router(handlers:_*)
+  def manualRouter(pf: PartialFunction[RequestHeader, Handler]): Router = Router.from(pf)
 
-  val routingManualService = Router.from {
-    case route1(_) => route1Res()
-    case route2(param) => route2Res(param)
-    case route3(param) => route3Res(param)
-    case route4(enabled) => route4Res(enabled)
-    case route5(param, id) => route5Res(param, id)
-  }
-
-  @annotation.nowarn("msg=match may not be exhaustive")
-  def testParams(r: Route[_, _]): r.Params =
-    r.paramTpes.foldLeft((): Any)((acc, tt) => (acc, tt.tag match {
-      case t if t =:= LTT[Int] => 1
-      case t if t =:= LTT[String] => "test"
-      case t if t =:= LTT[Boolean] => true
-    })).asInstanceOf[r.Params]
-
-  def mkRequest(r: Route[_ <: Method, _]): RequestHeader =
+  def request(r: Route[_ <: Method, _]): RequestHeader =
     new RequestHeader {
       def attrs = TypedMap.empty
       def connection: RemoteConnection = RemoteConnection("", false, None)
@@ -78,21 +46,11 @@ object playHelper {
       def version: String = ""
     }
 
-  val reqs = LazyList.continually(LazyList(
-    mkRequest(route1),
-    mkRequest(route2),
-    mkRequest(route3),
-    mkRequest(route4),
-    mkRequest(route5)
-  )).flatten.iterator
-
-  @inline def run(router: Router): String = {
-    val request = reqs.next()
+  def runReq(request: RequestHeader, router: Router): String =
     Await.result(
       router.handlerFor(request).collect { case a: EssentialAction => a }.get
         .apply(request).run().flatMap(_.body.consumeData).map(_.utf8String),
       Duration.Inf)
-  }
 }
 
 @State(Scope.Thread)

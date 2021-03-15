@@ -19,8 +19,8 @@ object syntax {
     handlers match {
       case Nil => None
       case handler :: rest =>
-        handler.route.unapplyNested(request) match {
-          case Some(params) => Some(handler.handleNested(params))
+        handler.route.unapply(request) match {
+          case Some(params) => Some(handler.handle(params))
           case None => tryRoutes(request, rest)
         }
     }
