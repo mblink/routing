@@ -1,15 +1,15 @@
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets.UTF_8
 
-package object routing extends routing.Handled.Ops {
+package object routing {
   type QueryMap = Map[String, collection.Seq[String]]
 
   type ReversePath = String
   type ReverseQuery = Vector[(String, Option[String])]
 
-  implicit def methodToRoute[M <: Method](m: M): Route.Aux[M, Unit, Unit, Unit] = Route.root(m)
+  implicit def methodToRoute[M <: Method](m: M): Route[M, Unit] = Route.root(m)
 
-  def root[M <: Method](m: M): Route.Aux[M, Unit, Unit, Unit] = Route.root(m)
+  def root[M <: Method](m: M): Route[M, Unit] = Route.root(m)
 
   def pathVar[A](name: String): (String, Option[A]) = name -> None
 

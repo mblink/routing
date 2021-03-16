@@ -1,4 +1,5 @@
 .bsp
 *DS_Store*
+package-lock.json
 target
 .traces

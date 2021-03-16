@@ -8,9 +8,9 @@ trait PathExtractor[A] {
   def extract(path: String): Option[A]
 }
 
-// Dumb duplicate trait to force callers to acknowledge that the String they're
-// extracting from is the rest of the path and may contain multiple path segments
-trait RestOfPathExtractor[A] extends PathExtractor[A]
+trait RestOfPathExtractor[A] {
+  def extract(path: String): Option[A]
+}
 
 object PathExtractor {
   def apply[A](implicit p: PathExtractor[A]): PathExtractor[A] = p
@@ -36,6 +36,7 @@ trait RootPath[ForwardPath] {
 }
 
 trait ExtractPathPart[ForwardPath] {
+  val rootPath: RootPath[ForwardPath]
   def apply[A](path: ForwardPath, extract: PathExtractor[A]): Option[(A, ForwardPath)]
-  def rest(path: ForwardPath): Option[(String, ForwardPath)]
+  def apply[A](path: ForwardPath, extract: RestOfPathExtractor[A]): Option[A]
 }

@@ -16,7 +16,7 @@ import _root_.routing.http4s._
 val test = GET / "test"
 
 // 1. Built with routing handler syntax
-val routing = Route.httpRoutes[IO](test.handle.with_(_ => _ => Ok("test")))
+val routing = Route.httpRoutes[IO](test.handle(_ => _ => Ok("test")))
 
 // 2. Built with routing manual match syntax
 val routingManual = HttpRoutes.of[IO] { case test(_) => Ok("test") }
