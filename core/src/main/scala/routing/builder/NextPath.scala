@@ -57,7 +57,7 @@ trait NextPathInstances {
       def outputParams(params: P, v: V): PO = tp(params, v)
       def paramTpe: Option[Tag[_]] = Some(tt)
       def part(t: (String, RestOfPath[V]), params: PO): PathPart =
-        PathPart.single((t._1, tp.untuple(params)._2))(Show.show(x => s.show(x._2)))
+        PathPart.multi((t._1, tp.untuple(params)._2))(Show.show(x => s.show(x._2)))
       def show(t: (String, RestOfPath[V])): Route.Shown = Route.shownPath[V](Right(t._1))
     }
 }

@@ -2,7 +2,6 @@ package routing
 package part
 
 import routing.util.Show
-import routing.util.dummy._
 
 sealed trait UrlPart {
   type T
@@ -39,28 +38,13 @@ sealed trait QueryPart extends UrlPart {
   def show: Vector[(String, Option[String])]
 }
 
-sealed trait QueryPartBase {
-  protected def kv[A](t: (String, A))(implicit s: Show[A]): (String, Option[String]) =
-    (t._1, Some(s.show(t._2)).filter(_.nonEmpty))
-
-  protected def inst[A](t: (String, A), s: => Vector[(String, Option[String])]): QueryPart.Aux[A] = new QueryPart {
-    type T = A
-    val key = t._1
-    val value = t._2
-    lazy val show = s
+object QueryPart extends UrlPart.Companion[QueryPart] {
+  private[routing] def inst[F[_], A](
+    t: (String, F[A]),
+    toV: F[A] => Vector[A]
+  )(implicit s: Show[A]): Aux[F[A]] = new QueryPart {
+    type T = F[A]
+    val (key, value) = t
+    lazy val show = toV(value).map(a => (key, Some(s.show(a)).filter(_.nonEmpty)))
   }
-
-  def inst[A](t: (String, A))(implicit s: Show[A]): QueryPart.Aux[A] = inst(t, Vector(kv(t)))
 }
-
-sealed trait QueryPartOptional extends QueryPartBase {
-  def inst[A](t: (String, Option[A]))(implicit s: Show[A], @uu d: Dummy1): QueryPart.Aux[Option[A]] =
-    inst(t, t._2.map(a => kv(t._1 -> a)).toVector)
-}
-
-sealed trait QueryPartMulti extends QueryPartOptional with UrlPart.Companion[QueryPart] {
-  def inst[A](t: (String, List[A]))(implicit s: Show[A], @uu d: Dummy2): QueryPart.Aux[List[A]] =
-    inst(t, t._2.map(a => kv(t._1 -> a)).toVector)
-}
-
-object QueryPart extends QueryPartMulti
