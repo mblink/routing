@@ -24,14 +24,15 @@ object Build {
       case Some((2, 13)) => _213
     }
 
-  def scalaVersionSpecificFolders(srcName: String, srcBaseDir: java.io.File, scalaVersion: String): Seq[java.io.File] =
-    Seq(srcBaseDir / srcName / s"scala-${foldScalaV(scalaVersion)("2.12", "2.13")}")
-
   val commonSettings = Seq(
     organization := "bondlink",
     version := currentVersion,
     addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersion.full),
-    scalacOptions ++= foldScalaV(scalaVersion.value)(Seq(), Seq("-Xlint:strict-unsealed-patmat")),
+    scalacOptions ++= Seq(
+      // scala 2.12 reports a warning when subclassing `annotation.nowarn` in uu.scala
+      // so we silence it here -- https://github.com/scala/bug/issues/10134
+      "-Wconf:msg=annotation visible at runtime&src=core/.*/uu.scala:s"
+    ) ++ foldScalaV(scalaVersion.value)(Seq(), Seq("-Xlint:strict-unsealed-patmat")),
     // scalacOptions ++= profileTraceOpts(baseDirectory.value, name.value),
     skip in publish := true,
     publishArtifact in (Compile, packageDoc) := false,

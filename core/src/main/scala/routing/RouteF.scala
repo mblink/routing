@@ -1,18 +1,17 @@
 package routing
 
-import routing.builder.{NextPath, NextQuery}
+import routing.builder.{NextPath, NextQuery, NextRoute}
+import routing.part.UrlPart
 
 trait RouteF[PI, PO] { self =>
   def apply[M <: Method](r: Route[M, PI]): Route[M, PO]
 
-  def /[A, V, POO](a: A)(implicit next: NextPath[A, V, PO, POO]): RouteF[PI, POO] =
-    new RouteF[PI, POO] { def apply[M <: Method](r: Route[M, PI]): Route[M, POO] = self(r) / a }
+  private def nextInst[A, V, POO](a: A)(implicit next: NextRoute[_ <: UrlPart, A, V, PO, POO]): RouteF[PI, POO] =
+    new RouteF[PI, POO] { def apply[M <: Method](r: Route[M, PI]): Route[M, POO] = next(a, self(r)) }
 
-  def :?[A, V, POO](a: A)(implicit next: NextQuery[A, V, PO, POO]): RouteF[PI, POO] =
-    new RouteF[PI, POO] { def apply[M <: Method](r: Route[M, PI]): Route[M, POO] = self(r) :? a }
-
-  def &[A, V, POO](a: A)(implicit next: NextQuery[A, V, PO, POO]): RouteF[PI, POO] =
-    new RouteF[PI, POO] { def apply[M <: Method](r: Route[M, PI]): Route[M, POO] = self(r) & a }
+  final def /[A, V, POO](a: A)(implicit next: NextPath[A, V, PO, POO]): RouteF[PI, POO] = nextInst(a)
+  final def :?[A, V, POO](a: A)(implicit next: NextQuery[A, V, PO, POO]): RouteF[PI, POO] = nextInst(a)
+  final def &[A, V, POO](a: A)(implicit next: NextQuery[A, V, PO, POO]): RouteF[PI, POO] = nextInst(a)
 }
 
 object RouteF {

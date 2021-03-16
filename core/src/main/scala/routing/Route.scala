@@ -6,12 +6,13 @@ import routing.extractor._
 import routing.part._
 import routing.util._
 
-abstract class Route[M <: Method, P]
-extends RouteMethods[M, P]
-with PathBuilder[M, P]
-with QueryBuilder[M, P] { self =>
+abstract class Route[M <: Method, P] extends RouteMethods[M, P] { self =>
   final type Method = M
   final type Params = P
+
+  def /[A, V, PO](a: A)(implicit next: NextPath[A, V, P, PO]): Route[Method, PO] = next(a, self)
+  def :?[A, V, PO](a: A)(implicit next: NextQuery[A, V, P, PO]): Route[Method, PO] = next(a, self)
+  def &[A, V, PO](a: A)(implicit next: NextQuery[A, V, P, PO]): Route[Method, PO] = next(a, self)
 
   def matchUri[ForwardPath, ForwardQuery](path: ForwardPath, query: ForwardQuery)(
     implicit P: ExtractPathPart[ForwardPath],

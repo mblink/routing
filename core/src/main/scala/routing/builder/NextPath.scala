@@ -6,6 +6,8 @@ import routing.extractor._
 import routing.part._
 import routing.util.{Show, Tupled}
 
+case class RestOfPath[A]()
+
 trait NextPathInstances {
   implicit def nextPathString[P]: NextPath[String, String, P, P] =
     new NextPath[String, String, P, P] {
