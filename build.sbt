@@ -77,7 +77,14 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
   .settings(noPublishSettings)
   .dependsOn(core, http4s, play)
 
-lazy val buildDocsSite = taskKey[Unit]("Build documentation site for publishing to GitHub pages")
+lazy val buildDocsSite = taskKey[Unit]("Build GitHub pages documentation site locally")
+lazy val publishDocsSite = taskKey[Unit]("Build and publish GitHub pages documentation site")
+
+def runCmd(cmd: ProcessBuilder): Unit = {
+  val code = cmd.!
+  assert(code == 0, s"command returned $code: $cmd")
+}
+
 buildDocsSite := Def.taskDyn {
   val projs = http4sVersions.map { case (axis, version) =>
     (docs.finder(axis, VirtualAxis.jvm)(latestScalaV), axis, version)
@@ -94,11 +101,23 @@ buildDocsSite := Def.taskDyn {
         srcFile -> new File(s"$out/implementations/$relFile")
       })
       val website = (ThisBuild / baseDirectory).value / "website"
-      val build = (Process(Seq("npm", "install"), cwd = website) #&& Process(Seq("npm", "run", "build"), cwd = website))
-      val code = build.!
-      assert(code == 0, s"build command returned $code: $build")
+      runCmd(Process(Seq("npm", "install"), cwd = website) #&& Process(Seq("npm", "run", "build"), cwd = website))
     }
   }
+}.value
+
+publishDocsSite := Def.taskDyn {
+  val gitUser = sys.env.getOrElse("GIT_USER", sys.error("Please set the `GIT_USER` environment variable to your GitHub username"))
+  val useSsh = sys.env.getOrElse("USE_SSH", sys.error("Please set the `USE_SSH` environment variable to `true` or `false` " ++
+                                                      "to specify whether connecting to GitHub should use SSH"))
+  Def.sequential(
+    buildDocsSite,
+    Def.task(runCmd(Process(
+      Seq("npm", "run", "publish-gh-pages"),
+      (ThisBuild / baseDirectory).value / "website",
+      "GIT_USER" -> gitUser,
+      "USE_SSH" -> useSsh)))
+  )
 }.value
 
 lazy val example = http4sProj(projectMatrix.in(file("example")), "example")((_, version) => _ => _.settings(
