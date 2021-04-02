@@ -52,9 +52,9 @@ object Build {
     gitRelease := {}
   )
 
-  val platforms = Map(
-    "js" -> Left[VirtualAxis.js.type, VirtualAxis.jvm.type](VirtualAxis.js),
-    "jvm" -> Right[VirtualAxis.js.type, VirtualAxis.jvm.type](VirtualAxis.jvm)
+  val platforms = Map[String, Either[VirtualAxis.js.type, VirtualAxis.jvm.type]](
+    "js" -> Left(VirtualAxis.js),
+    "jvm" -> Right(VirtualAxis.jvm)
   )
   type ProjSettings = Either[VirtualAxis.js.type, VirtualAxis.jvm.type] => Project => Project
 
@@ -76,28 +76,25 @@ object Build {
       .customRow(scalaVersions = scalaVersions, axisValues = Seq(VirtualAxis.jvm), projSettings("jvm", Seq(), extraSettings))
       .customRow(scalaVersions = scalaVersions, axisValues = Seq(VirtualAxis.js), sjsProj(projSettings("js", Seq(), extraSettings)))
 
-  def proj[V <: VirtualAxis](matrix: ProjectMatrix, nme: String, axes: List[(V, String)])(
-    srcDirSuffixes: (V, String) => Seq[String],
-    extraSettings: (V, String) => ProjSettings
-  ) =
+  def proj[V](matrix: ProjectMatrix, nme: String, axes: List[V])(
+    srcDirSuffixes: V => Seq[String],
+    extraSettings: V => ProjSettings
+  )(implicit va: V => VirtualAxis) =
     axes.foldLeft(matrix
       .settings(name := s"routing-$nme")
       .settings(commonSettings)
       .settings(testSettings)
-      .settings(commonSettings)) { case (p, (axis, version)) => p
-        .customRow(scalaVersions = scalaVersions, axisValues = Seq(axis, VirtualAxis.jvm),
-          projSettings("jvm", srcDirSuffixes(axis, version), extraSettings(axis, version)))
-        .customRow(scalaVersions = scalaVersions, axisValues = Seq(axis, VirtualAxis.js),
-          sjsProj(projSettings("js", srcDirSuffixes(axis, version), extraSettings(axis, version))))
+      .settings(commonSettings)) { case (p, axis) => p
+        .customRow(scalaVersions = scalaVersions, axisValues = Seq(va(axis), VirtualAxis.jvm),
+          projSettings("jvm", srcDirSuffixes(axis), extraSettings(axis)))
+        .customRow(scalaVersions = scalaVersions, axisValues = Seq(va(axis), VirtualAxis.js),
+          sjsProj(projSettings("js", srcDirSuffixes(axis), extraSettings(axis))))
       }
 
-  def foldHttp4sV[A](version: String)(on_1M: => A, other: => A): A =
-    if (isHttp4sV1Milestone(version)) on_1M else other
-
-  def http4sProj(matrix: ProjectMatrix, nme: String)(proc: (Http4sAxis, String) => ProjSettings) =
-    proj(matrix, nme, http4sVersions)(
-      (axis, version) => Seq(version, if (isHttp4sV1Milestone(version)) http4sV1Milestone else axis.suffix),
-      (axis, version) => proc(axis, version).andThen(_.andThen(_.settings(
+  def http4sProj(matrix: ProjectMatrix, nme: String)(proc: Http4sAxis.Value => ProjSettings) =
+    proj(matrix, nme, Http4sAxis.all)(
+      axis => Seq(axis.version, if (isHttp4sV1Milestone(axis.version)) http4sV1Milestone else axis.suffix),
+      axis => proc(axis).andThen(_.andThen(_.settings(
         moduleName := s"${name.value}_${axis.suffix}"
       ))))
 
@@ -114,18 +111,28 @@ object Build {
 
   val catsCore = "org.typelevel" %% "cats-core" % "2.4.2"
   val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.0.0-M16"
+  val http4sV1Milestone = "1.0.0-M"
 
-  case class Http4sAxis(suffix: String) extends VirtualAxis.WeakAxis {
-    val idSuffix = suffix.replace(".", "_")
-    val directorySuffix = suffix
+  object Http4sAxis extends Enumeration {
+    protected case class HAVal(suffix: String, version: String, comment: String) extends super.Val { self =>
+      lazy val axis: VirtualAxis.WeakAxis =
+        new VirtualAxis.WeakAxis {
+          val suffix = self.suffix
+          val idSuffix = self.suffix.replace(".", "_")
+          val directorySuffix = self.suffix
+        }
+    }
+
+    implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
+    implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
+
+    val v0_21 = HAVal("0.21", "0.21.21", "latest stable")
+    val v1_0_0_M10 = HAVal(s"${http4sV1Milestone}10", s"${http4sV1Milestone}10", "latest on cats effect 2")
+    val v1_0_0_M20 = HAVal(s"${http4sV1Milestone}20", s"${http4sV1Milestone}20", "latest on cats effect 3")
+
+    lazy val all = values.toList
   }
 
-  val http4sVersions = List(
-    Http4sAxis("0.21") -> "0.21.20",
-    Http4sAxis("1.0.0-M10") -> "1.0.0-M10",
-    Http4sAxis("1.0.0-M19") -> "1.0.0-M19"
-  )
-  val http4sV1Milestone = "1.0.0-M"
   def isHttp4sV1Milestone(version: String): Boolean = version.startsWith(http4sV1Milestone)
 
   def http4sDep(proj: String, version: String) = "org.http4s" %% s"http4s-$proj" % version

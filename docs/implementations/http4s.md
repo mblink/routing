@@ -1,12 +1,12 @@
 ---
-id: http4s-1.0.0-M19
-title: http4s 1.0.0-M19 (latest on cats-effect 3)
+id: http4s-@HTTP4S_SUFFIX@
+title: http4s @HTTP4S_SUFFIX@ (@HTTP4S_VERSION_COMMENT@)
 ---
 
-To use your routes in a project using http4s @HTTP4S_VERSION@, add the following to your `build.sbt`:
+To use your routes in a project using http4s @HTTP4S_SUFFIX@, add the following to your `build.sbt`:
 
 ```scala
-libraryDependencies += "bondlink" %% "routing-http4s_@HTTP4S_VERSION@" % "@VERSION@"
+libraryDependencies += "bondlink" %% "routing-http4s_@HTTP4S_SUFFIX@" % "@VERSION@"
 ```
 
 http4s handlers will be of the shape `Params => org.http4s.Request[F] => F[org.http4s.Response[F]]`
@@ -63,8 +63,7 @@ val service2: HttpRoutes[IO] = HttpRoutes.of {
 You can confirm that routes are matched correctly by passing some test requests to the service:
 
 ```scala mdoc
-import cats.effect.unsafe.implicits.global
-import org.http4s.Request
+@HTTP4S_UNSAFERUNSYNC_IMPORT@import org.http4s.Request
 
 def testRoute(service: HttpRoutes[IO], call: Call): String =
   service
@@ -89,7 +88,7 @@ You can also check that requests matching none of your routes are not handled by
 import org.http4s.{Method, Uri}
 
 def unhandled(method: Method, path: String) =
-  service1.run(Request[IO](method = method, uri = Uri(path = Uri.Path.fromString(path)))).value.unsafeRunSync()
+  service1.run(Request[IO](method = method, uri = Uri(path = @HTTP4S_PATH_CODE@))).value.unsafeRunSync()
 
 unhandled(GET, "/fake")
 
