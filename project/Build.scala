@@ -34,14 +34,14 @@ object Build {
       "-Wconf:msg=annotation visible at runtime&src=core/.*/uu.scala:s"
     ) ++ foldScalaV(scalaVersion.value)(Seq(), Seq("-Xlint:strict-unsealed-patmat")),
     // scalacOptions ++= profileTraceOpts(baseDirectory.value, name.value),
-    skip in publish := true,
-    publishArtifact in (Compile, packageDoc) := false,
-    publishArtifact in packageDoc := false,
-    sources in (Compile, doc) := Seq()
+    publish / skip := true,
+    Compile / packageDoc / publishArtifact := false,
+    packageDoc / publishArtifact := false,
+    Compile / doc / sources := Seq()
   )
 
   val publishSettings = Seq(
-    skip in publish := false,
+    publish / skip := false,
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     gitPublishDir := file("/src/maven-repo")
   )
@@ -60,7 +60,7 @@ object Build {
 
   def projSettings(platform: String, srcDirSuffixes: Seq[String], extra: ProjSettings): Project => Project =
     extra(platforms(platform)).andThen(_.settings(
-      unmanagedSourceDirectories in Compile ++=
+      Compile / unmanagedSourceDirectories ++=
         (platform +: srcDirSuffixes.flatMap(s => Seq(s, s"$s-$platform")))
           .map(suffix => sourceDirectory.value / "main" / s"scala-$suffix")
     ))
@@ -103,14 +103,14 @@ object Build {
 
   val testSettings = Seq(
     libraryDependencies += scalacheckDep % "test",
-    testOptions in Test ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "2")) ++
+    Test / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "2")) ++
       Option(System.getProperty("testIterations")).map(_.toInt)
         .map(n => Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-minSuccessfulTests", n.toString)))
         .getOrElse(Seq())
   )
 
-  val catsCore = "org.typelevel" %% "cats-core" % "2.4.2"
-  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.0.0-M16"
+  val catsCore = "org.typelevel" %% "cats-core" % "2.6.0"
+  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.1.1"
   val http4sV1Milestone = "1.0.0-M"
 
   object Http4sAxis extends Enumeration {
@@ -128,7 +128,7 @@ object Build {
 
     val v0_21 = HAVal("0.21", "0.21.21", "latest stable")
     val v1_0_0_M10 = HAVal(s"${http4sV1Milestone}10", s"${http4sV1Milestone}10", "latest on cats effect 2")
-    val v1_0_0_M20 = HAVal(s"${http4sV1Milestone}20", s"${http4sV1Milestone}20", "latest on cats effect 3")
+    val v1_0_0_M21 = HAVal(s"${http4sV1Milestone}21", s"${http4sV1Milestone}21", "latest on cats effect 3")
 
     lazy val all = values.toList
   }
@@ -136,5 +136,5 @@ object Build {
   def isHttp4sV1Milestone(version: String): Boolean = version.startsWith(http4sV1Milestone)
 
   def http4sDep(proj: String, version: String) = "org.http4s" %% s"http4s-$proj" % version
-  val playCore = "com.typesafe.play" %% "play" % "2.8.2"
+  val playCore = "com.typesafe.play" %% "play" % "2.8.8"
 }

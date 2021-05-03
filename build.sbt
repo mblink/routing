@@ -14,7 +14,7 @@ lazy val core = proj(projectMatrix.in(file("core")), "core")
       catsCore % Optional,
       izumiReflect
     ),
-    sourceGenerators in Compile += Def.task {
+    Compile / sourceGenerators += Def.task {
       val generators = new File("git rev-parse --show-toplevel".!!.trim) / "generators"
       val srcManaged = (Compile / sourceManaged).value / "generated"
 
@@ -67,10 +67,10 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
       "HTTP4S_PATH_CODE" -> (axis match {
         case Http4sAxis.v0_21 => "path"
         case Http4sAxis.v1_0_0_M10 => "Uri.Path.fromString(path)"
-        case Http4sAxis.v1_0_0_M20 => "Uri.Path.unsafeFromString(path)"
+        case Http4sAxis.v1_0_0_M21 => "Uri.Path.unsafeFromString(path)"
       }),
       "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
-        case Http4sAxis.v1_0_0_M20 => "import cats.effect.unsafe.implicits.global\n"
+        case Http4sAxis.v1_0_0_M21 => "import cats.effect.unsafe.implicits.global\n"
         case _ => ""
       })
     )
@@ -129,8 +129,8 @@ lazy val example = http4sProj(projectMatrix.in(file("example")), "example")(axis
   .settings(noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.circe" %% "circe-core" % "0.13.0",
-      "io.circe" %% "circe-generic" % "0.13.0",
+      "io.circe" %% "circe-core" % "0.14.0-M6",
+      "io.circe" %% "circe-generic" % "0.14.0-M6",
       "org.slf4j" % "slf4j-api" % "1.7.30",
       "org.slf4j" % "slf4j-simple" % "1.7.30"
     )

@@ -11,7 +11,7 @@
           "implementations",
           "implementations/http4s-0.21",
           "implementations/http4s-1.0.0-M10",
-          "implementations/http4s-1.0.0-M20",
+          "implementations/http4s-1.0.0-M21",
           "implementations/play"
         ]
       },
