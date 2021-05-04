@@ -14,7 +14,7 @@ lazy val core = proj(projectMatrix.in(file("core")), "core")
       catsCore % Optional,
       izumiReflect
     ),
-    sourceGenerators in Compile += Def.task {
+    Compile / sourceGenerators += Def.task {
       val generators = new File("git rev-parse --show-toplevel".!!.trim) / "generators"
       val srcManaged = (Compile / sourceManaged).value / "generated"
 
@@ -31,10 +31,10 @@ lazy val core = proj(projectMatrix.in(file("core")), "core")
     }
   )
 
-lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")((_, version) => _ => _.settings(
+lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")(axis => _ => _.settings(
   libraryDependencies ++= Seq(
-    http4sDep("core", version),
-    http4sDep("dsl", version)
+    http4sDep("core", axis.version),
+    http4sDep("dsl", axis.version)
   )
 ))
   .settings(publishSettings)
@@ -45,32 +45,34 @@ lazy val play = proj(projectMatrix.in(file("play")), "play")
   .settings(libraryDependencies += playCore)
   .dependsOn(core % "compile->compile;test->test")
 
-lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench")((_, _) => _ => identity)
+lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench")(_ => _ => identity)
   .settings(noPublishSettings)
   .dependsOn(core, http4s, play)
   .enablePlugins(JmhPlugin)
 
-def http4sImplDoc(dir: File, axis: Http4sAxis, version: String): (File, String) = {
-  val f = s"http4s-${axis.suffix}.md"
-  (dir / "implementations" / f, s"http4s-${axis.suffix}.md")
-}
+lazy val http4sImplFile = "http4s.md"
 
-lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs")((axis, version) => _.fold(
+def http4sImplDoc(dir: File, axis: Http4sAxis.Value): (File, String) =
+  (dir / "implementations" / http4sImplFile, s"${http4sImplFile.split(".md").head}-${axis.suffix}.md")
+
+lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs")(axis => _.fold(
   _ => identity,
   _ => _.settings(
-    mdocExtraArguments ++= "--no-link-hygiene" +: {
-      val (_, http4sFile) = http4sImplDoc(mdocIn.value, axis, version)
-      Seq("--include", "**.md", "--include", http4sFile) ++
-        (mdocIn.value / "implementations").listFiles.map(_.toString.stripPrefix(s"${mdocIn.value}/")).flatMap { f =>
-          val fn = f.split('/').last
-          if (fn.startsWith("http4s-") && fn != http4sFile) Seq("--exclude", f) else Seq()
-        }
-    },
     mdocVariables ++= Map(
       "VERSION" -> currentVersion,
-      "HTTP4S_VERSION" -> axis.suffix,
       "GITHUB_REPO_URL" -> githubRepoUrl,
-      "GITHUB_BLOB_URL" -> s"$githubRepoUrl/blob/master"
+      "GITHUB_BLOB_URL" -> s"$githubRepoUrl/blob/master",
+      "HTTP4S_SUFFIX" -> axis.suffix,
+      "HTTP4S_VERSION_COMMENT" -> axis.comment,
+      "HTTP4S_PATH_CODE" -> (axis match {
+        case Http4sAxis.v0_21 => "path"
+        case Http4sAxis.v1_0_0_M10 => "Uri.Path.fromString(path)"
+        case Http4sAxis.v1_0_0_M21 => "Uri.Path.unsafeFromString(path)"
+      }),
+      "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
+        case Http4sAxis.v1_0_0_M21 => "import cats.effect.unsafe.implicits.global\n"
+        case _ => ""
+      })
     )
   ).enablePlugins(MdocPlugin))
 )
@@ -86,19 +88,17 @@ def runCmd(cmd: ProcessBuilder): Unit = {
 }
 
 buildDocsSite := Def.taskDyn {
-  val projs = http4sVersions.map { case (axis, version) =>
-    (docs.finder(axis, VirtualAxis.jvm)(latestScalaV), axis, version)
-  }
+  val projs = Http4sAxis.all.map(axis => docs.finder(axis, VirtualAxis.jvm)(latestScalaV))
   val target = (ThisBuild / baseDirectory).value / "routing-docs" / "target"
   val out = target / "generated-site"
   Def.taskDyn {
-    Def.sequential(projs.map { case (p, _, _) => (p / mdoc).toTask("") }).map { _ =>
+    Def.sequential(projs.map(p => (p / mdoc).toTask(""))).map { _ =>
       IO.delete(out)
-      IO.copyDirectory((projs.last._1 / mdocOut).value, out)
-      IO.copy(http4sVersions.dropRight(1).map { case (axis, version) =>
-        val (srcFile, relFile) = http4sImplDoc(target / s"${axis.suffix}-jvm-2.13" / "mdoc", axis, version)
-        println(s"$srcFile -> ${new File(s"$out/implementations/$relFile")}")
-        srcFile -> new File(s"$out/implementations/$relFile")
+      IO.copyDirectory((projs.last / mdocOut).value, out)
+      IO.copy(Http4sAxis.all.dropRight(1).map { axis =>
+        val (srcFile, targetRelFile) = http4sImplDoc(target / s"${axis.suffix}-jvm-2.13" / "mdoc", axis)
+        println(s"$srcFile -> ${new File(s"$out/implementations/$targetRelFile")}")
+        srcFile -> new File(s"$out/implementations/$targetRelFile")
       })
       val website = (ThisBuild / baseDirectory).value / "website"
       runCmd(Process(Seq("npm", "install"), cwd = website) #&& Process(Seq("npm", "run", "build"), cwd = website))
@@ -120,17 +120,17 @@ publishDocsSite := Def.taskDyn {
   )
 }.value
 
-lazy val example = http4sProj(projectMatrix.in(file("example")), "example")((_, version) => _ => _.settings(
+lazy val example = http4sProj(projectMatrix.in(file("example")), "example")(axis => _ => _.settings(
   libraryDependencies ++= Seq(
-    http4sDep("circe", version),
-    http4sDep("blaze-server", version)
+    http4sDep("circe", axis.version),
+    http4sDep("blaze-server", axis.version)
   )
 ))
   .settings(noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.circe" %% "circe-core" % "0.13.0",
-      "io.circe" %% "circe-generic" % "0.13.0",
+      "io.circe" %% "circe-core" % "0.14.0-M6",
+      "io.circe" %% "circe-generic" % "0.14.0-M6",
       "org.slf4j" % "slf4j-api" % "1.7.30",
       "org.slf4j" % "slf4j-simple" % "1.7.30"
     )

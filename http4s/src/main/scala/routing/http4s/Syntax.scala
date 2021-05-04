@@ -6,7 +6,7 @@ import cats.data.OptionT
 import org.{http4s => h}
 import scala.annotation.tailrec
 
-object syntax {
+object syntax extends SyntaxCompat {
   implicit class Http4sMethodOps(val method: Method) extends AnyVal {
     def toHttp4s: h.Method = method match {
       case Method.GET => h.Method.GET
@@ -23,9 +23,10 @@ object syntax {
     def toHttp4s: h.Query = h.Query.fromVector(query)
   }
 
+  protected def queryToHttp4s(query: ReverseQuery): h.Query = new Http4sReverseQueryOps(query).toHttp4s
+
   implicit class Http4sReverseUriOps(val uri: ReverseUri) extends AnyVal {
-    def toHttp4s: h.Uri =
-      h.Uri(path = uri.path, query = (new Http4sReverseQueryOps(uri.query)).toHttp4s)
+    def toHttp4s: h.Uri = uriToHttp4s(uri)
   }
 
   @tailrec
@@ -42,12 +43,12 @@ object syntax {
         }
     }
 
-  trait MkHttpRoutes {
+  class MkHttpRoutes(val dummy: Boolean = false) extends AnyVal {
     def apply[F[_]: Applicative: Defer](handlers: Handled[h.Request[F] => F[h.Response[F]]]*): h.HttpRoutes[F] =
       h.HttpRoutes[F](tryRoutes(_, handlers.toList))
   }
 
   implicit class Http4sRouteObjectOps(val route: Route.type) extends AnyVal {
-    def httpRoutes: MkHttpRoutes = new MkHttpRoutes {}
+    def httpRoutes: MkHttpRoutes = new MkHttpRoutes
   }
 }

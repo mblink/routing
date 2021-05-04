@@ -1,31 +1,31 @@
 package routing
 
 import extractor._
-import org.http4s.{Method => Http4sMethod, Uri => Http4sUri, Request => Http4sRequest}
+import org.http4s.{Method => Http4sMethod, Request => Http4sRequest}
 import org.http4s.dsl.impl.{:?, /:, +&, ->}
 import routing.util.dummy._
 
-package object http4s {
-  implicit val http4sRootPath: RootPath[Http4sUri.Path] =
-    new RootPath[Http4sUri.Path] {
-      def apply(): Http4sUri.Path = Http4sUri.Path.Root
+package object http4s extends http4s.PackageCompat {
+  implicit val http4sRootPath: RootPath[Http4sPath] =
+    new RootPath[Http4sPath] {
+      def apply(): Http4sPath = rootHttp4sPath
     }
 
-  implicit val http4sExtractPathPart: ExtractPathPart[Http4sUri.Path] =
-    new ExtractPathPart[Http4sUri.Path] {
-      private def normalizePath(path: Http4sUri.Path): Http4sUri.Path =
-        if (path.isEmpty) Http4sUri.Path.Root else path
+  implicit val http4sExtractPathPart: ExtractPathPart[Http4sPath] =
+    new ExtractPathPart[Http4sPath] {
+      private def normalizePath(path: Http4sPath): Http4sPath =
+        if (http4sPathIsEmpty(path)) rootHttp4sPath else path
 
-      val rootPath: RootPath[Http4sUri.Path] = http4sRootPath
+      val rootPath: RootPath[Http4sPath] = http4sRootPath
 
-      def apply[A](path: Http4sUri.Path, extract: PathExtractor[A]): Option[(A, Http4sUri.Path)] =
+      def apply[A](path: Http4sPath, extract: PathExtractor[A]): Option[(A, Http4sPath)] =
         path match {
           case s /: rest => extract.extract(s).map(_ -> normalizePath(rest))
           case _ => None
         }
 
-      def apply[A](path: Http4sUri.Path, extract: RestOfPathExtractor[A]): Option[A] = {
-        def go(p: Http4sUri.Path): List[String] = normalizePath(p) match {
+      def apply[A](path: Http4sPath, extract: RestOfPathExtractor[A]): Option[A] = {
+        def go(p: Http4sPath): List[String] = normalizePath(p) match {
           case s /: rest => s :: go(rest)
           case _ => Nil
         }
@@ -42,12 +42,12 @@ package object http4s {
         }
     }
 
-  implicit def http4sExtractRequest[F[_]]: ExtractRequest.Aux[Http4sRequest[F], Http4sUri.Path, QueryMap] =
+  implicit def http4sExtractRequest[F[_]]: ExtractRequest.Aux[Http4sRequest[F], Http4sPath, QueryMap] =
     new ExtractRequest[Http4sRequest[F]] {
-      type ForwardPath = Http4sUri.Path
+      type ForwardPath = Http4sPath
       type ForwardQuery = QueryMap
 
-      def parts(request: Http4sRequest[F]): Option[(Method, Http4sUri.Path, QueryMap)] =
+      def parts(request: Http4sRequest[F]): Option[(Method, Http4sPath, QueryMap)] =
         request match {
           case m -> p :? q => Method.fromString(m.name).map((_, p, q))
         }
