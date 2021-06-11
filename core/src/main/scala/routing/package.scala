@@ -1,4 +1,3 @@
-import java.net.URLEncoder
 import java.nio.charset.StandardCharsets.UTF_8
 
 package object routing {
@@ -20,7 +19,4 @@ package object routing {
   def optionalQueryParam[A](key: String): (String, Option[Option[A]]) = key -> None
 
   private[routing] val utf8 = UTF_8.name()
-
-  private[routing] def queryUrlEncode(s: String): String = URLEncoder.encode(s, utf8)
-  private[routing] def pathUrlEncode(s: String): String = queryUrlEncode(s).replace("+", "%20")
 }

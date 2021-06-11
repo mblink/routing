@@ -34,8 +34,8 @@ abstract class Route[M <: Method, P] extends RouteMethods[M, P] { self =>
     pathParts(params).foreach { p =>
       b.append('/')
       p match {
-        case m: PathPart.Multi => b.append(m.show.split('/').map(pathUrlEncode).mkString("/"))
-        case s: PathPart.Single => b.append(pathUrlEncode(s.show))
+        case m: PathPart.Multi => b.append(m.show.split('/').map(UrlEncoder.pathEncode).mkString("/"))
+        case s: PathPart.Single => b.append(UrlEncoder.pathEncode(s.show))
       }
     }
     b.toString
