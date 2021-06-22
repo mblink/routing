@@ -31,11 +31,14 @@ abstract class Route[M <: Method, P] extends RouteMethods[M, P] { self =>
 
   def pathRaw(params: Params): ReversePath = {
     val b = new StringBuilder("")
-    pathParts(params).foreach { p =>
-      b.append('/')
-      p match {
-        case m: PathPart.Multi => b.append(m.show.split('/').map(UrlEncoder.pathEncode).mkString("/"))
-        case s: PathPart.Single => b.append(UrlEncoder.pathEncode(s.show))
+    pathParts(params) match {
+      case Vector() => b.append('/')
+      case parts => parts.foreach { p =>
+        b.append('/')
+        p match {
+          case m: PathPart.Multi => b.append(m.show.split('/').map(UrlEncoder.pathEncode).mkString("/"))
+          case s: PathPart.Single => b.append(UrlEncoder.pathEncode(s.show))
+        }
       }
     }
     b.toString

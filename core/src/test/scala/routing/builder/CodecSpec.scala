@@ -95,6 +95,6 @@ abstract class CodecSpec(name: String) extends Properties(s"$name.codec") {
       //   testDecode(queryRoute)(x => ReverseUri(Method.GET, "/", Vector("x" -> Some(x))), s, raw, encoded))
 
       property(s"encodes '$raw' in query") = forAll((s: Str) =>
-        testEncode(queryRoute)(s => s"?x=$s", s, raw, encoded))
+        testEncode(queryRoute)(s => s"/?x=$s", s, raw, encoded))
     }
 }
