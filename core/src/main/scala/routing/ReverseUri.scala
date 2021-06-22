@@ -9,10 +9,10 @@ final case class ReverseUri(method: Method, path: ReversePath, query: ReverseQue
 
 object ReverseUri {
   private def appendQueryPair(b: StringBuilder, t: (String, Option[String])): Unit = {
-    b.append(queryUrlEncode(t._1))
+    b.append(UrlEncoder.queryEncode(t._1))
     t._2.foreach { v =>
       b.append('=')
-      b.append(queryUrlEncode(v))
+      b.append(UrlEncoder.queryEncode(v))
     }
   }
 
