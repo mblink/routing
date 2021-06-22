@@ -109,8 +109,8 @@ object Build {
         .getOrElse(Seq())
   )
 
-  val catsCore = "org.typelevel" %% "cats-core" % "2.6.0"
-  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.1.1"
+  val catsCore = "org.typelevel" %% "cats-core" % "2.6.1"
+  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.1.2"
   val http4sV1Milestone = "1.0.0-M"
 
   object Http4sAxis extends Enumeration {
@@ -126,9 +126,9 @@ object Build {
     implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v0_21 = HAVal("0.21", "0.21.21", "latest stable")
+    val v0_21 = HAVal("0.21", "0.21.24", "latest stable")
     val v1_0_0_M10 = HAVal(s"${http4sV1Milestone}10", s"${http4sV1Milestone}10", "latest on cats effect 2")
-    val v1_0_0_M21 = HAVal(s"${http4sV1Milestone}21", s"${http4sV1Milestone}21", "latest on cats effect 3")
+    val v1_0_0_M23 = HAVal(s"${http4sV1Milestone}23", s"${http4sV1Milestone}23", "latest on cats effect 3")
 
     lazy val all = values.toList
   }
