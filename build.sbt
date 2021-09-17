@@ -34,10 +34,12 @@ lazy val core = proj(projectMatrix.in(file("core")), "core")
 lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")(axis => _ => _.settings(
   libraryDependencies ++= Seq(
     http4sDep("core", axis.version),
-    http4sDep("dsl", axis.version)
+    http4sDep("dsl", axis.version),
+    http4sDep("server", axis.version)
   )
 ))
   .settings(publishSettings)
+  .settings(scalacOptions ~= (_.filterNot(_ == "-Xfatal-warnings")))
   .dependsOn(core % "compile->compile;test->test")
 
 lazy val play = proj(projectMatrix.in(file("play")), "play")
@@ -65,12 +67,14 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
       "HTTP4S_SUFFIX" -> axis.suffix,
       "HTTP4S_VERSION_COMMENT" -> axis.comment,
       "HTTP4S_PATH_CODE" -> (axis match {
-        case Http4sAxis.v0_21 => "path"
         case Http4sAxis.v1_0_0_M10 => "Uri.Path.fromString(path)"
-        case Http4sAxis.v1_0_0_M23 => "Uri.Path.unsafeFromString(path)"
+        case Http4sAxis.v0_22 |
+             Http4sAxis.v0_23 |
+             Http4sAxis.v1_0_0_M25 =>
+          "Uri.Path.unsafeFromString(path)"
       }),
       "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
-        case Http4sAxis.v1_0_0_M23 => "import cats.effect.unsafe.implicits.global\n"
+        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M25 => "import cats.effect.unsafe.implicits.global\n"
         case _ => ""
       })
     )

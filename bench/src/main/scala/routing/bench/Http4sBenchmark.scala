@@ -2,13 +2,14 @@ package routing
 package bench
 
 import cats.effect.IO
+import cats.effect.unsafe.implicits.global // 0.23, 1.0.0-M25
 import org.http4s._
 import org.http4s.dsl.io._
 import org.openjdk.jmh.annotations._
 import routing.http4s._
 
 @State(Scope.Benchmark)
-abstract class Http4sBenchmarkHelper extends BenchmarkHelper[Request[IO], Request[IO] => IO[Response[IO]], HttpRoutes[IO]] {
+object http4sHelper extends BenchmarkHelper[Request[IO], Request[IO] => IO[Response[IO]], HttpRoutes[IO]] {
   object Id extends QueryParamDecoderMatcher[Int]("id")
   object Enabled extends QueryParamDecoderMatcher[Boolean]("enabled")
 
@@ -29,8 +30,19 @@ abstract class Http4sBenchmarkHelper extends BenchmarkHelper[Request[IO], Reques
   def request(r: Route[_ <: routing.Method, _]): Request[IO] =
     Request[IO](uri = r.uriRaw(testParams(r)).toHttp4s, method = r.method.toHttp4s)
 
-  def runIO[A](io: IO[A]): A
+  def runIO[A](io: IO[A]): A = io.unsafeRunSync()
 
   def runReq(request: Request[IO], routes: HttpRoutes[IO]): String =
     runIO(routes.run(request).value.flatMap(_.get.as[String]))
+}
+
+class Http4sBenchmark_0_22 { // 0.22
+class Http4sBenchmark_0_23 { // 0.23
+class Http4sBenchmark_1_0_0_M10 { // 1.0.0-M10
+class Http4sBenchmark_1_0_0_M25 { // 1.0.0-M25
+  import http4sHelper._
+
+  @Benchmark def http4s: String = run(http4sService)
+  @Benchmark def routing: String = run(routingService)
+  @Benchmark def routingManual: String = run(routingManualService)
 }

@@ -9,7 +9,7 @@ import sbtprojectmatrix.ProjectMatrixPlugin.autoImport._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.12.13", "2.13.5")
+  lazy val scalaVersions = Seq("2.12.15", "2.13.6")
   lazy val latestScalaV = scalaVersions.find(_.startsWith("2.13")).get
 
   def profileTraceOpts(baseDir: File, name: String): Seq[String] = {
@@ -24,14 +24,63 @@ object Build {
       case Some((2, 13)) => _213
     }
 
+  case class ParseState(
+    targetVersion: String,
+    currVersions: List[String],
+    output: List[String]
+  )
+
+  val startVersionBlock = "// ++ "
+  val endVersionBlock = "// -- "
+  val versionBlockComments = List(startVersionBlock, endVersionBlock)
+
+  val singleLineVersionComment = """^([^/]+) // (.*)$""".r
+
+  def splitVersion(v: String): List[String] = v.split(",").toList.map(_.trim)
+
+  def parseSourceFile(file: File, targetVersion: String): String =
+    scala.io.Source.fromFile(file).getLines().foldLeft(ParseState(
+      targetVersion,
+      Nil,
+      Nil
+    ))((acc, line) => (acc.currVersions, line) match {
+      // Start a version block with a line matching `// ++ $version`
+      case (Nil, l) if l.startsWith(startVersionBlock) =>
+        acc.copy(
+          currVersions = splitVersion(l.stripPrefix(startVersionBlock)),
+          output = (acc.output :+ ""))
+
+      // End a version block with a line matching `// -- $version`
+      case (vs @ (_ :: _), l) if vs.exists(v => l == endVersionBlock ++ v) =>
+        acc.copy(currVersions = Nil, output = (acc.output :+ ""))
+
+      // Fail on attempts at nested version blocks
+      case (_ :: _, l) if versionBlockComments.exists(l.startsWith(_)) =>
+        sys.error("Cannot nest version blocks")
+
+      // Decide whether to keep a version line within a version block by checking
+      // if the target version starts with the current version
+      case (vs @ (_ :: _), l) =>
+        acc.copy(output = acc.output ++ (if (vs.exists(acc.targetVersion.startsWith(_))) Seq(l) else Seq()))
+
+      // Decide whether to keep a single version specific line by checking
+      // if the target version matches the version in the comment
+      case (Nil, singleLineVersionComment(l, v)) =>
+        acc.copy(output = acc.output ++ (if (splitVersion(v).exists(acc.targetVersion.startsWith(_))) Seq(l) else Seq()))
+
+      // Keep all other lines
+      case (Nil, l) =>
+        acc.copy(output = (acc.output :+ l))
+    }).output.mkString("\n") ++ "\n"
+
   val commonSettings = Seq(
     organization := "bondlink",
     version := currentVersion,
-    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersion.full),
+    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full),
+    resolvers += "bondlink-maven-repo" at "https://raw.githubusercontent.com/mblink/maven-repo/main",
+    addCompilerPlugin("bondlink" %% "nowarn-plugin" % "1.0.1"),
     scalacOptions ++= Seq(
-      // scala 2.12 reports a warning when subclassing `annotation.nowarn` in uu.scala
-      // so we silence it here -- https://github.com/scala/bug/issues/10134
-      "-Wconf:msg=annotation visible at runtime&src=core/.*/uu.scala:s"
+      "-P:nowarn:uu:msg=never used",
     ) ++ foldScalaV(scalaVersion.value)(Seq(), Seq("-Xlint:strict-unsealed-patmat")),
     // scalacOptions ++= profileTraceOpts(baseDirectory.value, name.value),
     publish / skip := true,
@@ -91,11 +140,29 @@ object Build {
           sjsProj(projSettings("js", srcDirSuffixes(axis), extraSettings(axis))))
       }
 
+  var genTimes: Map[(String, String), Long] = Map()
+
   def http4sProj(matrix: ProjectMatrix, nme: String)(proc: Http4sAxis.Value => ProjSettings) =
     proj(matrix, nme, Http4sAxis.all)(
       axis => Seq(axis.version, if (isHttp4sV1Milestone(axis.version)) http4sV1Milestone else axis.suffix),
       axis => proc(axis).andThen(_.andThen(_.settings(
-        moduleName := s"${name.value}_${axis.suffix}"
+        moduleName := s"${name.value}_${axis.suffix}",
+        Compile / sources := {
+          val srcs = (Compile / sources).value
+          val srcManaged = (Compile / sourceManaged).value / "parsed"
+          srcs.map { src =>
+            val outFile = srcManaged / src.getName
+            val genTimeKey = (src.toString, outFile.toString)
+            if (outFile.exists && genTimes.get(genTimeKey).exists(_ > src.lastModified)) {
+              outFile
+            } else {
+              println(s"Writing $src to $outFile")
+              genTimes.synchronized { genTimes = genTimes ++ Map(genTimeKey -> System.currentTimeMillis) }
+              IO.write(outFile, parseSourceFile(src, axis.version))
+              outFile
+            }
+          }
+        }
       ))))
 
   val scalacheckVersion = "1.15.3"
@@ -110,7 +177,7 @@ object Build {
   )
 
   val catsCore = "org.typelevel" %% "cats-core" % "2.6.1"
-  val izumiReflect = "dev.zio" %% "izumi-reflect" % "1.1.2"
+  val izumiReflect = "dev.zio" %% "izumi-reflect" % "2.0.1"
   val http4sV1Milestone = "1.0.0-M"
 
   object Http4sAxis extends Enumeration {
@@ -126,9 +193,10 @@ object Build {
     implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v0_21 = HAVal("0.21", "0.21.24", "latest stable")
-    val v1_0_0_M10 = HAVal(s"${http4sV1Milestone}10", s"${http4sV1Milestone}10", "latest on cats effect 2")
-    val v1_0_0_M23 = HAVal(s"${http4sV1Milestone}23", s"${http4sV1Milestone}23", "latest on cats effect 3")
+    val v0_22 = HAVal("0.22", "0.22.4", "latest stable on cats effect 2")
+    val v0_23 = HAVal("0.23", "0.23.3", "latest stable on cats effect 3")
+    val v1_0_0_M10 = HAVal(s"${http4sV1Milestone}10", s"${http4sV1Milestone}10", "latest development on cats effect 2")
+    val v1_0_0_M25 = HAVal(s"${http4sV1Milestone}25", s"${http4sV1Milestone}25", "latest development on cats effect 3")
 
     lazy val all = values.toList
   }

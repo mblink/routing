@@ -3,9 +3,13 @@ package routing
 import extractor._
 import org.http4s.{Method => Http4sMethod, Request => Http4sRequest}
 import org.http4s.dsl.impl.{:?, /:, +&, ->}
+import org.http4s.Uri.{Path => Http4sPath}
 import routing.util.dummy._
 
-package object http4s extends http4s.PackageCompat {
+package object http4s {
+  private val rootHttp4sPath: Http4sPath = Http4sPath.Root
+  private def http4sPathIsEmpty(path: Http4sPath): Boolean = path.isEmpty
+
   implicit val http4sRootPath: RootPath[Http4sPath] =
     new RootPath[Http4sPath] {
       def apply(): Http4sPath = rootHttp4sPath
