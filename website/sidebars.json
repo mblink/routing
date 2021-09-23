@@ -9,9 +9,10 @@
         "label": "Implementations",
         "ids": [
           "implementations",
-          "implementations/http4s-0.21",
+          "implementations/http4s-0.22",
+          "implementations/http4s-0.23",
           "implementations/http4s-1.0.0-M10",
-          "implementations/http4s-1.0.0-M23",
+          "implementations/http4s-1.0.0-M25",
           "implementations/play"
         ]
       },
