@@ -47,7 +47,9 @@ lazy val play = proj(projectMatrix.in(file("play")), "play")
   .settings(libraryDependencies += playCore)
   .dependsOn(core % "compile->compile;test->test")
 
-lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench")(_ => _ => identity)
+lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench")(_ => jsOrJvm => _.settings(
+  scalacOptions ++= jsOrJvm.fold(_ => Seq("-P:scalajs:nowarnGlobalExecutionContext"), _ => Seq()),
+))
   .settings(noPublishSettings)
   .dependsOn(core, http4s, play)
   .enablePlugins(JmhPlugin)
@@ -70,11 +72,11 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
         case Http4sAxis.v1_0_0_M10 => "Uri.Path.fromString(path)"
         case Http4sAxis.v0_22 |
              Http4sAxis.v0_23 |
-             Http4sAxis.v1_0_0_M25 =>
+             Http4sAxis.v1_0_0_M30 =>
           "Uri.Path.unsafeFromString(path)"
       }),
       "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
-        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M25 => "import cats.effect.unsafe.implicits.global\n"
+        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M30 => "import cats.effect.unsafe.implicits.global\n"
         case _ => ""
       })
     )
@@ -124,7 +126,8 @@ publishDocsSite := Def.taskDyn {
   )
 }.value
 
-lazy val example = http4sProj(projectMatrix.in(file("example")), "example")(axis => _ => _.settings(
+lazy val example = http4sProj(projectMatrix.in(file("example")), "example")(axis => jsOrJvm => _.settings(
+  scalacOptions ++= jsOrJvm.fold(_ => Seq("-P:scalajs:nowarnGlobalExecutionContext"), _ => Seq()),
   libraryDependencies ++= Seq(
     http4sDep("circe", axis.version),
     http4sDep("blaze-server", axis.version)
@@ -133,10 +136,10 @@ lazy val example = http4sProj(projectMatrix.in(file("example")), "example")(axis
   .settings(noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.circe" %% "circe-core" % "0.14.0-M6",
-      "io.circe" %% "circe-generic" % "0.14.0-M6",
-      "org.slf4j" % "slf4j-api" % "1.7.30",
-      "org.slf4j" % "slf4j-simple" % "1.7.30"
+      "io.circe" %% "circe-core" % "0.14.1",
+      "io.circe" %% "circe-generic" % "0.14.1",
+      "org.slf4j" % "slf4j-api" % "1.7.33",
+      "org.slf4j" % "slf4j-simple" % "1.7.33"
     )
   )
   .dependsOn(core, http4s, play)

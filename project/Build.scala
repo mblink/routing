@@ -9,7 +9,7 @@ import sbtprojectmatrix.ProjectMatrixPlugin.autoImport._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.12.15", "2.13.6")
+  lazy val scalaVersions = Seq("2.12.15", "2.13.8")
   lazy val latestScalaV = scalaVersions.find(_.startsWith("2.13")).get
 
   def profileTraceOpts(baseDir: File, name: String): Seq[String] = {
@@ -165,7 +165,7 @@ object Build {
         }
       ))))
 
-  val scalacheckVersion = "1.15.3"
+  val scalacheckVersion = "1.15.4"
   val scalacheckDep = "org.scalacheck" %% "scalacheck" % scalacheckVersion
 
   val testSettings = Seq(
@@ -176,8 +176,8 @@ object Build {
         .getOrElse(Seq())
   )
 
-  val catsCore = "org.typelevel" %% "cats-core" % "2.6.1"
-  val izumiReflect = "dev.zio" %% "izumi-reflect" % "2.0.1"
+  val catsCore = "org.typelevel" %% "cats-core" % "2.7.0"
+  val izumiReflect = "dev.zio" %% "izumi-reflect" % "2.0.8"
   val http4sV1Milestone = "1.0.0-M"
 
   object Http4sAxis extends Enumeration {
@@ -193,10 +193,10 @@ object Build {
     implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v0_22 = HAVal("0.22", "0.22.4", "latest stable on cats effect 2")
-    val v0_23 = HAVal("0.23", "0.23.3", "latest stable on cats effect 3")
+    val v0_22 = HAVal("0.22", "0.22.8", "latest stable on cats effect 2")
+    val v0_23 = HAVal("0.23", "0.23.7", "latest stable on cats effect 3")
     val v1_0_0_M10 = HAVal(s"${http4sV1Milestone}10", s"${http4sV1Milestone}10", "latest development on cats effect 2")
-    val v1_0_0_M25 = HAVal(s"${http4sV1Milestone}25", s"${http4sV1Milestone}25", "latest development on cats effect 3")
+    val v1_0_0_M30 = HAVal(s"${http4sV1Milestone}30", s"${http4sV1Milestone}30", "latest development on cats effect 3")
 
     lazy val all = values.toList
   }
@@ -204,5 +204,5 @@ object Build {
   def isHttp4sV1Milestone(version: String): Boolean = version.startsWith(http4sV1Milestone)
 
   def http4sDep(proj: String, version: String) = "org.http4s" %% s"http4s-$proj" % version
-  val playCore = "com.typesafe.play" %% "play" % "2.8.8"
+  val playCore = "com.typesafe.play" %% "play" % "2.8.13"
 }
