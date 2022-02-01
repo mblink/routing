@@ -91,7 +91,7 @@ object Build {
 
   val publishSettings = Seq(
     publish / skip := false,
-    licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
+    licenses += License.Apache2,
     gitPublishDir := file("/src/maven-repo")
   )
 
