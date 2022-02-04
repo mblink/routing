@@ -101,11 +101,12 @@ object Build {
     gitRelease := {}
   )
 
-  val platforms = Map[String, Either[VirtualAxis.js.type, VirtualAxis.jvm.type]](
+  type JsOrJvm = Either[VirtualAxis.js.type, VirtualAxis.jvm.type]
+  val platforms = Map[String, JsOrJvm](
     "js" -> Left(VirtualAxis.js),
     "jvm" -> Right(VirtualAxis.jvm)
   )
-  type ProjSettings = Either[VirtualAxis.js.type, VirtualAxis.jvm.type] => Project => Project
+  type ProjSettings = JsOrJvm => Project => Project
 
   def projSettings(platform: String, srcDirSuffixes: Seq[String], extra: ProjSettings): Project => Project =
     extra(platforms(platform)).andThen(_.settings(
@@ -117,33 +118,54 @@ object Build {
   def sjsProj(f: Project => Project): Project => Project =
     f.andThen(_.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin))
 
-  def proj[A](matrix: ProjectMatrix, nme: String, extraSettings: ProjSettings = _ => identity) =
+  def simpleProj(
+    matrix: ProjectMatrix,
+    nme: String,
+    extraSettings: ProjSettings = _ => identity,
+    modScalaVersions: JsOrJvm => Seq[String] => Seq[String] = _ => identity,
+  ) =
     matrix
       .settings(name := s"routing-$nme")
       .settings(commonSettings)
       .settings(testSettings)
-      .customRow(scalaVersions = scalaVersions, axisValues = Seq(VirtualAxis.jvm), projSettings("jvm", Seq(), extraSettings))
-      .customRow(scalaVersions = scalaVersions, axisValues = Seq(VirtualAxis.js), sjsProj(projSettings("js", Seq(), extraSettings)))
+      .customRow(
+        scalaVersions = modScalaVersions(platforms("jvm"))(scalaVersions),
+        axisValues = Seq(VirtualAxis.jvm),
+        projSettings("jvm", Seq(), extraSettings)
+      )
+      .customRow(
+        scalaVersions = modScalaVersions(platforms("js"))(scalaVersions),
+        axisValues = Seq(VirtualAxis.js),
+        sjsProj(projSettings("js", Seq(), extraSettings))
+      )
 
-  def proj[V](matrix: ProjectMatrix, nme: String, axes: List[V])(
+  def axesProj[V](matrix: ProjectMatrix, nme: String, axes: List[V])(
     srcDirSuffixes: V => Seq[String],
-    extraSettings: V => ProjSettings
+    extraSettings: V => ProjSettings,
+    modScalaVersions: V => JsOrJvm => Seq[String] => Seq[String] = (_: V) => (_: JsOrJvm) => identity _,
   )(implicit va: V => VirtualAxis) =
     axes.foldLeft(matrix
       .settings(name := s"routing-$nme")
       .settings(commonSettings)
       .settings(testSettings)
       .settings(commonSettings)) { case (p, axis) => p
-        .customRow(scalaVersions = scalaVersions, axisValues = Seq(va(axis), VirtualAxis.jvm),
+        .customRow(
+          scalaVersions = modScalaVersions(axis)(platforms("jvm"))(scalaVersions),
+          axisValues = Seq(va(axis), VirtualAxis.jvm),
           projSettings("jvm", srcDirSuffixes(axis), extraSettings(axis)))
-        .customRow(scalaVersions = scalaVersions, axisValues = Seq(va(axis), VirtualAxis.js),
+        .customRow(
+          scalaVersions = modScalaVersions(axis)(platforms("js"))(scalaVersions),
+          axisValues = Seq(va(axis), VirtualAxis.js),
           sjsProj(projSettings("js", srcDirSuffixes(axis), extraSettings(axis))))
       }
 
   var genTimes: Map[(String, String), Long] = Map()
 
-  def http4sProj(matrix: ProjectMatrix, nme: String)(proc: Http4sAxis.Value => ProjSettings) =
-    proj(matrix, nme, Http4sAxis.all)(
+  def http4sProj(matrix: ProjectMatrix, nme: String)(
+    proc: Http4sAxis.Value => ProjSettings,
+    modScalaVersions: Http4sAxis.Value => JsOrJvm => Seq[String] => Seq[String] = _ => _ => identity,
+  ) =
+    axesProj(matrix, nme, Http4sAxis.all)(
       axis => Seq(axis.version, if (isHttp4sV1Milestone(axis.version)) http4sV1Milestone else axis.suffix),
       axis => proc(axis).andThen(_.andThen(_.settings(
         moduleName := s"${name.value}_${axis.suffix}",
@@ -163,7 +185,11 @@ object Build {
             }
           }
         }
-      ))))
+      ))),
+      axis => jsOrJvm => versions => axis match {
+        case Http4sAxis.v1_0_0_M31 => modScalaVersions(axis)(jsOrJvm)(versions.filterNot(_.startsWith("2.12")))
+        case _ => modScalaVersions(axis)(jsOrJvm)(versions)
+      })
 
   val scalacheckVersion = "1.15.4"
   val scalacheckDep = "org.scalacheck" %% "scalacheck" % scalacheckVersion
@@ -193,10 +219,10 @@ object Build {
     implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v0_22 = HAVal("0.22", "0.22.8", "latest stable on cats effect 2")
-    val v0_23 = HAVal("0.23", "0.23.7", "latest stable on cats effect 3")
+    val v0_22 = HAVal("0.22", "0.22.11", "latest stable on cats effect 2")
+    val v0_23 = HAVal("0.23", "0.23.10", "latest stable on cats effect 3")
     val v1_0_0_M10 = HAVal(s"${http4sV1Milestone}10", s"${http4sV1Milestone}10", "latest development on cats effect 2")
-    val v1_0_0_M30 = HAVal(s"${http4sV1Milestone}30", s"${http4sV1Milestone}30", "latest development on cats effect 3")
+    val v1_0_0_M31 = HAVal(s"${http4sV1Milestone}31", s"${http4sV1Milestone}31", "latest development on cats effect 3")
 
     lazy val all = values.toList
   }
