@@ -1,10 +1,12 @@
 package routing
 
 import izumi.reflect.Tag
+import izumi.reflect.macrortti.LightTypeTag
 import routing.builder._
 import routing.extractor._
 import routing.part._
 import routing.util._
+import scala.util.control.TailCalls.{done, tailcall, TailRec}
 
 abstract class Route[M <: Method, P] extends RouteMethods[M, P] { self =>
   final type Method = M
@@ -142,9 +144,23 @@ object Route {
       Shown(self.pathParts ++ other.pathParts, self.queryParts ++ other.queryParts)
   }
 
+  def renderTag[A](t: Tag[A]): String = {
+    def go(acc: StringBuilder, bracketOpen: Boolean, typeArgs: List[LightTypeTag]): TailRec[String] =
+      typeArgs match {
+        case ta :: rest =>
+          tailcall(go(new StringBuilder(ta.shortName), false, ta.typeArgs)).flatMap(taStr =>
+            tailcall(go(acc.append(if (bracketOpen) ", " else "[").append(taStr), true, rest)))
+
+        case Nil => done(acc.append(if (bracketOpen) "]" else "").toString)
+      }
+
+    val tag = t.tag
+    go(new StringBuilder(tag.shortName), false, tag.typeArgs).result
+  }
+
   def shownPath[A](name: Either[String, String])(implicit tt: Tag[A]): Shown =
-    Shown(Vector(name.fold(identity _, s => s"<$s: ${tt.tag}>")), Vector())
+    Shown(Vector(name.fold(identity _, s => s"<$s: ${renderTag(tt)}>")), Vector())
 
   def shownQueryParam[A](key: String)(implicit tt: Tag[A]): Shown =
-    Shown(Vector(), Vector(s"<$key: ${tt.tag}>"))
+    Shown(Vector(), Vector(s"<$key: ${renderTag(tt)}>"))
 }

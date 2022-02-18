@@ -26,7 +26,7 @@ trait NextQueryInstancesLP {
         val (k, fv) = (t._1, tp.untuple(params)._2)
         QueryPart.inst((k, fv), toV)
       }
-      def show(t: (String, Option[F[V]])): Route.Shown = Route.shownPath[F[V]](Right(t._1))
+      def show(t: (String, Option[F[V]])): Route.Shown = Route.shownQueryParam[F[V]](t._1)
     }
 
   implicit def nextQueryParamId[P, V, PO](
