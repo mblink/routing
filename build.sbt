@@ -72,11 +72,11 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
         case Http4sAxis.v1_0_0_M10 => "Uri.Path.fromString(path)"
         case Http4sAxis.v0_22 |
              Http4sAxis.v0_23 |
-             Http4sAxis.v1_0_0_M31 =>
+             Http4sAxis.v1_0_0_M32 =>
           "Uri.Path.unsafeFromString(path)"
       }),
       "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
-        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M31 => "import cats.effect.unsafe.implicits.global\n"
+        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M32 => "import cats.effect.unsafe.implicits.global\n"
         case _ => ""
       })
     )
