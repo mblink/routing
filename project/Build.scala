@@ -101,19 +101,27 @@ object Build {
     gitRelease := {}
   )
 
-  type JsOrJvm = Either[VirtualAxis.js.type, VirtualAxis.jvm.type]
-  val platforms = Map[String, JsOrJvm](
-    "js" -> Left(VirtualAxis.js),
-    "jvm" -> Right(VirtualAxis.jvm)
-  )
-  type ProjSettings = JsOrJvm => Project => Project
+  sealed abstract class Platform(val s: String)
+  object Platform {
+    case object Jvm extends Platform("jvm")
+    case object Js extends Platform("js")
+    case object Native extends Platform("native")
+  }
 
-  def projSettings(platform: String, srcDirSuffixes: Seq[String], extra: ProjSettings): Project => Project =
-    extra(platforms(platform)).andThen(_.settings(
+  type ProjSettings = Platform => Project => Project
+
+  def projSettings(platform: Platform, srcDirSuffixes: Seq[String], extra: ProjSettings): Project => Project =
+    extra(platform).andThen(_.settings(
       Compile / unmanagedSourceDirectories ++=
-        (platform +: srcDirSuffixes.flatMap(s => Seq(s, s"$s-$platform")))
+        (platform.s +: srcDirSuffixes.flatMap(s => Seq(s, s"$s-${platform.s}")))
           .map(suffix => sourceDirectory.value / "main" / s"scala-$suffix")
     ))
+
+  val sjsNowarnGlobalECSettings: Platform => Project => Project =
+    _ match {
+      case Platform.Js => _.settings(scalacOptions += "-P:scalajs:nowarnGlobalExecutionContext")
+      case Platform.Jvm | Platform.Native => identity
+    }
 
   def sjsProj(f: Project => Project): Project => Project =
     f.andThen(_.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin))
@@ -122,27 +130,38 @@ object Build {
     matrix: ProjectMatrix,
     nme: String,
     extraSettings: ProjSettings = _ => identity,
-    modScalaVersions: JsOrJvm => Seq[String] => Seq[String] = _ => identity,
-  ) =
-    matrix
+    modScalaVersions: Platform => Seq[String] => Seq[String] = _ => identity,
+    includeNative: Boolean = false
+  ) = {
+    val proj = matrix
       .settings(name := s"routing-$nme")
       .settings(commonSettings)
       .settings(testSettings)
       .customRow(
-        scalaVersions = modScalaVersions(platforms("jvm"))(scalaVersions),
+        scalaVersions = modScalaVersions(Platform.Jvm)(scalaVersions),
         axisValues = Seq(VirtualAxis.jvm),
-        projSettings("jvm", Seq(), extraSettings)
+        projSettings(Platform.Jvm, Seq(), extraSettings)
       )
       .customRow(
-        scalaVersions = modScalaVersions(platforms("js"))(scalaVersions),
+        scalaVersions = modScalaVersions(Platform.Js)(scalaVersions),
         axisValues = Seq(VirtualAxis.js),
-        sjsProj(projSettings("js", Seq(), extraSettings))
+        sjsProj(projSettings(Platform.Js, Seq(), extraSettings))
       )
+
+    if (includeNative)
+      proj.customRow(
+        scalaVersions = modScalaVersions(Platform.Native)(scalaVersions),
+        axisValues = Seq(VirtualAxis.native),
+        projSettings(Platform.Native, Seq(), extraSettings)
+      )
+    else
+      proj
+  }
 
   def axesProj[V](matrix: ProjectMatrix, nme: String, axes: List[V])(
     srcDirSuffixes: V => Seq[String],
     extraSettings: V => ProjSettings,
-    modScalaVersions: V => JsOrJvm => Seq[String] => Seq[String] = (_: V) => (_: JsOrJvm) => identity _,
+    modScalaVersions: V => Platform => Seq[String] => Seq[String] = (_: V) => (_: Platform) => identity _,
   )(implicit va: V => VirtualAxis) =
     axes.foldLeft(matrix
       .settings(name := s"routing-$nme")
@@ -150,20 +169,20 @@ object Build {
       .settings(testSettings)
       .settings(commonSettings)) { case (p, axis) => p
         .customRow(
-          scalaVersions = modScalaVersions(axis)(platforms("jvm"))(scalaVersions),
+          scalaVersions = modScalaVersions(axis)(Platform.Jvm)(scalaVersions),
           axisValues = Seq(va(axis), VirtualAxis.jvm),
-          projSettings("jvm", srcDirSuffixes(axis), extraSettings(axis)))
+          projSettings(Platform.Jvm, srcDirSuffixes(axis), extraSettings(axis)))
         .customRow(
-          scalaVersions = modScalaVersions(axis)(platforms("js"))(scalaVersions),
+          scalaVersions = modScalaVersions(axis)(Platform.Js)(scalaVersions),
           axisValues = Seq(va(axis), VirtualAxis.js),
-          sjsProj(projSettings("js", srcDirSuffixes(axis), extraSettings(axis))))
+          sjsProj(projSettings(Platform.Js, srcDirSuffixes(axis), extraSettings(axis))))
       }
 
   var genTimes: Map[(String, String), Long] = Map()
 
   def http4sProj(matrix: ProjectMatrix, nme: String)(
     proc: Http4sAxis.Value => ProjSettings,
-    modScalaVersions: Http4sAxis.Value => JsOrJvm => Seq[String] => Seq[String] = _ => _ => identity,
+    modScalaVersions: Http4sAxis.Value => Platform => Seq[String] => Seq[String] = _ => _ => identity,
   ) =
     axesProj(matrix, nme, Http4sAxis.all)(
       axis => Seq(axis.version, if (isHttp4sV1Milestone(axis.version)) http4sV1Milestone else axis.suffix),
@@ -187,7 +206,7 @@ object Build {
         }
       ))),
       axis => jsOrJvm => versions => axis match {
-        case Http4sAxis.v1_0_0_M32 => modScalaVersions(axis)(jsOrJvm)(versions.filterNot(_.startsWith("2.12")))
+        case Http4sAxis.v1_0_0_M33 => modScalaVersions(axis)(jsOrJvm)(versions.filterNot(_.startsWith("2.12")))
         case _ => modScalaVersions(axis)(jsOrJvm)(versions)
       })
 
@@ -219,10 +238,10 @@ object Build {
     implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v0_22 = HAVal("0.22", "0.22.12", "latest stable on cats effect 2")
-    val v0_23 = HAVal("0.23", "0.23.11", "latest stable on cats effect 3")
+    val v0_22 = HAVal("0.22", "0.22.13", "latest stable on cats effect 2")
+    val v0_23 = HAVal("0.23", "0.23.12", "latest stable on cats effect 3")
     val v1_0_0_M10 = HAVal(s"${http4sV1Milestone}10", s"${http4sV1Milestone}10", "latest development on cats effect 2")
-    val v1_0_0_M32 = HAVal(s"${http4sV1Milestone}32", s"${http4sV1Milestone}32", "latest development on cats effect 3")
+    val v1_0_0_M33 = HAVal(s"${http4sV1Milestone}33", s"${http4sV1Milestone}33", "latest development on cats effect 3")
 
     lazy val all = values.toList
   }

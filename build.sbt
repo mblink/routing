@@ -7,7 +7,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 noPublishSettings
 
-lazy val core = simpleProj(projectMatrix.in(file("core")), "core")
+lazy val core = simpleProj(projectMatrix.in(file("core")), "core", includeNative = true)
   .settings(publishSettings)
   .settings(
     libraryDependencies ++= Seq(
@@ -35,7 +35,6 @@ lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")(axis =>
   libraryDependencies ++= Seq(
     http4sDep("core", axis.version),
     http4sDep("dsl", axis.version),
-    http4sDep("server", axis.version)
   )
 ))
   .settings(publishSettings)
@@ -47,9 +46,7 @@ lazy val play = simpleProj(projectMatrix.in(file("play")), "play")
   .settings(libraryDependencies += playCore)
   .dependsOn(core % "compile->compile;test->test")
 
-lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench")(_ => jsOrJvm => _.settings(
-  scalacOptions ++= jsOrJvm.fold(_ => Seq("-P:scalajs:nowarnGlobalExecutionContext"), _ => Seq()),
-))
+lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench")(_ => sjsNowarnGlobalECSettings)
   .settings(noPublishSettings)
   .dependsOn(core, http4s, play)
   .enablePlugins(JmhPlugin)
@@ -59,9 +56,9 @@ lazy val http4sImplFile = "http4s.md"
 def http4sImplDoc(dir: File, axis: Http4sAxis.Value): (File, String) =
   (dir / "implementations" / http4sImplFile, s"${http4sImplFile.split(".md").head}-${axis.suffix}.md")
 
-lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs")(axis => _.fold(
-  _ => identity,
-  _ => _.settings(
+lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs")(axis => _ match {
+  case Platform.Js | Platform.Native => identity
+  case Platform.Jvm => _.settings(
     mdocVariables ++= Map(
       "VERSION" -> currentVersion,
       "GITHUB_REPO_URL" -> githubRepoUrl,
@@ -72,16 +69,16 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
         case Http4sAxis.v1_0_0_M10 => "Uri.Path.fromString(path)"
         case Http4sAxis.v0_22 |
              Http4sAxis.v0_23 |
-             Http4sAxis.v1_0_0_M32 =>
+             Http4sAxis.v1_0_0_M33 =>
           "Uri.Path.unsafeFromString(path)"
       }),
       "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
-        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M32 => "import cats.effect.unsafe.implicits.global\n"
+        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M33 => "import cats.effect.unsafe.implicits.global\n"
         case _ => ""
       })
     )
-  ).enablePlugins(MdocPlugin))
-)
+  ).enablePlugins(MdocPlugin)
+})
   .settings(noPublishSettings)
   .dependsOn(core, http4s, play)
 
@@ -126,13 +123,12 @@ publishDocsSite := Def.taskDyn {
   )
 }.value
 
-lazy val example = http4sProj(projectMatrix.in(file("example")), "example")(axis => jsOrJvm => _.settings(
-  scalacOptions ++= jsOrJvm.fold(_ => Seq("-P:scalajs:nowarnGlobalExecutionContext"), _ => Seq()),
+lazy val example = http4sProj(projectMatrix.in(file("example")), "example")(axis => sjsNowarnGlobalECSettings.andThen(_.andThen(_.settings(
   libraryDependencies ++= Seq(
     http4sDep("circe", axis.version),
     http4sDep("blaze-server", axis.version)
   )
-))
+))))
   .settings(noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
