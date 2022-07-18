@@ -206,7 +206,7 @@ object Build {
         }
       ))),
       axis => jsOrJvm => versions => axis match {
-        case Http4sAxis.v1_0_0_M33 => modScalaVersions(axis)(jsOrJvm)(versions.filterNot(_.startsWith("2.12")))
+        case Http4sAxis.v1_0_0_M34 => modScalaVersions(axis)(jsOrJvm)(versions.filterNot(_.startsWith("2.12")))
         case _ => modScalaVersions(axis)(jsOrJvm)(versions)
       })
 
@@ -238,10 +238,10 @@ object Build {
     implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v0_22 = HAVal("0.22", "0.22.13", "latest stable on cats effect 2")
-    val v0_23 = HAVal("0.23", "0.23.12", "latest stable on cats effect 3")
+    val v0_22 = HAVal("0.22", "0.22.14", "latest stable on cats effect 2")
+    val v0_23 = HAVal("0.23", "0.23.13", "latest stable on cats effect 3")
     val v1_0_0_M10 = HAVal(s"${http4sV1Milestone}10", s"${http4sV1Milestone}10", "latest development on cats effect 2")
-    val v1_0_0_M33 = HAVal(s"${http4sV1Milestone}33", s"${http4sV1Milestone}33", "latest development on cats effect 3")
+    val v1_0_0_M34 = HAVal(s"${http4sV1Milestone}34", s"${http4sV1Milestone}34", "latest development on cats effect 3")
 
     lazy val all = values.toList
   }

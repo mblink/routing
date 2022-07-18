@@ -69,11 +69,11 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
         case Http4sAxis.v1_0_0_M10 => "Uri.Path.fromString(path)"
         case Http4sAxis.v0_22 |
              Http4sAxis.v0_23 |
-             Http4sAxis.v1_0_0_M33 =>
+             Http4sAxis.v1_0_0_M34 =>
           "Uri.Path.unsafeFromString(path)"
       }),
       "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
-        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M33 => "import cats.effect.unsafe.implicits.global\n"
+        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M34 => "import cats.effect.unsafe.implicits.global\n"
         case _ => ""
       })
     )
@@ -126,7 +126,10 @@ publishDocsSite := Def.taskDyn {
 lazy val example = http4sProj(projectMatrix.in(file("example")), "example")(axis => sjsNowarnGlobalECSettings.andThen(_.andThen(_.settings(
   libraryDependencies ++= Seq(
     http4sDep("circe", axis.version),
-    http4sDep("blaze-server", axis.version)
+    http4sDep("blaze-server", axis match {
+      case Http4sAxis.v0_23 => s"${axis.suffix}.12"
+      case _ => axis.version
+    }),
   )
 ))))
   .settings(noPublishSettings)
