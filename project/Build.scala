@@ -127,7 +127,9 @@ object Build {
     }
 
   def sjsProj(f: Project => Project): Project => Project =
-    f.andThen(_.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin))
+    f.andThen(_.settings(
+      scalacOptions ++= foldScalaV(scalaVersion.value)(Seq(), Seq(), Seq("-scalajs")),
+    ).enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin))
 
   def platformAxes(platforms: List[Platform]): List[(Platform, VirtualAxis)] =
     platforms.map {
