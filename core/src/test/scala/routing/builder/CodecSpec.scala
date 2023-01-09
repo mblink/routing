@@ -33,7 +33,7 @@ abstract class CodecSpec(name: String) extends Properties(s"$name.codec") {
     '~' -> "%7E",
     '[' -> "%5B",
     ']' -> "%5D",
-    '`' -> "%60"
+    '`' -> "%60",
   )
 
   val queryEncodedChars = pathEncodedChars + (' ' -> "+")

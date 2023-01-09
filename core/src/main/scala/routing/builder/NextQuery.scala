@@ -35,7 +35,7 @@ trait NextQueryInstancesLP {
     tt: Tag[V],
     tp: Tupled[P, V, PO]
   ): NextQuery[(String, Option[V]), V, P, PO] =
-    nextQueryInst[Lambda[a => a], P, V, PO](Vector(_))
+    nextQueryInst[λ[a => a], P, V, PO](Vector(_))
 }
 
 trait NextQueryInstances extends NextQueryInstancesLP {

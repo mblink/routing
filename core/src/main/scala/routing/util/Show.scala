@@ -12,7 +12,7 @@ private[routing] sealed trait CatsShow extends TCHolder {
 }
 
 private[routing] object CatsShow {
-  implicit val get: GetTC[CatsShow, cats.Show] = new GetTC[CatsShow, cats.Show] {
+  implicit val get: GetTC[CatsShow, cats.Show] = new GetTC[CatsShow, cats.Show](new CatsShow {}) {
     override def equiv[A] = implicitly
   }
 }

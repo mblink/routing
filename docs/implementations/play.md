@@ -24,7 +24,7 @@ val BlogPost = Method.GET / "post" / pathVar[String]("slug") :? queryParam[Int](
 Then we can define our handlers.
 
 ```scala mdoc
-import _root_.play.api.mvc.{ActionBuilder, Results}
+import _root_.play.api.mvc.{ActionBuilder, AnyContent, Request, Results}
 import routing.play._
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -33,7 +33,7 @@ val action = new ActionBuilder.IgnoringBody()
 val handledLogin = Login.handle(_ => action(Results.Ok("Login page")))
 val handledHello = Hello.handle(name => action(Results.Ok(s"Hello, $name")))
 val handledBlogPost = BlogPost.handle { case (slug, id) =>
-  action(req => Results.Ok(s"Blog post with id: $id, slug: $slug found at ${req.uri}"))
+  action((req: Request[AnyContent]) => Results.Ok(s"Blog post with id: $id, slug: $slug found at ${req.uri}"))
 }
 ```
 

@@ -1,6 +1,7 @@
 package routing
 
 import java.io.File
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import sbt._
 import sbt.Keys._
 import sbt.internal.ProjectMatrix
@@ -9,8 +10,9 @@ import sbtprojectmatrix.ProjectMatrixPlugin.autoImport._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.12.15", "2.13.8")
-  lazy val latestScalaV = scalaVersions.find(_.startsWith("2.13")).get
+  lazy val scalaVersions = Seq("2.12.17", "2.13.10", "3.2.1")
+  lazy val latestScalaV = scalaVersions.find(_.startsWith("3.")).get
+  lazy val kindProjector = compilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
 
   def profileTraceOpts(baseDir: File, name: String): Seq[String] = {
     val dir = baseDir / ".traces"
@@ -18,10 +20,11 @@ object Build {
     Seq("-Yprofile-trace", s"$dir/$name.trace")
   }
 
-  def foldScalaV[A](scalaVersion: String)(_212: => A, _213: => A): A =
+  def foldScalaV[A](scalaVersion: String)(_212: => A, _213: => A, _3: => A): A =
     CrossVersion.partialVersion(scalaVersion) match {
       case Some((2, 12)) => _212
       case Some((2, 13)) => _213
+      case Some((3, _)) => _3
     }
 
   case class ParseState(
@@ -76,12 +79,16 @@ object Build {
   val commonSettings = Seq(
     organization := "bondlink",
     version := currentVersion,
-    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full),
-    resolvers += "bondlink-maven-repo" at "https://raw.githubusercontent.com/mblink/maven-repo/main",
-    addCompilerPlugin("bondlink" %% "nowarn-plugin" % "1.0.1"),
-    scalacOptions ++= Seq(
-      "-P:nowarn:uu:msg=never used",
-    ) ++ foldScalaV(scalaVersion.value)(Seq(), Seq("-Xlint:strict-unsealed-patmat")),
+    scalacOptions ++= foldScalaV(scalaVersion.value)(
+      Seq("-Xsource:3"),
+      Seq("-Xlint:strict-unsealed-patmat", "-Xsource:3"),
+      Seq()
+    ),
+    libraryDependencies ++= foldScalaV(scalaVersion.value)(
+      Seq(kindProjector),
+      Seq(kindProjector),
+      Seq()
+    ),
     // scalacOptions ++= profileTraceOpts(baseDirectory.value, name.value),
     publish / skip := true,
     Compile / packageDoc / publishArtifact := false,
@@ -110,12 +117,8 @@ object Build {
 
   type ProjSettings = Platform => Project => Project
 
-  def projSettings(platform: Platform, srcDirSuffixes: Seq[String], extra: ProjSettings): Project => Project =
-    extra(platform).andThen(_.settings(
-      Compile / unmanagedSourceDirectories ++=
-        (platform.s +: srcDirSuffixes.flatMap(s => Seq(s, s"$s-${platform.s}")))
-          .map(suffix => sourceDirectory.value / "main" / s"scala-$suffix")
-    ))
+  def nativeProj(f: Project => Project): Project => Project =
+    f.andThen(_.enablePlugins(scala.scalanative.sbtplugin.ScalaNativePlugin))
 
   val sjsNowarnGlobalECSettings: Platform => Project => Project =
     _ match {
@@ -126,65 +129,79 @@ object Build {
   def sjsProj(f: Project => Project): Project => Project =
     f.andThen(_.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin))
 
-  def simpleProj(
-    matrix: ProjectMatrix,
-    nme: String,
-    extraSettings: ProjSettings = _ => identity,
-    modScalaVersions: Platform => Seq[String] => Seq[String] = _ => identity,
-    includeNative: Boolean = false
-  ) = {
-    val proj = matrix
+  def platformAxes(platforms: List[Platform]): List[(Platform, VirtualAxis)] =
+    platforms.map {
+      case p @ Platform.Jvm => (p, VirtualAxis.jvm)
+      case p @ Platform.Js => (p, VirtualAxis.js)
+      case p @ Platform.Native => (p, VirtualAxis.native)
+    }
+
+  def baseProj(matrix: ProjectMatrix, nme: String) =
+    matrix
       .settings(name := s"routing-$nme")
       .settings(commonSettings)
       .settings(testSettings)
-      .customRow(
-        scalaVersions = modScalaVersions(Platform.Jvm)(scalaVersions),
-        axisValues = Seq(VirtualAxis.jvm),
-        projSettings(Platform.Jvm, Seq(), extraSettings)
-      )
-      .customRow(
-        scalaVersions = modScalaVersions(Platform.Js)(scalaVersions),
-        axisValues = Seq(VirtualAxis.js),
-        sjsProj(projSettings(Platform.Js, Seq(), extraSettings))
-      )
 
-    if (includeNative)
-      proj.customRow(
-        scalaVersions = modScalaVersions(Platform.Native)(scalaVersions),
-        axisValues = Seq(VirtualAxis.native),
-        projSettings(Platform.Native, Seq(), extraSettings)
+  def projSettings(srcDirSuffixes: Seq[String], extra: ProjSettings): ProjSettings =
+    platform => {
+      val base = extra(platform).andThen(_.settings(
+        Compile / unmanagedSourceDirectories ++=
+          (platform.s +: srcDirSuffixes.flatMap(s => Seq(s, s"$s-${platform.s}")))
+            .map(suffix => sourceDirectory.value / "main" / s"scala-$suffix")
+      ))
+
+      platform match {
+        case Platform.Jvm => base
+        case Platform.Js => sjsProj(base)
+        case Platform.Native => nativeProj(base)
+      }
+    }
+
+  def simpleProj(
+    matrix: ProjectMatrix,
+    nme: String,
+    platforms: List[Platform],
+    extraSettings: ProjSettings = _ => identity,
+    modScalaVersions: Platform => Seq[String] => Seq[String] = _ => identity,
+    includeNative: Boolean = false
+  ) =
+    platformAxes(platforms).foldLeft(baseProj(matrix, nme)) { case (acc, (platform, axis)) =>
+      acc.customRow(
+        scalaVersions = modScalaVersions(platform)(scalaVersions),
+        axisValues = Seq(axis),
+        projSettings(Seq(), extraSettings)(platform),
       )
-    else
-      proj
-  }
+    }
 
   def axesProj[V](matrix: ProjectMatrix, nme: String, axes: List[V])(
+    platforms: V => List[Platform],
     srcDirSuffixes: V => Seq[String],
     extraSettings: V => ProjSettings,
     modScalaVersions: V => Platform => Seq[String] => Seq[String] = (_: V) => (_: Platform) => identity _,
   )(implicit va: V => VirtualAxis) =
-    axes.foldLeft(matrix
-      .settings(name := s"routing-$nme")
-      .settings(commonSettings)
-      .settings(testSettings)
-      .settings(commonSettings)) { case (p, axis) => p
-        .customRow(
-          scalaVersions = modScalaVersions(axis)(Platform.Jvm)(scalaVersions),
-          axisValues = Seq(va(axis), VirtualAxis.jvm),
-          projSettings(Platform.Jvm, srcDirSuffixes(axis), extraSettings(axis)))
-        .customRow(
-          scalaVersions = modScalaVersions(axis)(Platform.Js)(scalaVersions),
-          axisValues = Seq(va(axis), VirtualAxis.js),
-          sjsProj(projSettings(Platform.Js, srcDirSuffixes(axis), extraSettings(axis))))
+    axes
+      .flatMap(a => platformAxes(platforms(a)).map(a -> _))
+      .foldLeft(baseProj(matrix, nme)) { case (acc, (versionAxis, (platform, platformAxis))) =>
+        acc.customRow(
+          scalaVersions = modScalaVersions(versionAxis)(platform)(scalaVersions),
+          axisValues = Seq(va(versionAxis), platformAxis),
+          projSettings(srcDirSuffixes(versionAxis), extraSettings(versionAxis))(platform),
+        )
       }
 
   var genTimes: Map[(String, String), Long] = Map()
 
-  def http4sProj(matrix: ProjectMatrix, nme: String)(
+  val defaultHttp4sPlatforms = (_: Http4sAxis.Value) match {
+    case Http4sAxis.v0_22 => List(Platform.Jvm)
+    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M38 => List(Platform.Jvm, Platform.Js)
+  }
+
+  def http4sProj(matrix: ProjectMatrix, nme: String, platforms: Http4sAxis.Value => List[Platform] = defaultHttp4sPlatforms)(
     proc: Http4sAxis.Value => ProjSettings,
     modScalaVersions: Http4sAxis.Value => Platform => Seq[String] => Seq[String] = _ => _ => identity,
   ) =
     axesProj(matrix, nme, Http4sAxis.all)(
+      platforms,
       axis => Seq(axis.version, if (isHttp4sV1Milestone(axis.version)) http4sV1Milestone else axis.suffix),
       axis => proc(axis).andThen(_.andThen(_.settings(
         moduleName := s"${name.value}_${axis.suffix}",
@@ -205,24 +222,25 @@ object Build {
           }
         }
       ))),
-      axis => jsOrJvm => versions => axis match {
-        case Http4sAxis.v1_0_0_M34 => modScalaVersions(axis)(jsOrJvm)(versions.filterNot(_.startsWith("2.12")))
-        case _ => modScalaVersions(axis)(jsOrJvm)(versions)
-      })
+      modScalaVersions = axis => platform => versions => axis match {
+        case Http4sAxis.v1_0_0_M38 => modScalaVersions(axis)(platform)(versions.filterNot(_.startsWith("2.12")))
+        case _ => modScalaVersions(axis)(platform)(versions)
+      },
+    )
 
-  val scalacheckVersion = "1.15.4"
-  val scalacheckDep = "org.scalacheck" %% "scalacheck" % scalacheckVersion
+  val scalacheckVersion = "1.17.0"
+  val scalacheckDep = Def.setting("org.scalacheck" %%% "scalacheck" % scalacheckVersion)
 
   val testSettings = Seq(
-    libraryDependencies += scalacheckDep % "test",
+    libraryDependencies += scalacheckDep.value % "test",
     Test / testOptions ++= Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-verbosity", "2")) ++
       Option(System.getProperty("testIterations")).map(_.toInt)
         .map(n => Seq(Tests.Argument(TestFrameworks.ScalaCheck, "-minSuccessfulTests", n.toString)))
         .getOrElse(Seq())
   )
 
-  val catsCore = "org.typelevel" %% "cats-core" % "2.7.0"
-  val izumiReflect = "dev.zio" %% "izumi-reflect" % "2.0.8"
+  val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.9.0")
+  val izumiReflect = Def.setting("dev.zio" %%% "izumi-reflect" % "2.2.3")
   val http4sV1Milestone = "1.0.0-M"
 
   object Http4sAxis extends Enumeration {
@@ -238,16 +256,16 @@ object Build {
     implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v0_22 = HAVal("0.22", "0.22.14", "latest stable on cats effect 2")
-    val v0_23 = HAVal("0.23", "0.23.13", "latest stable on cats effect 3")
-    val v1_0_0_M10 = HAVal(s"${http4sV1Milestone}10", s"${http4sV1Milestone}10", "latest development on cats effect 2")
-    val v1_0_0_M34 = HAVal(s"${http4sV1Milestone}34", s"${http4sV1Milestone}34", "latest development on cats effect 3")
+    val v0_22 = HAVal("0.22", "0.22.15", "latest stable on cats effect 2")
+    val v0_23 = HAVal("0.23", "0.23.17", "latest stable on cats effect 3")
+    val v1_0_0_M38 = HAVal(s"${http4sV1Milestone}38", s"${http4sV1Milestone}38", "latest development on cats effect 3")
 
     lazy val all = values.toList
   }
 
   def isHttp4sV1Milestone(version: String): Boolean = version.startsWith(http4sV1Milestone)
 
-  def http4sDep(proj: String, version: String) = "org.http4s" %% s"http4s-$proj" % version
-  val playCore = "com.typesafe.play" %% "play" % "2.8.15"
+  def circeDep(proj: String) = Def.setting("io.circe" %%% s"circe-$proj" % "0.14.3")
+  def http4sDep(proj: String, version: String) = Def.setting("org.http4s" %%% s"http4s-$proj" % version)
+  val playCore = Def.setting("com.typesafe.play" %%% "play" % "2.8.18" cross CrossVersion.for3Use2_13)
 }

@@ -5,12 +5,12 @@ private[routing] trait TCHolder {
   type TC[_]
 }
 
-private[routing] trait GetTC[Name <: TCHolder, ResultTC[A]] {
-  implicit def equiv[A]: ResultTC[A] =:= Name#TC[A]
+private[routing] abstract class GetTC[Name <: TCHolder, ResultTC[A]](private[routing] val name: Name) {
+  private[routing] implicit def equiv[A]: ResultTC[A] =:= name.TC[A]
 
   object reverse {
-    implicit final def eqReverse[A]: Name#TC[A] =:= ResultTC[A] = {
-      equiv[A].asInstanceOf[Name#TC[A] =:= ResultTC[A]]
+    implicit final def eqReverse[A]: name.TC[A] =:= ResultTC[A] = {
+      equiv[A].asInstanceOf[name.TC[A] =:= ResultTC[A]]
     }
   }
 }
