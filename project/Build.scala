@@ -195,7 +195,7 @@ object Build {
 
   val defaultHttp4sPlatforms = (_: Http4sAxis.Value) match {
     case Http4sAxis.v0_22 => List(Platform.Jvm)
-    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M38 => List(Platform.Jvm, Platform.Js)
+    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M39 => List(Platform.Jvm, Platform.Js)
   }
 
   def http4sProj(matrix: ProjectMatrix, nme: String, platforms: Http4sAxis.Value => List[Platform] = defaultHttp4sPlatforms)(
@@ -225,7 +225,7 @@ object Build {
         }
       ))),
       modScalaVersions = axis => platform => versions => axis match {
-        case Http4sAxis.v1_0_0_M38 => modScalaVersions(axis)(platform)(versions.filterNot(_.startsWith("2.12")))
+        case Http4sAxis.v1_0_0_M39 => modScalaVersions(axis)(platform)(versions.filterNot(_.startsWith("2.12")))
         case _ => modScalaVersions(axis)(platform)(versions)
       },
     )
@@ -260,7 +260,7 @@ object Build {
 
     val v0_22 = HAVal("0.22", "0.22.15", "latest stable on cats effect 2")
     val v0_23 = HAVal("0.23", "0.23.17", "latest stable on cats effect 3")
-    val v1_0_0_M38 = HAVal(s"${http4sV1Milestone}38", s"${http4sV1Milestone}38", "latest development on cats effect 3")
+    val v1_0_0_M39 = HAVal(s"${http4sV1Milestone}39", s"${http4sV1Milestone}39", "latest development on cats effect 3")
 
     lazy val all = values.toList
   }
