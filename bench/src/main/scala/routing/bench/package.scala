@@ -20,12 +20,12 @@ package object bench {
     case t if t =:= LTT[Boolean] => true
   }
 
-  def testParams(r: Route[_, _]): r.Params = (r.paramTpes match {
+  def testParams(r: Route[_, _]): r.Params = (r.components.collect { case p: Component.Param => p } match {
     case Vector() => ()
-    case Vector(t) => fakeParam(t)
+    case Vector(t) => fakeParam(t.tpe)
     case ts =>
       Class.forName(s"scala.Tuple${ts.size}")
         .getConstructor(List.fill(ts.size)(classOf[AnyRef]):_*)
-        .newInstance(ts.map(fakeParam(_).asInstanceOf[AnyRef]):_*)
+        .newInstance(ts.map(t => fakeParam(t.tpe).asInstanceOf[AnyRef]):_*)
   }).asInstanceOf[r.Params]
 }
