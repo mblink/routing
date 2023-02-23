@@ -1,7 +1,6 @@
 package routing
 package builder
 
-import izumi.reflect.Tag
 import routing.extractor._
 import routing.part._
 
@@ -12,14 +11,14 @@ trait NextRoute[T <: UrlPart, A, V, PI, PO] { next =>
   ): Option[(V, ForwardPath, ForwardQuery)]
   def inputParams(params: PO): PI
   def outputParams(params: PI, v: V): PO
-  def paramTpe: Option[Tag[_]]
+  def component(a: A): Component
   def part(a: A, params: PO): T
   def show(a: A): Route.Shown
 
   final def apply[M <: Method](a: A, route: Route[M, PI]): Route[M, PO] =
     new Route[M, PO] {
       lazy val method = route.method
-      lazy val paramTpes = route.paramTpes ++ next.paramTpe
+      lazy val components = route.components :+ next.component(a)
       lazy val show = route.show |+| next.show(a)
 
       def pathParts(params: Params): Vector[PathPart] =

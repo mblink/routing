@@ -21,7 +21,7 @@ trait NextQueryInstancesLP {
         Q(query, t._1, qe).map { case (v, q) => (v, path, q) }
       def inputParams(params: PO): P = tp.untuple(params)._1
       def outputParams(params: P, v: F[V]): PO = tp(params, v)
-      def paramTpe: Option[Tag[_]] = Some(tt)
+      def component(t: (String, Option[F[V]])): Component = Component.QueryParam(t._1, tt)
       def part(t: (String, Option[F[V]]), params: PO): QueryPart = {
         val (k, fv) = (t._1, tp.untuple(params)._2)
         QueryPart.inst((k, fv), toV)

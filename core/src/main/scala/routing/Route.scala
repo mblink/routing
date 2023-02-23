@@ -29,7 +29,7 @@ abstract class Route[M <: Method, P] extends RouteMethods[M, P] { self =>
   def pathParts(params: Params): Vector[PathPart]
   def queryParts(params: Params): Vector[QueryPart]
 
-  def paramTpes: Vector[Tag[_]]
+  def components: Vector[Component]
 
   def pathRaw(params: Params): ReversePath = {
     val b = new StringBuilder("")
@@ -92,7 +92,7 @@ object Route {
     def pathParts(u: Unit) = Vector()
     def queryParts(u: Unit) = Vector()
 
-    lazy val paramTpes = Vector()
+    lazy val components = Vector()
 
     def matchUri[ForwardPath, ForwardQuery](path: ForwardPath, query: ForwardQuery)(
       implicit P: ExtractPathPart[ForwardPath],
@@ -109,7 +109,7 @@ object Route {
       Q: ExtractQueryPart[ForwardQuery]
     ): Option[(ForwardPath, ForwardQuery, Params)] = r.matchUri(path, query).map { case (p, q, ps) => (p, q, io(ps)) }
     def method: Method = r.method
-    def paramTpes: Vector[Tag[_]] = r.paramTpes
+    lazy val components: Vector[Component] = r.components
     def pathParts(params: Params): Vector[PathPart] = r.pathParts(oi(params))
     def queryParts(params: Params): Vector[QueryPart] = r.queryParts(oi(params))
     def show: Shown = r.show
@@ -122,7 +122,7 @@ object Route {
 
   abstract class WithFallback[M <: Method, P, R1 <: Route[M, P], R2 <: Route[M, P]](val main: R1, val fallback: R2) extends Route[M, P] {
     def method: Method = main.method
-    def paramTpes: Vector[Tag[_]] = main.paramTpes
+    lazy val components: Vector[Component] = main.components
     def pathParts(params: Params): Vector[PathPart] = main.pathParts(params)
     def queryParts(params: Params): Vector[QueryPart] = main.queryParts(params)
     def show: Shown = main.show
