@@ -74,7 +74,7 @@ implicit val actorSystem: ActorSystem = ActorSystem.create()
 
 def fakeRequest(u: ReverseUri): RequestHeader =
   new RequestHeader {
-    def attrs = TypedMap.empty
+    def attrs: TypedMap = TypedMap.empty
     def connection: RemoteConnection = RemoteConnection("", false, None)
     def headers: Headers = Headers()
     def method: String = u.method.name

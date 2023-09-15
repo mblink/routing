@@ -265,7 +265,7 @@ object Build {
 
   def isHttp4sV1Milestone(version: String): Boolean = version.startsWith(http4sV1Milestone)
 
-  def circeDep(proj: String) = Def.setting("io.circe" %%% s"circe-$proj" % "0.14.3")
+  def circeDep(proj: String) = Def.setting("io.circe" %%% s"circe-$proj" % "0.14.5")
   def http4sDep(proj: String, version: String) = Def.setting("org.http4s" %%% s"http4s-$proj" % version)
   def playCore(version: String) = Def.setting("com.typesafe.play" %%% "play" % version)
 }
