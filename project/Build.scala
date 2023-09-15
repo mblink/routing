@@ -10,7 +10,7 @@ import sbtprojectmatrix.ProjectMatrixPlugin.autoImport._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.12.17", "2.13.10", "3.3.0")
+  lazy val scalaVersions = Seq("2.12.18", "2.13.12", "3.3.1")
   lazy val latestScalaV = scalaVersions.find(_.startsWith("3.")).get
   lazy val kindProjector = compilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
 
@@ -127,9 +127,7 @@ object Build {
     }
 
   def sjsProj(f: Project => Project): Project => Project =
-    f.andThen(_.settings(
-      scalacOptions ++= foldScalaV(scalaVersion.value)(Seq(), Seq(), Seq("-scalajs")),
-    ).enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin))
+    f.andThen(_.enablePlugins(org.scalajs.sbtplugin.ScalaJSPlugin))
 
   def platformAxes(platforms: List[Platform]): List[(Platform, VirtualAxis)] =
     platforms.map {
@@ -195,7 +193,7 @@ object Build {
 
   val defaultHttp4sPlatforms = (_: Http4sAxis.Value) match {
     case Http4sAxis.v0_22 => List(Platform.Jvm)
-    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M39 => List(Platform.Jvm, Platform.Js)
+    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M40 => List(Platform.Jvm, Platform.Js)
   }
 
   def http4sProj(matrix: ProjectMatrix, nme: String, platforms: Http4sAxis.Value => List[Platform] = defaultHttp4sPlatforms)(
@@ -225,7 +223,7 @@ object Build {
         }
       ))),
       modScalaVersions = axis => platform => versions => axis match {
-        case Http4sAxis.v1_0_0_M39 => modScalaVersions(axis)(platform)(versions.filterNot(_.startsWith("2.12")))
+        case Http4sAxis.v1_0_0_M40 => modScalaVersions(axis)(platform)(versions.filterNot(_.startsWith("2.12")))
         case _ => modScalaVersions(axis)(platform)(versions)
       },
     )
@@ -241,8 +239,8 @@ object Build {
         .getOrElse(Seq())
   )
 
-  val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.9.0")
-  val izumiReflect = Def.setting("dev.zio" %%% "izumi-reflect" % "2.2.3")
+  val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.10.0")
+  val izumiReflect = Def.setting("dev.zio" %%% "izumi-reflect" % "2.3.8")
   val http4sV1Milestone = "1.0.0-M"
 
   object Http4sAxis extends Enumeration {
@@ -259,8 +257,8 @@ object Build {
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
     val v0_22 = HAVal("0.22", "0.22.15", "latest stable on cats effect 2")
-    val v0_23 = HAVal("0.23", "0.23.17", "latest stable on cats effect 3")
-    val v1_0_0_M39 = HAVal(s"${http4sV1Milestone}39", s"${http4sV1Milestone}39", "latest development on cats effect 3")
+    val v0_23 = HAVal("0.23", "0.23.23", "latest stable on cats effect 3")
+    val v1_0_0_M40 = HAVal(s"${http4sV1Milestone}40", s"${http4sV1Milestone}40", "latest development on cats effect 3")
 
     lazy val all = values.toList
   }

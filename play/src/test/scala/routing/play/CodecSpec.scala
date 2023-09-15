@@ -12,7 +12,7 @@ object CodecSpec extends routing.CodecSpec("play") {
 
   def mkReq(u: ReverseUri): Request =
     new RequestHeader {
-      def attrs = TypedMap.empty
+      def attrs: TypedMap = TypedMap.empty
       def connection: RemoteConnection = RemoteConnection("", false, None)
       def headers: Headers = Headers()
       def method: String = "GET"

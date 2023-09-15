@@ -47,13 +47,13 @@ lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")(axis =>
 
 lazy val play = simpleProj(projectMatrix.in(file("play")), "play", List(Platform.Jvm))
   .settings(publishSettings)
-  .settings(libraryDependencies += playCore("2.8.18").value cross CrossVersion.for3Use2_13)
+  .settings(libraryDependencies += playCore("2.8.20").value cross CrossVersion.for3Use2_13)
   .dependsOn(core % "compile->compile;test->test")
 
 lazy val play2_9 = {
   lazy val play2_9 = simpleProj(projectMatrix.in(file("play2_9")), "play2_9", List(Platform.Jvm), modScalaVersions = _ => _.filterNot(_.startsWith("2.12")))
     .settings(publishSettings)
-    .settings(libraryDependencies += playCore("2.9.0-M6").value)
+    .settings(libraryDependencies += playCore("2.9.0-RC1").value)
     .dependsOn(core % "compile->compile;test->test")
 
   if (System.getProperty("java.version").startsWith("1.8")) play2_9 else play2_9.settings(
@@ -67,6 +67,7 @@ lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench", _ => List(
   modScalaVersions = _ => _ => _.filterNot(_.startsWith("3.")),
 )
   .settings(noPublishSettings)
+  .settings(scalacOptions --= foldScalaV(scalaVersion.value)(Seq("-Ywarn-unused:nowarn"), Seq(), Seq()))
   .dependsOn(core, http4s, play)
   .enablePlugins(JmhPlugin)
 
@@ -77,6 +78,7 @@ def http4sImplDoc(dir: File, axis: Http4sAxis.Value): (File, String) =
 
 lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs", _ => List(Platform.Jvm))(
   axis => _ => _.settings(
+    scalacOptions -= "-Xfatal-warnings",
     mdocVariables ++= Map(
       "VERSION" -> currentVersion,
       "GITHUB_REPO_URL" -> githubRepoUrl,
@@ -86,14 +88,14 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
       "HTTP4S_PATH_CODE" -> (axis match {
         case Http4sAxis.v0_22 |
              Http4sAxis.v0_23 |
-             Http4sAxis.v1_0_0_M39 =>
+             Http4sAxis.v1_0_0_M40 =>
           "Uri.Path.unsafeFromString(path)"
       }),
       "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
-        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M39 => "import cats.effect.unsafe.implicits.global\n"
+        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M40 => "import cats.effect.unsafe.implicits.global\n"
         case _ => ""
       })
-    )
+    ),
   ),
 ).enablePlugins(MdocPlugin)
   .settings(noPublishSettings)
@@ -146,7 +148,7 @@ lazy val example = http4sProj(projectMatrix.in(file("example")), "example", _ =>
       http4sDep("circe", axis.version).value,
       http4sDep("blaze-server", axis match {
         case Http4sAxis.v0_23 => s"${axis.suffix}.12"
-        case Http4sAxis.v1_0_0_M39 => s"${axis.suffix.dropRight(1)}6"
+        case Http4sAxis.v1_0_0_M40 => s"${axis.suffix.dropRight(2)}38"
         case _ => axis.version
       }).value,
     ),

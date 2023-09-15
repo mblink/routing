@@ -5,6 +5,8 @@ import org.scalacheck.Prop.{forAll, propBoolean}
 import routing.extractor.ExtractRequest
 
 abstract class CodecSpec(name: String) extends Properties(s"$name.codec") {
+  implicit class PipeOps[A](a: A) { final def |>[B](f: A => B): B = f(a) }
+
   def matches[A](tpe: String, expected: A, actual: A): Prop =
     (expected == actual) :| s"$tpe mismatch\n    expected: $expected\n    actual: $actual"
 
@@ -80,8 +82,9 @@ abstract class CodecSpec(name: String) extends Properties(s"$name.codec") {
 
   def testPath() =
     pathEncodedChars.foreach { case (raw, encoded) =>
-      property(s"decodes '$raw' in path") = forAll((s: Str) =>
-        testDecode(pathRoute)(x => ReverseUri(Method.GET, s"/$x", Vector()), s, raw, encoded))
+      property.update(s"decodes '$raw' in path", forAll((s: Str) =>
+        testDecode(pathRoute)(x => ReverseUri(Method.GET, s"/$x", Vector()), s, raw, encoded)
+      )) |> (_ => ())
 
       property(s"encodes '$raw' in path") = forAll((s: Str) =>
         testEncode(pathRoute)(s => s"/$s", s, raw, encoded))

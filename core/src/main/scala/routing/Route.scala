@@ -89,10 +89,10 @@ object Route {
 
     lazy val show = Shown(Vector(), Vector())
 
-    def pathParts(u: Unit) = Vector()
-    def queryParts(u: Unit) = Vector()
+    def pathParts(u: Unit): Vector[PathPart] = Vector()
+    def queryParts(u: Unit): Vector[QueryPart] = Vector()
 
-    lazy val components = Vector()
+    lazy val components: Vector[Component] = Vector()
 
     def matchUri[ForwardPath, ForwardQuery](path: ForwardPath, query: ForwardQuery)(
       implicit P: ExtractPathPart[ForwardPath],

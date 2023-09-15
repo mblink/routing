@@ -31,7 +31,7 @@ object PlayBenchmarkHelper extends BenchmarkHelper[RequestHeader, Handler, Route
 
   def request(r: Route[_ <: Method, _]): RequestHeader =
     new RequestHeader {
-      def attrs = TypedMap.empty
+      def attrs: TypedMap = TypedMap.empty
       def connection: RemoteConnection = RemoteConnection("", false, None)
       def headers: Headers = Headers()
       def method: String = r.method.name
