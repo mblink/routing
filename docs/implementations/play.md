@@ -3,11 +3,18 @@ id: play
 title: Play Framework
 ---
 
-To use your routes in a project using the Play framework, add the following to your `build.sbt`:
+To use your routes in a project using the Play framework, add the following to your `build.sbt`, choosing the
+correct minor version of Play that you're using:
 
 ```scala
-libraryDependencies += "bondlink" %% "routing-play" % "@VERSION@"
+libraryDependencies += @PLAY_LATEST_DEPENDENCY@
 ```
+
+The currently supported versions of Play are:
+
+@PLAY_SUPPORTED_VERSIONS@
+
+**Note:** Java 8 is only supported on Play 2.8.x
 
 Play handlers will be of the shape `Params => play.api.mvc.Handler`
 
@@ -63,7 +70,7 @@ val router2: Router = Router.from {
 You can confirm that routes are matched correctly by passing some test requests to the router:
 
 ```scala mdoc
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import _root_.play.api.libs.typedmap.TypedMap
 import _root_.play.api.mvc.{EssentialAction, Headers, RequestHeader}
 import _root_.play.api.mvc.request.{RemoteConnection, RequestTarget}

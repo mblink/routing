@@ -65,6 +65,9 @@ lazy val http4sImplFile = "http4s.md"
 def http4sImplDoc(dir: File, axis: Http4sAxis.Value): (File, String) =
   (dir / "implementations" / http4sImplFile, s"${http4sImplFile.split(".md").head}-${axis.suffix}.md")
 
+def playDepString(axis: PlayAxis.Value): String =
+  s""""bondlink" %% "routing-play_${axis.suffix}" % "$currentVersion""""
+
 lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs", _ => List(Platform.Jvm))(
   axis => _ => _.settings(
     scalacOptions -= "-Xfatal-warnings",
@@ -83,7 +86,9 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
       "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
         case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M40 => "import cats.effect.unsafe.implicits.global\n"
         case _ => ""
-      })
+      }),
+      "PLAY_LATEST_DEPENDENCY" -> playDepString(PlayAxis.v3_0),
+      "PLAY_SUPPORTED_VERSIONS" -> PlayAxis.all.map(a => s"- ${a.version} -- `${playDepString(a)}`").mkString("\n"),
     ),
   ),
 ).enablePlugins(MdocPlugin)
