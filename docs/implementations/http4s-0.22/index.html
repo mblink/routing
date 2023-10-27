@@ -55,7 +55,7 @@
               }
             });
         </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">http4s 0.22 (latest stable on cats effect 2)</h1></header><article><div><span><p>To use your routes in a project using http4s 0.22, add the following to your <code>build.sbt</code>:</p>
-<pre><code class="hljs css language-scala">libraryDependencies += <span class="hljs-string">"bondlink"</span> %% <span class="hljs-string">"routing-http4s_0.22"</span> % <span class="hljs-string">"3.2.0"</span>
+<pre><code class="hljs css language-scala">libraryDependencies += <span class="hljs-string">"bondlink"</span> %% <span class="hljs-string">"routing-http4s_0.22"</span> % <span class="hljs-string">"4.0.0"</span>
 </code></pre>
 <p>http4s handlers will be of the shape <code>Params =&gt; org.http4s.Request[F] =&gt; F[org.http4s.Response[F]]</code></p>
 <p>First let's rebuild our example routes.</p>
@@ -79,13 +79,13 @@
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Login</span> &lt;: <span class="hljs-type">Login</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">2</span>f714341
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">94</span>aedc9
 <span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle(name =&gt; (_: <span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>]) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>))
 <span class="hljs-comment">// handledHello: Handled[Function1[Request[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]], IO[Response[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]]]]] {</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Hello</span> &lt;: <span class="hljs-type">Hello</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">5e7</span>ac044
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">3</span>abfc787
 <span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle { <span class="hljs-keyword">case</span> (slug, id) =&gt; (req: <span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>]) =&gt;
   <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>)
 }
@@ -93,7 +93,7 @@
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">BlogPost</span> &lt;: <span class="hljs-type">BlogPost</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">1</span>eb9fe11
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">380</span>f00ca
 </code></pre>
 <p>Handled routes can be composed into an http4s service by passing them to <code>Route.httpRoutes</code>:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> cats.effect.<span class="hljs-type">IO</span>
@@ -105,7 +105,7 @@
   handledBlogPost
 )
 <span class="hljs-comment">// service1: Kleisli[[_$7 &gt;: Nothing &lt;: Any] =&gt; OptionT[[A &gt;: Nothing &lt;: Any] =&gt; IO[A], _$7], Request[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]], Response[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]]] = Kleisli(</span>
-<span class="hljs-comment">//   run = org.http4s.Http$$$Lambda$10718/0x0000000502b86328@319ad915</span>
+<span class="hljs-comment">//   run = org.http4s.Http$$$Lambda$20453/0x0000007003d22ed0@270f91e</span>
 <span class="hljs-comment">// )</span>
 </code></pre>
 <p>If you prefer, you can call <code>HttpRoutes.of</code> with a partial function that matches on your <code>Route</code>s manually:</p>
@@ -116,7 +116,7 @@
     <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>)
 }
 <span class="hljs-comment">// service2: Kleisli[[_$7 &gt;: Nothing &lt;: Any] =&gt; OptionT[[A &gt;: Nothing &lt;: Any] =&gt; IO[A], _$7], Request[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]], Response[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]]] = Kleisli(</span>
-<span class="hljs-comment">//   run = org.http4s.HttpRoutes$$$Lambda$10719/0x0000000502b86970@1454ef2c</span>
+<span class="hljs-comment">//   run = org.http4s.HttpRoutes$$$Lambda$20454/0x0000007003d23518@5c8a783c</span>
 <span class="hljs-comment">// )</span>
 </code></pre>
 <p>You can confirm that routes are matched correctly by passing some test requests to the service:</p>

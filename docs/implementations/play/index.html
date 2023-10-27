@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Play Framework · routing</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="To use your routes in a project using the Play framework, add the following to your `build.sbt`:"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Play Framework · routing"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mblink.github.io/routing/"/><meta property="og:description" content="To use your routes in a project using the Play framework, add the following to your `build.sbt`:"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/routing/img/routing.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/routing/js/scrollSpy.js"></script><link rel="stylesheet" href="/routing/css/main.css"/><script src="/routing/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/routing/"><img class="logo" src="/routing/img/routing.png" alt="routing"/><h2 class="headerTitleWithLogo">routing</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/routing/docs/installation" target="_self">Docs</a></li><li class=""><a href="https://github.com/mblink/routing" target="_blank">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Implementations</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Documentation</h3><ul class=""><li class="navListItem"><a class="navItem" href="/routing/docs/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/routes">Routes</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/routing">Routing</a></li><div class="navGroup subNavGroup"><h4 class="navGroupSubcategoryTitle">Implementations</h4><ul><li class="navListItem"><a class="navItem" href="/routing/docs/implementations">Choosing an implementation</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/implementations/http4s-0.22">http4s 0.22 (latest stable on cats effect 2)</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/implementations/http4s-0.23">http4s 0.23 (latest stable on cats effect 3)</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/implementations/http4s-1.0.0-M40">http4s 1.0.0-M40 (latest development on cats effect 3)</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/routing/docs/implementations/play">Play Framework</a></li></ul></div><li class="navListItem"><a class="navItem" href="/routing/docs/reverse-routing">Reverse Routing</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">More</h3><ul class=""><li class="navListItem"><a class="navItem" href="/routing/docs/benchmarks">Benchmarks</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/example">Example</a></li></ul></div></div></section></div><script>
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Play Framework · routing</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="To use your routes in a project using the Play framework, add the following to your `build.sbt`, choosing the"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Play Framework · routing"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mblink.github.io/routing/"/><meta property="og:description" content="To use your routes in a project using the Play framework, add the following to your `build.sbt`, choosing the"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/routing/img/routing.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/routing/js/scrollSpy.js"></script><link rel="stylesheet" href="/routing/css/main.css"/><script src="/routing/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/routing/"><img class="logo" src="/routing/img/routing.png" alt="routing"/><h2 class="headerTitleWithLogo">routing</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/routing/docs/installation" target="_self">Docs</a></li><li class=""><a href="https://github.com/mblink/routing" target="_blank">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Implementations</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Documentation</h3><ul class=""><li class="navListItem"><a class="navItem" href="/routing/docs/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/routes">Routes</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/routing">Routing</a></li><div class="navGroup subNavGroup"><h4 class="navGroupSubcategoryTitle">Implementations</h4><ul><li class="navListItem"><a class="navItem" href="/routing/docs/implementations">Choosing an implementation</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/implementations/http4s-0.22">http4s 0.22 (latest stable on cats effect 2)</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/implementations/http4s-0.23">http4s 0.23 (latest stable on cats effect 3)</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/implementations/http4s-1.0.0-M40">http4s 1.0.0-M40 (latest development on cats effect 3)</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/routing/docs/implementations/play">Play Framework</a></li></ul></div><li class="navListItem"><a class="navItem" href="/routing/docs/reverse-routing">Reverse Routing</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">More</h3><ul class=""><li class="navListItem"><a class="navItem" href="/routing/docs/benchmarks">Benchmarks</a></li><li class="navListItem"><a class="navItem" href="/routing/docs/example">Example</a></li></ul></div></div></section></div><script>
             var coll = document.getElementsByClassName('collapsible');
             var checkActiveCategory = true;
             for (var i = 0; i < coll.length; i++) {
@@ -54,9 +54,17 @@
                 };
               }
             });
-        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Play Framework</h1></header><article><div><span><p>To use your routes in a project using the Play framework, add the following to your <code>build.sbt</code>:</p>
-<pre><code class="hljs css language-scala">libraryDependencies += <span class="hljs-string">"bondlink"</span> %% <span class="hljs-string">"routing-play"</span> % <span class="hljs-string">"3.2.0"</span>
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Play Framework</h1></header><article><div><span><p>To use your routes in a project using the Play framework, add the following to your <code>build.sbt</code>, choosing the
+correct minor version of Play that you're using:</p>
+<pre><code class="hljs css language-scala">libraryDependencies += <span class="hljs-string">"bondlink"</span> %% <span class="hljs-string">"routing-play_3.0"</span> % <span class="hljs-string">"4.0.0"</span>
 </code></pre>
+<p>The currently supported versions of Play are:</p>
+<ul>
+<li>3.0.0 -- <code>&quot;bondlink&quot; %% &quot;routing-play_3.0&quot; % &quot;4.0.0&quot;</code></li>
+<li>2.9.0 -- <code>&quot;bondlink&quot; %% &quot;routing-play_2.9&quot; % &quot;4.0.0&quot;</code></li>
+<li>2.8.20 -- <code>&quot;bondlink&quot; %% &quot;routing-play_2.8&quot; % &quot;4.0.0&quot;</code></li>
+</ul>
+<p><strong>Note:</strong> Java 8 is only supported on Play 2.8.x</p>
 <p>Play handlers will be of the shape <code>Params =&gt; play.api.mvc.Handler</code></p>
 <p>First let's rebuild our example routes.</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> routing._
@@ -74,20 +82,20 @@
 <span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">ExecutionContext</span>.<span class="hljs-type">Implicits</span>.global
 
 <span class="hljs-keyword">val</span> action = <span class="hljs-keyword">new</span> <span class="hljs-type">ActionBuilder</span>.<span class="hljs-type">IgnoringBody</span>()
-<span class="hljs-comment">// action: IgnoringBody = play.api.mvc.ActionBuilder$IgnoringBody@1203d3ad</span>
+<span class="hljs-comment">// action: IgnoringBody = play.api.mvc.ActionBuilder$IgnoringBody@314435a</span>
 
 <span class="hljs-keyword">val</span> handledLogin = <span class="hljs-type">Login</span>.handle(_ =&gt; action(<span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">"Login page"</span>)))
 <span class="hljs-comment">// handledLogin: Handled[Action[AnyContent]] {</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Login</span> &lt;: <span class="hljs-type">Login</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">105570</span>f6
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">761</span>fb435
 <span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle(name =&gt; action(<span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>)))
 <span class="hljs-comment">// handledHello: Handled[Action[AnyContent]] {</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Hello</span> &lt;: <span class="hljs-type">Hello</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">6</span>bffd83c
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">3</span>fc623e
 <span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle { <span class="hljs-keyword">case</span> (slug, id) =&gt;
   action((req: <span class="hljs-type">Request</span>[<span class="hljs-type">AnyContent</span>]) =&gt; <span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>))
 }
@@ -95,7 +103,7 @@
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">BlogPost</span> &lt;: <span class="hljs-type">BlogPost</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">55</span>b91c06
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">4</span>c3c1e9c
 </code></pre>
 <p>Handled routes can be composed into a play <code>Router</code> by passing them to <code>Route.router</code>:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> _root_.play.api.routing.<span class="hljs-type">Router</span>
@@ -105,7 +113,7 @@
   handledHello,
   handledBlogPost
 )
-<span class="hljs-comment">// router1: Router = play.api.routing.SimpleRouterImpl@59ab33a7</span>
+<span class="hljs-comment">// router1: Router = play.api.routing.SimpleRouterImpl@6d939ad2</span>
 </code></pre>
 <p>If you prefer, you can call <code>Router.from</code> with a partial function that matches on your <code>Route</code>s manually:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> router2: <span class="hljs-type">Router</span> = <span class="hljs-type">Router</span>.from {
@@ -114,10 +122,10 @@
   <span class="hljs-keyword">case</span> <span class="hljs-type">BlogPost</span>(slug, id) =&gt;
     action(req =&gt; <span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>))
 }
-<span class="hljs-comment">// router2: Router = play.api.routing.SimpleRouterImpl@62c23aa4</span>
+<span class="hljs-comment">// router2: Router = play.api.routing.SimpleRouterImpl@66a63549</span>
 </code></pre>
 <p>You can confirm that routes are matched correctly by passing some test requests to the router:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> akka.actor.<span class="hljs-type">ActorSystem</span>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.apache.pekko.actor.<span class="hljs-type">ActorSystem</span>
 <span class="hljs-keyword">import</span> _root_.play.api.libs.typedmap.<span class="hljs-type">TypedMap</span>
 <span class="hljs-keyword">import</span> _root_.play.api.mvc.{<span class="hljs-type">EssentialAction</span>, <span class="hljs-type">Headers</span>, <span class="hljs-type">RequestHeader</span>}
 <span class="hljs-keyword">import</span> _root_.play.api.mvc.request.{<span class="hljs-type">RemoteConnection</span>, <span class="hljs-type">RequestTarget</span>}
@@ -125,7 +133,7 @@
 <span class="hljs-keyword">import</span> scala.concurrent.duration._
 
 <span class="hljs-keyword">implicit</span> <span class="hljs-keyword">val</span> actorSystem: <span class="hljs-type">ActorSystem</span> = <span class="hljs-type">ActorSystem</span>.create()
-<span class="hljs-comment">// actorSystem: ActorSystem = akka://default</span>
+<span class="hljs-comment">// actorSystem: ActorSystem = pekko://default</span>
 
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">fakeRequest</span></span>(u: <span class="hljs-type">ReverseUri</span>): <span class="hljs-type">RequestHeader</span> =
   <span class="hljs-keyword">new</span> <span class="hljs-type">RequestHeader</span> {
