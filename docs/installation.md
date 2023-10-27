@@ -10,3 +10,6 @@ applications. To get started, add the following to your SBT configuration:
 resolvers += "bondlink-maven-repo" at "https://raw.githubusercontent.com/mblink/maven-repo/main"
 libraryDependencies += "bondlink" %% "routing-core" % "@VERSION@"
 ```
+
+**Note:** Versions 4 and above are built for Scala 2.13.x and Scala 3, and require at least Java 11. The last version
+to support Scala 2.12 and Java 8 is 3.2.1.

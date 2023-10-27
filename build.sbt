@@ -52,11 +52,9 @@ lazy val play = playProj(projectMatrix.in(file("play")), "play")(axis => _ => _.
   .dependsOn(core % "compile->compile;test->test")
 
 lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench", _ => List(Platform.Jvm))(
-  _ => platform => proj => fakeJava8Settings(platform)(sjsNowarnGlobalECSettings(platform)(proj)),
-  modScalaVersions = _ => _ => _.filterNot(_.startsWith("2.12")),
+  _ => sjsNowarnGlobalECSettings,
 )
   .settings(noPublishSettings)
-  .settings(scalacOptions --= foldScalaV(scalaVersion.value)(Seq("-Ywarn-unused:nowarn"), Seq(), Seq()))
   .dependsOn(core, http4s, play)
   .enablePlugins(JmhPlugin)
 

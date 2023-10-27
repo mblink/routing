@@ -10,7 +10,7 @@ import sbtprojectmatrix.ProjectMatrixPlugin.autoImport._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.12.18", "2.13.12", "3.3.1")
+  lazy val scalaVersions = Seq("2.13.12", "3.3.1")
   lazy val latestScalaV = scalaVersions.find(_.startsWith("3.")).get
   lazy val kindProjector = compilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
 
@@ -20,9 +20,8 @@ object Build {
     Seq("-Yprofile-trace", s"$dir/$name.trace")
   }
 
-  def foldScalaV[A](scalaVersion: String)(_212: => A, _213: => A, _3: => A): A =
+  def foldScalaV[A](scalaVersion: String)(_213: => A, _3: => A): A =
     CrossVersion.partialVersion(scalaVersion) match {
-      case Some((2, 12)) => _212
       case Some((2, 13)) => _213
       case Some((3, _)) => _3
     }
@@ -80,12 +79,10 @@ object Build {
     organization := "bondlink",
     version := currentVersion,
     scalacOptions ++= foldScalaV(scalaVersion.value)(
-      Seq("-Xsource:3"),
       Seq("-Xlint:strict-unsealed-patmat", "-Xsource:3"),
       Seq()
     ),
     libraryDependencies ++= foldScalaV(scalaVersion.value)(
-      Seq(kindProjector),
       Seq(kindProjector),
       Seq()
     ),
@@ -156,15 +153,6 @@ object Build {
         case Platform.Native => nativeProj(base)
       }
     }
-
-  val fakeJava8Settings: ProjSettings =
-    _ => proj =>
-      if (System.getProperty("java.version").startsWith("1.8"))
-        proj.settings(
-          Compile / scalaSource := (ThisBuild / baseDirectory).value / "fake" / "src" / "main" / "scala",
-          Test / scalaSource := (ThisBuild / baseDirectory).value / "fake" / "src" / "test" / "scala",
-        )
-      else proj
 
   def simpleProj(
     matrix: ProjectMatrix,
@@ -244,8 +232,7 @@ object Build {
     case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M40 => List(Platform.Jvm, Platform.Js)
   }
   val defaultHttp4sScalaVersions = (axis: Http4sAxis.Value) => (_: Platform) => axis match {
-    case Http4sAxis.v1_0_0_M40 => (_: Seq[String]).filterNot(_.startsWith("2.12"))
-    case Http4sAxis.v0_22 | Http4sAxis.v0_23 => identity[Seq[String]] _
+    case Http4sAxis.v0_22 | Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M40 => identity[Seq[String]] _
   }
 
   lazy val http4sProj = LibAxesProj(Http4sAxis.all)(
@@ -257,21 +244,16 @@ object Build {
     defaultHttp4sScalaVersions,
   )
 
-  val defaultPlaySettings = (axis: PlayAxis.Value) => axis match {
-    case PlayAxis.v2_8 => (_: Platform) => identity[Project] _
-    case PlayAxis.v2_9 | PlayAxis.v3_0 => fakeJava8Settings
-  }
   val defaultPlayPlatforms = (_: PlayAxis.Value) => List(Platform.Jvm)
   val defaultPlayScalaVersions = (axis: PlayAxis.Value) => (_: Platform) => axis match {
-    case PlayAxis.v2_9 | PlayAxis.v3_0 => (_: Seq[String]).filterNot(_.startsWith("2.12"))
-    case PlayAxis.v2_8 => identity[Seq[String]] _
+    case PlayAxis.v2_8 | PlayAxis.v2_9 | PlayAxis.v3_0 => identity[Seq[String]] _
   }
 
   lazy val playProj = LibAxesProj(PlayAxis.all)(
     _.version,
     _.suffix,
     _.suffix,
-    defaultPlaySettings,
+    _ => _ => identity[Project],
     defaultPlayPlatforms,
     defaultPlayScalaVersions,
   )
