@@ -191,42 +191,87 @@ object Build {
 
   var genTimes: Map[(String, String), Long] = Map()
 
+  case class LibAxesProj[V](axes: List[V])(
+    version: V => String,
+    suffix: V => String,
+    suffixSrcDir: V => String,
+    defaultSettings: V => ProjSettings,
+    defaultPlatforms: V => List[Platform],
+    defaultModScalaVersions: V => Platform => Seq[String] => Seq[String],
+  ) {
+    def apply(matrix: ProjectMatrix, nme: String, platforms: V => List[Platform] = defaultPlatforms)(
+      settings: V => ProjSettings,
+      modScalaVersions: V => Platform => Seq[String] => Seq[String] = (_: V) => (_: Platform) => identity[Seq[String]],
+    )(implicit va: V => VirtualAxis) =
+      axesProj(matrix, nme, axes)(
+        platforms,
+        axis => Seq(version(axis), suffixSrcDir(axis)),
+        axis => platform => proj => settings(axis)(platform)(defaultSettings(axis)(platform)(proj)).settings(
+          moduleName := s"${name.value}_${suffix(axis)}",
+          Compile / sources := {
+            val srcs = (Compile / sources).value
+            val srcManaged = (Compile / sourceManaged).value / "parsed"
+            srcs.map { src =>
+              val outFile = srcManaged / src.getName
+              val genTimeKey = (src.toString, outFile.toString)
+              if (outFile.exists && genTimes.get(genTimeKey).exists(_ > src.lastModified)) {
+                outFile
+              } else {
+                println(s"Writing $src to $outFile")
+                genTimes.synchronized { genTimes = genTimes ++ Map(genTimeKey -> System.currentTimeMillis) }
+                IO.write(outFile, parseSourceFile(src, version(axis)))
+                outFile
+              }
+            }
+          },
+        ),
+        modScalaVersions = axis => platform =>
+          defaultModScalaVersions(axis)(platform).andThen(modScalaVersions(axis)(platform)),
+      )
+  }
+
   val defaultHttp4sPlatforms = (_: Http4sAxis.Value) match {
     case Http4sAxis.v0_22 => List(Platform.Jvm)
     case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M40 => List(Platform.Jvm, Platform.Js)
   }
+  val defaultHttp4sScalaVersions = (axis: Http4sAxis.Value) => (_: Platform) => axis match {
+    case Http4sAxis.v1_0_0_M40 => (_: Seq[String]).filterNot(_.startsWith("2.12"))
+    case Http4sAxis.v0_22 | Http4sAxis.v0_23 => identity[Seq[String]] _
+  }
 
-  def http4sProj(matrix: ProjectMatrix, nme: String, platforms: Http4sAxis.Value => List[Platform] = defaultHttp4sPlatforms)(
-    proc: Http4sAxis.Value => ProjSettings,
-    modScalaVersions: Http4sAxis.Value => Platform => Seq[String] => Seq[String] = _ => _ => identity,
-  ) =
-    axesProj(matrix, nme, Http4sAxis.all)(
-      platforms,
-      axis => Seq(axis.version, if (isHttp4sV1Milestone(axis.version)) http4sV1Milestone else axis.suffix),
-      axis => proc(axis).andThen(_.andThen(_.settings(
-        moduleName := s"${name.value}_${axis.suffix}",
-        Compile / sources := {
-          val srcs = (Compile / sources).value
-          val srcManaged = (Compile / sourceManaged).value / "parsed"
-          srcs.map { src =>
-            val outFile = srcManaged / src.getName
-            val genTimeKey = (src.toString, outFile.toString)
-            if (outFile.exists && genTimes.get(genTimeKey).exists(_ > src.lastModified)) {
-              outFile
-            } else {
-              println(s"Writing $src to $outFile")
-              genTimes.synchronized { genTimes = genTimes ++ Map(genTimeKey -> System.currentTimeMillis) }
-              IO.write(outFile, parseSourceFile(src, axis.version))
-              outFile
-            }
-          }
-        }
-      ))),
-      modScalaVersions = axis => platform => versions => axis match {
-        case Http4sAxis.v1_0_0_M40 => modScalaVersions(axis)(platform)(versions.filterNot(_.startsWith("2.12")))
-        case _ => modScalaVersions(axis)(platform)(versions)
-      },
-    )
+  lazy val http4sProj = LibAxesProj(Http4sAxis.all)(
+    _.version,
+    _.suffix,
+    axis => if (isHttp4sV1Milestone(axis.version)) http4sV1Milestone else axis.suffix,
+    _ => _ => identity[Project],
+    defaultHttp4sPlatforms,
+    defaultHttp4sScalaVersions,
+  )
+
+  val defaultPlaySettings = (axis: PlayAxis.Value) => (_: Platform) => axis match {
+    case PlayAxis.v2_8 => identity[Project] _
+    case PlayAxis.v2_9 | PlayAxis.v3_0 => (proj: Project) =>
+      if (System.getProperty("java.version").startsWith("1.8"))
+        proj.settings(
+          Compile / scalaSource := (ThisBuild / baseDirectory).value / "fake-play" / "src" / "main" / "scala",
+          Test / scalaSource := (ThisBuild / baseDirectory).value / "fake-play" / "src" / "test" / "scala",
+        )
+      else proj
+  }
+  val defaultPlayPlatforms = (_: PlayAxis.Value) => List(Platform.Jvm)
+  val defaultPlayScalaVersions = (axis: PlayAxis.Value) => (_: Platform) => axis match {
+    case PlayAxis.v2_9 | PlayAxis.v3_0 => (_: Seq[String]).filterNot(_.startsWith("2.12"))
+    case PlayAxis.v2_8 => identity[Seq[String]] _
+  }
+
+  lazy val playProj = LibAxesProj(PlayAxis.all)(
+    _.version,
+    _.suffix,
+    _.suffix,
+    defaultPlaySettings,
+    defaultPlayPlatforms,
+    defaultPlayScalaVersions,
+  )
 
   val scalacheckVersion = "1.17.0"
   val scalacheckDep = Def.setting("org.scalacheck" %%% "scalacheck" % scalacheckVersion)
@@ -263,9 +308,30 @@ object Build {
     lazy val all = values.toList
   }
 
+  object PlayAxis extends Enumeration {
+    protected case class PAVal(suffix: String, version: String, dep0: String => String => Def.Initialize[ModuleID]) extends super.Val { self =>
+      lazy val axis: VirtualAxis.WeakAxis =
+        new VirtualAxis.WeakAxis {
+          val suffix = self.suffix
+          val idSuffix = self.suffix.replace(".", "_")
+          val directorySuffix = self.suffix
+        }
+
+      val dep: String => Def.Initialize[ModuleID] = dep0(_)(version)
+    }
+
+    implicit def valueToPAVal(v: Value): PAVal = v.asInstanceOf[PAVal]
+    implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
+
+    val v3_0 = PAVal("3.0", "3.0.0", proj => version => Def.setting("org.playframework" %%% proj % version))
+    val v2_9 = PAVal("2.9", "2.9.0", proj => version => Def.setting("com.typesafe.play" %%% proj % version))
+    val v2_8 = PAVal("2.8", "2.8.20", proj => version => Def.setting("com.typesafe.play" %%% proj % version cross CrossVersion.for3Use2_13))
+
+    lazy val all = values.toList
+  }
+
   def isHttp4sV1Milestone(version: String): Boolean = version.startsWith(http4sV1Milestone)
 
   def circeDep(proj: String) = Def.setting("io.circe" %%% s"circe-$proj" % "0.14.5")
   def http4sDep(proj: String, version: String) = Def.setting("org.http4s" %%% s"http4s-$proj" % version)
-  def playCore(version: String) = Def.setting("com.typesafe.play" %%% "play" % version)
 }

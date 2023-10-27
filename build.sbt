@@ -45,22 +45,11 @@ lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")(axis =>
   .settings(scalacOptions ~= (_.filterNot(_ == "-Xfatal-warnings")))
   .dependsOn(core % "compile->compile;test->test")
 
-lazy val play = simpleProj(projectMatrix.in(file("play")), "play", List(Platform.Jvm))
+lazy val play = playProj(projectMatrix.in(file("play")), "play")(axis => _ => _.settings(
+  libraryDependencies ++= Seq(axis.dep("play").value),
+))
   .settings(publishSettings)
-  .settings(libraryDependencies += playCore("2.8.20").value cross CrossVersion.for3Use2_13)
   .dependsOn(core % "compile->compile;test->test")
-
-lazy val play2_9 = {
-  lazy val play2_9 = simpleProj(projectMatrix.in(file("play2_9")), "play2_9", List(Platform.Jvm), modScalaVersions = _ => _.filterNot(_.startsWith("2.12")))
-    .settings(publishSettings)
-    .settings(libraryDependencies += playCore("2.9.0-RC1").value)
-    .dependsOn(core % "compile->compile;test->test")
-
-  if (System.getProperty("java.version").startsWith("1.8")) play2_9 else play2_9.settings(
-    Compile / scalaSource := (ThisBuild / baseDirectory).value / "play" / "src" / "main" / "scala",
-    Test / scalaSource := (ThisBuild / baseDirectory).value / "play" / "src" / "test" / "scala",
-  )
-}
 
 lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench", _ => List(Platform.Jvm))(
   _ => sjsNowarnGlobalECSettings,

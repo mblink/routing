@@ -1,7 +1,7 @@
 package routing
 package bench
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import _root_.play.api.libs.typedmap.TypedMap
 import _root_.play.api.mvc.{ActionBuilder, EssentialAction, Handler, Headers, RequestHeader, Results}
 import _root_.play.api.mvc.request.{RemoteConnection, RequestTarget}
