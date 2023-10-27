@@ -120,7 +120,7 @@ object Build {
   def nativeProj(f: Project => Project): Project => Project =
     f.andThen(_.enablePlugins(scala.scalanative.sbtplugin.ScalaNativePlugin))
 
-  val sjsNowarnGlobalECSettings: Platform => Project => Project =
+  val sjsNowarnGlobalECSettings: ProjSettings =
     _ match {
       case Platform.Js => _.settings(scalacOptions += "-P:scalajs:nowarnGlobalExecutionContext")
       case Platform.Jvm | Platform.Native => identity
@@ -156,6 +156,15 @@ object Build {
         case Platform.Native => nativeProj(base)
       }
     }
+
+  val fakeJava8Settings: ProjSettings =
+    _ => proj =>
+      if (System.getProperty("java.version").startsWith("1.8"))
+        proj.settings(
+          Compile / scalaSource := (ThisBuild / baseDirectory).value / "fake" / "src" / "main" / "scala",
+          Test / scalaSource := (ThisBuild / baseDirectory).value / "fake" / "src" / "test" / "scala",
+        )
+      else proj
 
   def simpleProj(
     matrix: ProjectMatrix,
@@ -248,15 +257,9 @@ object Build {
     defaultHttp4sScalaVersions,
   )
 
-  val defaultPlaySettings = (axis: PlayAxis.Value) => (_: Platform) => axis match {
-    case PlayAxis.v2_8 => identity[Project] _
-    case PlayAxis.v2_9 | PlayAxis.v3_0 => (proj: Project) =>
-      if (System.getProperty("java.version").startsWith("1.8"))
-        proj.settings(
-          Compile / scalaSource := (ThisBuild / baseDirectory).value / "fake-play" / "src" / "main" / "scala",
-          Test / scalaSource := (ThisBuild / baseDirectory).value / "fake-play" / "src" / "test" / "scala",
-        )
-      else proj
+  val defaultPlaySettings = (axis: PlayAxis.Value) => axis match {
+    case PlayAxis.v2_8 => (_: Platform) => identity[Project] _
+    case PlayAxis.v2_9 | PlayAxis.v3_0 => fakeJava8Settings
   }
   val defaultPlayPlatforms = (_: PlayAxis.Value) => List(Platform.Jvm)
   val defaultPlayScalaVersions = (axis: PlayAxis.Value) => (_: Platform) => axis match {
