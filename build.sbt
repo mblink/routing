@@ -53,7 +53,7 @@ lazy val play = playProj(projectMatrix.in(file("play")), "play")(axis => _ => _.
 
 lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench", _ => List(Platform.Jvm))(
   _ => sjsNowarnGlobalECSettings,
-  modScalaVersions = _ => _ => _.filterNot(_.startsWith("3.")),
+  modScalaVersions = _ => _ => _.filterNot(_.startsWith("2.12")),
 )
   .settings(noPublishSettings)
   .settings(scalacOptions --= foldScalaV(scalaVersion.value)(Seq("-Ywarn-unused:nowarn"), Seq(), Seq()))
