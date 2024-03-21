@@ -20,8 +20,8 @@
       "implementations/http4s-0.23": {
         "title": "http4s 0.23 (latest stable on cats effect 3)"
       },
-      "implementations/http4s-1.0.0-M40": {
-        "title": "http4s 1.0.0-M40 (latest development on cats effect 3)"
+      "implementations/http4s-1.0.0-M41": {
+        "title": "http4s 1.0.0-M41 (latest development on cats effect 3)"
       },
       "implementations/play": {
         "title": "Play Framework"

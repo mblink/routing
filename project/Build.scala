@@ -10,9 +10,9 @@ import sbtprojectmatrix.ProjectMatrixPlugin.autoImport._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.13.12", "3.3.1")
+  lazy val scalaVersions = Seq("2.13.13", "3.3.3")
   lazy val latestScalaV = scalaVersions.find(_.startsWith("3.")).get
-  lazy val kindProjector = compilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
+  lazy val kindProjector = compilerPlugin("org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full)
 
   def profileTraceOpts(baseDir: File, name: String): Seq[String] = {
     val dir = baseDir / ".traces"
@@ -229,10 +229,10 @@ object Build {
 
   val defaultHttp4sPlatforms = (_: Http4sAxis.Value) match {
     case Http4sAxis.v0_22 => List(Platform.Jvm)
-    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M40 => List(Platform.Jvm, Platform.Js)
+    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M41 => List(Platform.Jvm, Platform.Js)
   }
   val defaultHttp4sScalaVersions = (axis: Http4sAxis.Value) => (_: Platform) => axis match {
-    case Http4sAxis.v0_22 | Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M40 => identity[Seq[String]] _
+    case Http4sAxis.v0_22 | Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M41 => identity[Seq[String]] _
   }
 
   lazy val http4sProj = LibAxesProj(Http4sAxis.all)(
@@ -287,8 +287,8 @@ object Build {
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
     val v0_22 = HAVal("0.22", "0.22.15", "latest stable on cats effect 2")
-    val v0_23 = HAVal("0.23", "0.23.23", "latest stable on cats effect 3")
-    val v1_0_0_M40 = HAVal(s"${http4sV1Milestone}40", s"${http4sV1Milestone}40", "latest development on cats effect 3")
+    val v0_23 = HAVal("0.23", "0.23.26", "latest stable on cats effect 3")
+    val v1_0_0_M41 = HAVal(s"${http4sV1Milestone}41", s"${http4sV1Milestone}41", "latest development on cats effect 3")
 
     lazy val all = values.toList
   }

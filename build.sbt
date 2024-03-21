@@ -78,11 +78,11 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
       "HTTP4S_PATH_CODE" -> (axis match {
         case Http4sAxis.v0_22 |
              Http4sAxis.v0_23 |
-             Http4sAxis.v1_0_0_M40 =>
+             Http4sAxis.v1_0_0_M41 =>
           "Uri.Path.unsafeFromString(path)"
       }),
       "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
-        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M40 => "import cats.effect.unsafe.implicits.global\n"
+        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M41 => "import cats.effect.unsafe.implicits.global\n"
         case _ => ""
       }),
       "PLAY_LATEST_DEPENDENCY" -> playDepString(PlayAxis.v3_0),
@@ -140,7 +140,7 @@ lazy val example = http4sProj(projectMatrix.in(file("example")), "example", _ =>
       http4sDep("circe", axis.version).value,
       http4sDep("blaze-server", axis match {
         case Http4sAxis.v0_23 => s"${axis.suffix}.12"
-        case Http4sAxis.v1_0_0_M40 => s"${axis.suffix.dropRight(2)}38"
+        case Http4sAxis.v1_0_0_M41 => s"${axis.suffix.dropRight(2)}38"
         case _ => axis.version
       }).value,
     ),
