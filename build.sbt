@@ -75,16 +75,6 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
       "GITHUB_BLOB_URL" -> s"$githubRepoUrl/blob/master",
       "HTTP4S_SUFFIX" -> axis.suffix,
       "HTTP4S_VERSION_COMMENT" -> axis.comment,
-      "HTTP4S_PATH_CODE" -> (axis match {
-        case Http4sAxis.v0_22 |
-             Http4sAxis.v0_23 |
-             Http4sAxis.v1_0_0_M41 =>
-          "Uri.Path.unsafeFromString(path)"
-      }),
-      "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
-        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M41 => "import cats.effect.unsafe.implicits.global\n"
-        case _ => ""
-      }),
       "PLAY_LATEST_DEPENDENCY" -> playDepString(PlayAxis.v3_0),
       "PLAY_SUPPORTED_VERSIONS" -> PlayAxis.all.map(a => s"- ${a.version} -- `${playDepString(a)}`").mkString("\n"),
     ),

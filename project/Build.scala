@@ -228,11 +228,10 @@ object Build {
   }
 
   val defaultHttp4sPlatforms = (_: Http4sAxis.Value) match {
-    case Http4sAxis.v0_22 => List(Platform.Jvm)
     case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M41 => List(Platform.Jvm, Platform.Js)
   }
   val defaultHttp4sScalaVersions = (axis: Http4sAxis.Value) => (_: Platform) => axis match {
-    case Http4sAxis.v0_22 | Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M41 => identity[Seq[String]] _
+    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M41 => identity[Seq[String]] _
   }
 
   lazy val http4sProj = LibAxesProj(Http4sAxis.all)(
@@ -286,8 +285,7 @@ object Build {
     implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v0_22 = HAVal("0.22", "0.22.15", "latest stable on cats effect 2")
-    val v0_23 = HAVal("0.23", "0.23.26", "latest stable on cats effect 3")
+    val v0_23 = HAVal("0.23", "0.23.27", "latest stable on cats effect 3")
     val v1_0_0_M41 = HAVal(s"${http4sV1Milestone}41", s"${http4sV1Milestone}41", "latest development on cats effect 3")
 
     lazy val all = values.toList
