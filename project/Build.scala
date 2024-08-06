@@ -245,7 +245,7 @@ object Build {
 
   val defaultPlayPlatforms = (_: PlayAxis.Value) => List(Platform.Jvm)
   val defaultPlayScalaVersions = (axis: PlayAxis.Value) => (_: Platform) => axis match {
-    case PlayAxis.v2_8 | PlayAxis.v2_9 | PlayAxis.v3_0 => identity[Seq[String]] _
+    case PlayAxis.v2_9 | PlayAxis.v3_0 => identity[Seq[String]] _
   }
 
   lazy val playProj = LibAxesProj(PlayAxis.all)(
@@ -308,7 +308,6 @@ object Build {
 
     val v3_0 = PAVal("3.0", "3.0.0", proj => version => Def.setting("org.playframework" %%% proj % version))
     val v2_9 = PAVal("2.9", "2.9.0", proj => version => Def.setting("com.typesafe.play" %%% proj % version))
-    val v2_8 = PAVal("2.8", "2.8.20", proj => version => Def.setting("com.typesafe.play" %%% proj % version cross CrossVersion.for3Use2_13))
 
     lazy val all = values.toList
   }
