@@ -7,6 +7,22 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 noPublishSettings
 
+// GitHub Actions config
+val javaVersions = Seq(11, 17, 21).map(v => JavaSpec.temurin(v.toString))
+
+ThisBuild / githubWorkflowJavaVersions := javaVersions
+ThisBuild / githubWorkflowArtifactUpload := false
+ThisBuild / githubWorkflowBuildMatrixFailFast := Some(false)
+ThisBuild / githubWorkflowTargetBranches := Seq("master")
+ThisBuild / githubWorkflowPublishTargetBranches := Seq()
+
+def isJava(v: Int) = s"matrix.java == '${javaVersions.find(_.version == v.toString).get.render}'"
+
+ThisBuild / githubWorkflowBuild := Seq(
+  WorkflowStep.Run(List("sbt test"), name = Some("Build project")),
+  WorkflowStep.Run(List("sbt mdoc"), name = Some("Build docs"), cond = Some(isJava(21))),
+)
+
 lazy val core = simpleProj(projectMatrix.in(file("core")), "core", List(
   Platform.Jvm,
   Platform.Js,
