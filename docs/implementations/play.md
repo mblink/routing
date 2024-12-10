@@ -14,8 +14,6 @@ The currently supported versions of Play are:
 
 @PLAY_SUPPORTED_VERSIONS@
 
-**Note:** Java 8 is only supported on Play 2.8.x
-
 Play handlers will be of the shape `Params => play.api.mvc.Handler`
 
 First let's rebuild our example routes.

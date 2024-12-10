@@ -7,6 +7,22 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 noPublishSettings
 
+// GitHub Actions config
+val javaVersions = Seq(11, 17, 21).map(v => JavaSpec.temurin(v.toString))
+
+ThisBuild / githubWorkflowJavaVersions := javaVersions
+ThisBuild / githubWorkflowArtifactUpload := false
+ThisBuild / githubWorkflowBuildMatrixFailFast := Some(false)
+ThisBuild / githubWorkflowTargetBranches := Seq("master")
+ThisBuild / githubWorkflowPublishTargetBranches := Seq()
+
+def isJava(v: Int) = s"matrix.java == '${javaVersions.find(_.version == v.toString).get.render}'"
+
+ThisBuild / githubWorkflowBuild := Seq(
+  WorkflowStep.Run(List("sbt test"), name = Some("Build project")),
+  WorkflowStep.Run(List("sbt mdoc"), name = Some("Build docs"), cond = Some(isJava(21))),
+)
+
 lazy val core = simpleProj(projectMatrix.in(file("core")), "core", List(
   Platform.Jvm,
   Platform.Js,
@@ -75,16 +91,6 @@ lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs
       "GITHUB_BLOB_URL" -> s"$githubRepoUrl/blob/master",
       "HTTP4S_SUFFIX" -> axis.suffix,
       "HTTP4S_VERSION_COMMENT" -> axis.comment,
-      "HTTP4S_PATH_CODE" -> (axis match {
-        case Http4sAxis.v0_22 |
-             Http4sAxis.v0_23 |
-             Http4sAxis.v1_0_0_M41 =>
-          "Uri.Path.unsafeFromString(path)"
-      }),
-      "HTTP4S_UNSAFERUNSYNC_IMPORT" -> (axis match {
-        case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M41 => "import cats.effect.unsafe.implicits.global\n"
-        case _ => ""
-      }),
       "PLAY_LATEST_DEPENDENCY" -> playDepString(PlayAxis.v3_0),
       "PLAY_SUPPORTED_VERSIONS" -> PlayAxis.all.map(a => s"- ${a.version} -- `${playDepString(a)}`").mkString("\n"),
     ),
@@ -139,8 +145,8 @@ lazy val example = http4sProj(projectMatrix.in(file("example")), "example", _ =>
     libraryDependencies ++= Seq(
       http4sDep("circe", axis.version).value,
       http4sDep("blaze-server", axis match {
-        case Http4sAxis.v0_23 => s"${axis.suffix}.12"
-        case Http4sAxis.v1_0_0_M41 => s"${axis.suffix.dropRight(2)}38"
+        case Http4sAxis.v0_23 => s"${axis.suffix}.17"
+        case Http4sAxis.v1_0_0_M44 => s"${axis.suffix.dropRight(2)}41"
         case _ => axis.version
       }).value,
     ),

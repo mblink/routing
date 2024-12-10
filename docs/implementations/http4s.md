@@ -63,7 +63,8 @@ val service2: HttpRoutes[IO] = HttpRoutes.of {
 You can confirm that routes are matched correctly by passing some test requests to the service:
 
 ```scala mdoc
-@HTTP4S_UNSAFERUNSYNC_IMPORT@import org.http4s.Request
+import cats.effect.unsafe.implicits.global
+import org.http4s.Request
 
 def testRoute(service: HttpRoutes[IO], call: Call): String =
   service
@@ -88,7 +89,7 @@ You can also check that requests matching none of your routes are not handled by
 import org.http4s.{Method, Uri}
 
 def unhandled(method: Method, path: String) =
-  service1.run(Request[IO](method = method, uri = Uri(path = @HTTP4S_PATH_CODE@))).value.unsafeRunSync()
+  service1.run(Request[IO](method = method, uri = Uri(path = Uri.Path.unsafeFromString(path)))).value.unsafeRunSync()
 
 unhandled(GET, "/fake")
 

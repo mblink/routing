@@ -10,7 +10,7 @@ import sbtprojectmatrix.ProjectMatrixPlugin.autoImport._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.13.13", "3.3.3")
+  lazy val scalaVersions = Seq("2.13.15", "3.3.4")
   lazy val latestScalaV = scalaVersions.find(_.startsWith("3.")).get
   lazy val kindProjector = compilerPlugin("org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full)
 
@@ -32,8 +32,8 @@ object Build {
     output: List[String]
   )
 
-  val startVersionBlock = "// ++ "
-  val endVersionBlock = "// -- "
+  val startVersionBlock = """^\s*// \+\+ (.*)$""".r
+  val endVersionBlock = """^\s*// -- (.*)$""".r
   val versionBlockComments = List(startVersionBlock, endVersionBlock)
 
   val singleLineVersionComment = """^([^/]+) // (.*)$""".r
@@ -47,17 +47,15 @@ object Build {
       Nil
     ))((acc, line) => (acc.currVersions, line) match {
       // Start a version block with a line matching `// ++ $version`
-      case (Nil, l) if l.startsWith(startVersionBlock) =>
-        acc.copy(
-          currVersions = splitVersion(l.stripPrefix(startVersionBlock)),
-          output = (acc.output :+ ""))
+      case (Nil, startVersionBlock(v)) =>
+        acc.copy(currVersions = splitVersion(v), output = (acc.output :+ ""))
 
       // End a version block with a line matching `// -- $version`
-      case (vs @ (_ :: _), l) if vs.exists(v => l == endVersionBlock ++ v) =>
+      case (vs @ (_ :: _), endVersionBlock(v)) if vs.exists(_ == v) =>
         acc.copy(currVersions = Nil, output = (acc.output :+ ""))
 
       // Fail on attempts at nested version blocks
-      case (_ :: _, l) if versionBlockComments.exists(l.startsWith(_)) =>
+      case (_ :: _, startVersionBlock(_) | endVersionBlock(_)) =>
         sys.error("Cannot nest version blocks")
 
       // Decide whether to keep a version line within a version block by checking
@@ -228,11 +226,10 @@ object Build {
   }
 
   val defaultHttp4sPlatforms = (_: Http4sAxis.Value) match {
-    case Http4sAxis.v0_22 => List(Platform.Jvm)
-    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M41 => List(Platform.Jvm, Platform.Js)
+    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M44 => List(Platform.Jvm, Platform.Js)
   }
   val defaultHttp4sScalaVersions = (axis: Http4sAxis.Value) => (_: Platform) => axis match {
-    case Http4sAxis.v0_22 | Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M41 => identity[Seq[String]] _
+    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M44 => identity[Seq[String]] _
   }
 
   lazy val http4sProj = LibAxesProj(Http4sAxis.all)(
@@ -246,7 +243,7 @@ object Build {
 
   val defaultPlayPlatforms = (_: PlayAxis.Value) => List(Platform.Jvm)
   val defaultPlayScalaVersions = (axis: PlayAxis.Value) => (_: Platform) => axis match {
-    case PlayAxis.v2_8 | PlayAxis.v2_9 | PlayAxis.v3_0 => identity[Seq[String]] _
+    case PlayAxis.v2_9 | PlayAxis.v3_0 => identity[Seq[String]] _
   }
 
   lazy val playProj = LibAxesProj(PlayAxis.all)(
@@ -258,7 +255,7 @@ object Build {
     defaultPlayScalaVersions,
   )
 
-  val scalacheckVersion = "1.17.0"
+  val scalacheckVersion = "1.18.1"
   val scalacheckDep = Def.setting("org.scalacheck" %%% "scalacheck" % scalacheckVersion)
 
   val testSettings = Seq(
@@ -269,8 +266,8 @@ object Build {
         .getOrElse(Seq())
   )
 
-  val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.10.0")
-  val izumiReflect = Def.setting("dev.zio" %%% "izumi-reflect" % "2.3.8")
+  val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.12.0")
+  val izumiReflect = Def.setting("dev.zio" %%% "izumi-reflect" % "2.3.10")
   val http4sV1Milestone = "1.0.0-M"
 
   object Http4sAxis extends Enumeration {
@@ -286,9 +283,8 @@ object Build {
     implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v0_22 = HAVal("0.22", "0.22.15", "latest stable on cats effect 2")
-    val v0_23 = HAVal("0.23", "0.23.26", "latest stable on cats effect 3")
-    val v1_0_0_M41 = HAVal(s"${http4sV1Milestone}41", s"${http4sV1Milestone}41", "latest development on cats effect 3")
+    val v0_23 = HAVal("0.23", "0.23.30", "latest stable on cats effect 3")
+    val v1_0_0_M44 = HAVal(s"${http4sV1Milestone}44", s"${http4sV1Milestone}44", "latest development on cats effect 3")
 
     lazy val all = values.toList
   }
@@ -308,9 +304,8 @@ object Build {
     implicit def valueToPAVal(v: Value): PAVal = v.asInstanceOf[PAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v3_0 = PAVal("3.0", "3.0.0", proj => version => Def.setting("org.playframework" %%% proj % version))
-    val v2_9 = PAVal("2.9", "2.9.0", proj => version => Def.setting("com.typesafe.play" %%% proj % version))
-    val v2_8 = PAVal("2.8", "2.8.20", proj => version => Def.setting("com.typesafe.play" %%% proj % version cross CrossVersion.for3Use2_13))
+    val v3_0 = PAVal("3.0", "3.0.6", proj => version => Def.setting("org.playframework" %%% proj % version))
+    val v2_9 = PAVal("2.9", "2.9.6", proj => version => Def.setting("com.typesafe.play" %%% proj % version))
 
     lazy val all = values.toList
   }

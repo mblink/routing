@@ -2,7 +2,7 @@ package routing
 package bench
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global // 0.23, 1.0.0-M41
+import cats.effect.unsafe.implicits.global
 import org.http4s._
 import org.http4s.dsl.io._
 import org.openjdk.jmh.annotations._
@@ -36,9 +36,8 @@ object http4sHelper extends BenchmarkHelper[Request[IO], Request[IO] => IO[Respo
     runIO(routes.run(request).value.flatMap(_.get.as[String]))
 }
 
-class Http4sBenchmark_0_22 { // 0.22
 class Http4sBenchmark_0_23 { // 0.23
-class Http4sBenchmark_1_0_0_M41 { // 1.0.0-M41
+class Http4sBenchmark_1_0_0_M44 { // 1.0.0-M44
   import http4sHelper._
 
   @Benchmark def http4s: String = run(http4sService)
