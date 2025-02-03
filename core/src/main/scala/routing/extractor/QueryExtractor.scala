@@ -5,8 +5,15 @@ import java.util.UUID
 import scala.annotation.tailrec
 import scala.util.Try
 
-trait QueryExtractor[A] {
+trait QueryExtractor[A] { self =>
   def extract(key: String, query: QueryMap): Option[A]
+
+  final def mapO[B](f: A => Option[B]): QueryExtractor[B] =
+    new QueryExtractor[B] {
+      def extract(key: String, query: QueryMap): Option[B] = self.extract(key, query).flatMap(f)
+    }
+
+  final def map[B](f: A => B): QueryExtractor[B] = mapO(a => Some(f(a)))
 }
 
 object QueryExtractor {
