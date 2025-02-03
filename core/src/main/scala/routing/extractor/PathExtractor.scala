@@ -4,12 +4,26 @@ package extractor
 import java.util.UUID
 import scala.util.Try
 
-trait PathExtractor[A] {
+trait PathExtractor[A] { self =>
   def extract(path: String): Option[A]
+
+  final def mapO[B](f: A => Option[B]): PathExtractor[B] =
+    new PathExtractor[B] {
+      def extract(path: String): Option[B] = self.extract(path).flatMap(f)
+    }
+
+  final def map[B](f: A => B): PathExtractor[B] = mapO(a => Some(f(a)))
 }
 
-trait RestOfPathExtractor[A] {
+trait RestOfPathExtractor[A] { self =>
   def extract(path: String): Option[A]
+
+  final def mapO[B](f: A => Option[B]): RestOfPathExtractor[B] =
+    new RestOfPathExtractor[B] {
+      def extract(path: String): Option[B] = self.extract(path).flatMap(f)
+    }
+
+  final def map[B](f: A => B): RestOfPathExtractor[B] = mapO(a => Some(f(a)))
 }
 
 object PathExtractor {
