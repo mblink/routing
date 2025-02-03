@@ -10,7 +10,7 @@ import sbtprojectmatrix.ProjectMatrixPlugin.autoImport._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.13.15", "3.3.4")
+  lazy val scalaVersions = Seq("2.13.16", "3.3.5")
   lazy val latestScalaV = scalaVersions.find(_.startsWith("3.")).get
   lazy val kindProjector = compilerPlugin("org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full)
 
@@ -266,8 +266,8 @@ object Build {
         .getOrElse(Seq())
   )
 
-  val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.12.0")
-  val izumiReflect = Def.setting("dev.zio" %%% "izumi-reflect" % "2.3.10")
+  val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.13.0")
+  val izumiReflect = Def.setting("dev.zio" %%% "izumi-reflect" % "3.0.1")
   val http4sV1Milestone = "1.0.0-M"
 
   object Http4sAxis extends Enumeration {
@@ -312,6 +312,6 @@ object Build {
 
   def isHttp4sV1Milestone(version: String): Boolean = version.startsWith(http4sV1Milestone)
 
-  def circeDep(proj: String) = Def.setting("io.circe" %%% s"circe-$proj" % "0.14.6")
+  def circeDep(proj: String) = Def.setting("io.circe" %%% s"circe-$proj" % "0.14.10")
   def http4sDep(proj: String, version: String) = Def.setting("org.http4s" %%% s"http4s-$proj" % version)
 }

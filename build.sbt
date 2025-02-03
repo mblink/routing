@@ -58,7 +58,7 @@ lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")(axis =>
   )
 ))
   .settings(publishSettings)
-  .settings(scalacOptions ~= (_.filterNot(_ == "-Xfatal-warnings")))
+  .settings(scalacOptions ~= (_.filterNot(_ == "-Wunused:nowarn")))
   .dependsOn(core % "compile->compile;test->test")
 
 lazy val play = playProj(projectMatrix.in(file("play")), "play")(axis => _ => _.settings(
