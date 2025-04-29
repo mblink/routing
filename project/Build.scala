@@ -5,7 +5,6 @@ import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import sbt._
 import sbt.Keys._
 import sbt.internal.ProjectMatrix
-import sbtgitpublish.GitPublishKeys._
 import sbtprojectmatrix.ProjectMatrixPlugin.autoImport._
 import scala.sys.process._
 
@@ -92,15 +91,15 @@ object Build {
   )
 
   val publishSettings = Seq(
-    publish / skip := false,
     licenses += License.Apache2,
-    gitPublishDir := file("/src/maven-repo")
+    publish / skip := false,
+    publishTo := Some("GitHub Packages".at("https://maven.pkg.github.com/mblink/routing")),
+    publishConfiguration := publishConfiguration.value.withOverwrite(true),
   )
 
   val noPublishSettings = Seq(
     publish := {},
     publishLocal := {},
-    gitRelease := {}
   )
 
   sealed abstract class Platform(val s: String)
@@ -202,7 +201,7 @@ object Build {
         platforms,
         axis => Seq(version(axis), suffixSrcDir(axis)),
         axis => platform => proj => settings(axis)(platform)(defaultSettings(axis)(platform)(proj)).settings(
-          moduleName := s"${name.value}_${suffix(axis)}",
+          moduleName := s"${name.value}_${suffix(axis).toLowerCase}",
           Compile / sources := {
             val srcs = (Compile / sources).value
             val srcManaged = (Compile / sourceManaged).value / "parsed"
