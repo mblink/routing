@@ -93,8 +93,7 @@ object Build {
   val publishSettings = Seq(
     licenses += License.Apache2,
     publish / skip := false,
-    publishTo := Some("GitHub Packages".at("https://maven.pkg.github.com/mblink/routing")),
-    publishConfiguration := publishConfiguration.value.withOverwrite(true),
+    publishTo := Some("BondLink S3".at("s3://bondlink-maven-repo")),
   )
 
   val noPublishSettings = Seq(
