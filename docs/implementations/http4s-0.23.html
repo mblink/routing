@@ -79,13 +79,13 @@
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Login</span> &lt;: <span class="hljs-type">Login</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">5</span>bf0de9c
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">4</span>dc56e0c
 <span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle(name =&gt; (_: <span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>]) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>))
 <span class="hljs-comment">// handledHello: Handled[Function1[Request[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]], IO[Response[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]]]]] {</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Hello</span> &lt;: <span class="hljs-type">Hello</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">34</span>efaabd
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">56</span>c2f0e
 <span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle { <span class="hljs-keyword">case</span> (slug, id) =&gt; (req: <span class="hljs-type">Request</span>[<span class="hljs-type">IO</span>]) =&gt;
   <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>)
 }
@@ -93,7 +93,7 @@
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">BlogPost</span> &lt;: <span class="hljs-type">BlogPost</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">6</span>b505d44
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">66</span>a0fe71
 </code></pre>
 <p>Handled routes can be composed into an http4s service by passing them to <code>Route.httpRoutes</code>:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> cats.effect.<span class="hljs-type">IO</span>
@@ -105,7 +105,7 @@
   handledBlogPost
 )
 <span class="hljs-comment">// service1: Kleisli[[_$7 &gt;: Nothing &lt;: Any] =&gt; OptionT[[A &gt;: Nothing &lt;: Any] =&gt; IO[A], _$7], Request[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]], Response[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]]] = Kleisli(</span>
-<span class="hljs-comment">//   run = org.http4s.Http$$$Lambda/0x00000070054f3fc8@7ffc2881</span>
+<span class="hljs-comment">//   run = org.http4s.Http$$$Lambda/0x00000003040f71f0@1d55bf93</span>
 <span class="hljs-comment">// )</span>
 </code></pre>
 <p>If you prefer, you can call <code>HttpRoutes.of</code> with a partial function that matches on your <code>Route</code>s manually:</p>
@@ -116,7 +116,7 @@
     <span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>)
 }
 <span class="hljs-comment">// service2: Kleisli[[_$7 &gt;: Nothing &lt;: Any] =&gt; OptionT[[A &gt;: Nothing &lt;: Any] =&gt; IO[A], _$7], Request[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]], Response[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]]] = Kleisli(</span>
-<span class="hljs-comment">//   run = org.http4s.HttpRoutes$$$Lambda/0x00000070054f45f0@336a7c66</span>
+<span class="hljs-comment">//   run = org.http4s.HttpRoutes$$$Lambda/0x00000003040f7818@5a60fae0</span>
 <span class="hljs-comment">// )</span>
 </code></pre>
 <p>You can confirm that routes are matched correctly by passing some test requests to the service:</p>

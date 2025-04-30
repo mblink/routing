@@ -75,13 +75,13 @@ type you want to target with your handler.</p>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Login</span> &lt;: <span class="hljs-type">Login</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">29</span>c83f9c
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">6</span>ab9ed09
 <span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle(name =&gt; <span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>)
 <span class="hljs-comment">// handledHello: Handled[String] {</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Hello</span> &lt;: <span class="hljs-type">Hello</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">5</span>a9030ba
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">54494</span>cd3
 <span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle { <span class="hljs-keyword">case</span> (slug, id) =&gt;
   <span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found"</span>
 }
@@ -89,7 +89,7 @@ type you want to target with your handler.</p>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">BlogPost</span> &lt;: <span class="hljs-type">BlogPost</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">2541836</span>e
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">7895e84</span>e
 </code></pre>
 <p>Of course the actual output type of your handlers will be dictated by the HTTP application framework you've chosen.
 See the <a href="/routing/docs/implementations">implementations documentation</a> for more examples.</p>
