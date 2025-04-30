@@ -7,7 +7,7 @@ The `routing-core` package provides simple, type-safe, and framework-agnostic fo
 applications. To get started, add the following to your SBT configuration:
 
 ```scala
-resolvers += "bondlink-maven-repo" at "https://raw.githubusercontent.com/mblink/maven-repo/main"
+resolvers += "bondlink-maven-repo" at "https://s3.amazonaws.com/bondlink-maven-repo"
 libraryDependencies += "bondlink" %% "routing-core" % "@VERSION@"
 ```
 
