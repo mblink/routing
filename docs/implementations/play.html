@@ -80,20 +80,20 @@ correct minor version of Play that you're using:</p>
 <span class="hljs-keyword">import</span> scala.concurrent.<span class="hljs-type">ExecutionContext</span>.<span class="hljs-type">Implicits</span>.global
 
 <span class="hljs-keyword">val</span> action = <span class="hljs-keyword">new</span> <span class="hljs-type">ActionBuilder</span>.<span class="hljs-type">IgnoringBody</span>()
-<span class="hljs-comment">// action: IgnoringBody = play.api.mvc.ActionBuilder$IgnoringBody@6cc2c922</span>
+<span class="hljs-comment">// action: IgnoringBody = play.api.mvc.ActionBuilder$IgnoringBody@1919e594</span>
 
 <span class="hljs-keyword">val</span> handledLogin = <span class="hljs-type">Login</span>.handle(_ =&gt; action(<span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">"Login page"</span>)))
 <span class="hljs-comment">// handledLogin: Handled[Action[AnyContent]] {</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Login</span> &lt;: <span class="hljs-type">Login</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">29</span>dcff43
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">29712e74</span>
 <span class="hljs-keyword">val</span> handledHello = <span class="hljs-type">Hello</span>.handle(name =&gt; action(<span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>)))
 <span class="hljs-comment">// handledHello: Handled[Action[AnyContent]] {</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Hello</span> &lt;: <span class="hljs-type">Hello</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">2e956251</span>
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">6</span>eccdc58
 <span class="hljs-keyword">val</span> handledBlogPost = <span class="hljs-type">BlogPost</span>.handle { <span class="hljs-keyword">case</span> (slug, id) =&gt;
   action((req: <span class="hljs-type">Request</span>[<span class="hljs-type">AnyContent</span>]) =&gt; <span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>))
 }
@@ -101,7 +101,7 @@ correct minor version of Play that you're using:</p>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">M</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Method</span> &lt;: <span class="hljs-type">Method</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">P</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">Params</span> &lt;: <span class="hljs-type">Params</span>
   <span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">R</span> <span class="hljs-title">&gt;</span></span>: <span class="hljs-type">BlogPost</span> &lt;: <span class="hljs-type">BlogPost</span>
-} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">177</span>a0abb
+} = routing.<span class="hljs-type">Route</span>$$anon$<span class="hljs-number">3</span>@<span class="hljs-number">75</span>a38463
 </code></pre>
 <p>Handled routes can be composed into a play <code>Router</code> by passing them to <code>Route.router</code>:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> _root_.play.api.routing.<span class="hljs-type">Router</span>
@@ -111,7 +111,7 @@ correct minor version of Play that you're using:</p>
   handledHello,
   handledBlogPost
 )
-<span class="hljs-comment">// router1: Router = play.api.routing.SimpleRouterImpl@4123ad5b</span>
+<span class="hljs-comment">// router1: Router = play.api.routing.SimpleRouterImpl@2e29148</span>
 </code></pre>
 <p>If you prefer, you can call <code>Router.from</code> with a partial function that matches on your <code>Route</code>s manually:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> router2: <span class="hljs-type">Router</span> = <span class="hljs-type">Router</span>.from {
@@ -120,7 +120,7 @@ correct minor version of Play that you're using:</p>
   <span class="hljs-keyword">case</span> <span class="hljs-type">BlogPost</span>(slug, id) =&gt;
     action(req =&gt; <span class="hljs-type">Results</span>.<span class="hljs-type">Ok</span>(<span class="hljs-string">s"Blog post with id: <span class="hljs-subst">$id</span>, slug: <span class="hljs-subst">$slug</span> found at <span class="hljs-subst">${req.uri}</span>"</span>))
 }
-<span class="hljs-comment">// router2: Router = play.api.routing.SimpleRouterImpl@39c5f494</span>
+<span class="hljs-comment">// router2: Router = play.api.routing.SimpleRouterImpl@604365e5</span>
 </code></pre>
 <p>You can confirm that routes are matched correctly by passing some test requests to the router:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.apache.pekko.actor.<span class="hljs-type">ActorSystem</span>

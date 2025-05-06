@@ -68,13 +68,13 @@ We put together a simple benchmark to test the performance of routing requests t
 <span class="hljs-comment">// 1. Built with routing handler syntax</span>
 <span class="hljs-keyword">val</span> routing = <span class="hljs-type">Route</span>.httpRoutes[<span class="hljs-type">IO</span>](test.handle(_ =&gt; _ =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>)))
 <span class="hljs-comment">// routing: Kleisli[[_$7 &gt;: Nothing &lt;: Any] =&gt; OptionT[[A &gt;: Nothing &lt;: Any] =&gt; IO[A], _$7], Request[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]], Response[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]]] = Kleisli(</span>
-<span class="hljs-comment">//   run = org.http4s.Http$$$Lambda/0x0000000304a79b60@604370cc</span>
+<span class="hljs-comment">//   run = org.http4s.Http$$$Lambda/0x00000005037461a0@3487f387</span>
 <span class="hljs-comment">// )</span>
 
 <span class="hljs-comment">// 2. Built with routing manual match syntax</span>
 <span class="hljs-keyword">val</span> routingManual = <span class="hljs-type">HttpRoutes</span>.of[<span class="hljs-type">IO</span>] { <span class="hljs-keyword">case</span> test(_) =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>) }
 <span class="hljs-comment">// routingManual: Kleisli[[_$7 &gt;: Nothing &lt;: Any] =&gt; OptionT[[A &gt;: Nothing &lt;: Any] =&gt; IO[A], _$7], Request[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]], Response[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]]] = Kleisli(</span>
-<span class="hljs-comment">//   run = org.http4s.HttpRoutes$$$Lambda/0x0000000304a7a188@7cb99d39</span>
+<span class="hljs-comment">//   run = org.http4s.HttpRoutes$$$Lambda/0x00000005037467c8@f39da08</span>
 <span class="hljs-comment">// )</span>
 
 <span class="hljs-comment">// 3. Built with explicit URL matches using the http4s DSL</span>
@@ -82,7 +82,7 @@ We put together a simple benchmark to test the performance of routing requests t
   <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Root</span> / <span class="hljs-string">"test"</span> =&gt; <span class="hljs-type">Ok</span>(<span class="hljs-string">"test"</span>)
 }
 <span class="hljs-comment">// http4s: Kleisli[[_$7 &gt;: Nothing &lt;: Any] =&gt; OptionT[[A &gt;: Nothing &lt;: Any] =&gt; IO[A], _$7], Request[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]], Response[[A &gt;: Nothing &lt;: Any] =&gt; IO[A]]] = Kleisli(</span>
-<span class="hljs-comment">//   run = org.http4s.HttpRoutes$$$Lambda/0x0000000304a7a188@421fb201</span>
+<span class="hljs-comment">//   run = org.http4s.HttpRoutes$$$Lambda/0x00000005037467c8@1bad9326</span>
 <span class="hljs-comment">// )</span>
 </code></pre>
 <p>Then ran the benchmarks with the command:</p>
