@@ -253,7 +253,7 @@ object Build {
     defaultPlayScalaVersions,
   )
 
-  val scalacheckVersion = "1.18.1"
+  val scalacheckVersion = "1.19.0"
   val scalacheckDep = Def.setting("org.scalacheck" %%% "scalacheck" % scalacheckVersion)
 
   val testSettings = Seq(
