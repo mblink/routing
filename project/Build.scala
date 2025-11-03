@@ -135,12 +135,10 @@ object Build {
       .settings(commonSettings)
       .settings(testSettings)
 
-  def projSettings(srcDirSuffixes: Seq[String], extra: ProjSettings): ProjSettings =
+  def projSettings(extra: ProjSettings): ProjSettings =
     platform => {
       val base = extra(platform).andThen(_.settings(
-        Compile / unmanagedSourceDirectories ++=
-          (platform.s +: srcDirSuffixes.flatMap(s => Seq(s, s"$s-${platform.s}")))
-            .map(suffix => sourceDirectory.value / "main" / s"scala-$suffix")
+        Compile / unmanagedSourceDirectories += sourceDirectory.value / "main" / s"scala-${platform.s}",
       ))
 
       platform match {
@@ -162,13 +160,12 @@ object Build {
       acc.customRow(
         scalaVersions = modScalaVersions(platform)(scalaVersions),
         axisValues = Seq(axis),
-        projSettings(Seq(), extraSettings)(platform),
+        projSettings(extraSettings)(platform),
       )
     }
 
   def axesProj[V](matrix: ProjectMatrix, nme: String, axes: List[V])(
     platforms: V => List[Platform],
-    srcDirSuffixes: V => Seq[String],
     extraSettings: V => ProjSettings,
     modScalaVersions: V => Platform => Seq[String] => Seq[String] = (_: V) => (_: Platform) => identity _,
   )(implicit va: V => VirtualAxis) =
@@ -178,16 +175,14 @@ object Build {
         acc.customRow(
           scalaVersions = modScalaVersions(versionAxis)(platform)(scalaVersions),
           axisValues = Seq(va(versionAxis), platformAxis),
-          projSettings(srcDirSuffixes(versionAxis), extraSettings(versionAxis))(platform),
+          projSettings(extraSettings(versionAxis))(platform),
         )
       }
 
   var genTimes: Map[(String, String), Long] = Map()
 
   case class LibAxesProj[V](axes: List[V])(
-    version: V => String,
     suffix: V => String,
-    suffixSrcDir: V => String,
     defaultSettings: V => ProjSettings,
     defaultPlatforms: V => List[Platform],
     defaultModScalaVersions: V => Platform => Seq[String] => Seq[String],
@@ -198,7 +193,6 @@ object Build {
     )(implicit va: V => VirtualAxis) =
       axesProj(matrix, nme, axes)(
         platforms,
-        axis => Seq(version(axis), suffixSrcDir(axis)),
         axis => platform => proj => settings(axis)(platform)(defaultSettings(axis)(platform)(proj)).settings(
           moduleName := s"${name.value}_${suffix(axis).toLowerCase}",
           Compile / sources := {
@@ -212,7 +206,7 @@ object Build {
               } else {
                 println(s"Writing $src to $outFile")
                 genTimes.synchronized { genTimes = genTimes ++ Map(genTimeKey -> System.currentTimeMillis) }
-                IO.write(outFile, parseSourceFile(src, version(axis)))
+                IO.write(outFile, parseSourceFile(src, suffix(axis)))
                 outFile
               }
             }
@@ -231,9 +225,7 @@ object Build {
   }
 
   lazy val http4sProj = LibAxesProj(Http4sAxis.all)(
-    _.version,
     _.suffix,
-    axis => if (isHttp4sV1Milestone(axis.version)) http4sV1Milestone else axis.suffix,
     _ => _ => identity[Project],
     defaultHttp4sPlatforms,
     defaultHttp4sScalaVersions,
@@ -245,8 +237,6 @@ object Build {
   }
 
   lazy val playProj = LibAxesProj(PlayAxis.all)(
-    _.version,
-    _.suffix,
     _.suffix,
     _ => _ => identity[Project],
     defaultPlayPlatforms,
@@ -269,7 +259,7 @@ object Build {
   val http4sV1Milestone = "1.0.0-M"
 
   object Http4sAxis extends Enumeration {
-    protected case class HAVal(suffix: String, version: String, comment: String) extends super.Val { self =>
+    protected case class HAVal(suffix: String, dep: String => Def.Initialize[ModuleID], comment: String) extends super.Val { self =>
       lazy val axis: VirtualAxis.WeakAxis =
         new VirtualAxis.WeakAxis {
           val suffix = self.suffix
@@ -281,29 +271,27 @@ object Build {
     implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v0_23 = HAVal("0.23", "0.23.30", "latest stable on cats effect 3")
-    val v1_0_0_M46 = HAVal(s"${http4sV1Milestone}46", s"${http4sV1Milestone}46", "latest development on cats effect 3")
+    val v0_23 = HAVal("0.23", proj => Def.setting("org.http4s" %%% s"http4s-$proj" % "0.23.30"), "latest stable on cats effect 3")
+    val v1_0_0_M46 = HAVal(s"${http4sV1Milestone}46", proj => Def.setting("org.http4s" %%% s"http4s-$proj" % "1.0.0-M46"), "latest development on cats effect 3")
 
     lazy val all = values.toList
   }
 
   object PlayAxis extends Enumeration {
-    protected case class PAVal(suffix: String, version: String, dep0: String => String => Def.Initialize[ModuleID]) extends super.Val { self =>
+    protected case class PAVal(suffix: String, dep: String => Def.Initialize[ModuleID]) extends super.Val { self =>
       lazy val axis: VirtualAxis.WeakAxis =
         new VirtualAxis.WeakAxis {
           val suffix = self.suffix
           val idSuffix = self.suffix.replace(".", "_")
           val directorySuffix = self.suffix
         }
-
-      val dep: String => Def.Initialize[ModuleID] = dep0(_)(version)
     }
 
     implicit def valueToPAVal(v: Value): PAVal = v.asInstanceOf[PAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v3_0 = PAVal("3.0", "3.0.6", proj => version => Def.setting("org.playframework" %%% proj % version))
-    val v2_9 = PAVal("2.9", "2.9.6", proj => version => Def.setting("com.typesafe.play" %%% proj % version))
+    val v3_0 = PAVal("3.0", proj => Def.setting("org.playframework" %%% proj % "3.0.6"))
+    val v2_9 = PAVal("2.9", proj => Def.setting("com.typesafe.play" %%% proj % "2.9.6"))
 
     lazy val all = values.toList
   }
@@ -311,5 +299,4 @@ object Build {
   def isHttp4sV1Milestone(version: String): Boolean = version.startsWith(http4sV1Milestone)
 
   def circeDep(proj: String) = Def.setting("io.circe" %%% s"circe-$proj" % "0.14.15")
-  def http4sDep(proj: String, version: String) = Def.setting("org.http4s" %%% s"http4s-$proj" % version)
 }

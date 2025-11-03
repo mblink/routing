@@ -1,7 +1,8 @@
 package routing.example
 
 import cats.effect.{ExitCode, IO, IOApp}
-import org.http4s.blaze.server.BlazeServerBuilder
+import com.comcast.ip4s.*
+import org.http4s.ember.server.EmberServerBuilder
 
 object App extends IOApp {
   // ++ 1.0.0-M46
@@ -12,11 +13,10 @@ object App extends IOApp {
   // -- 1.0.0-M46
 
   override def run(args: List[String]): IO[ExitCode] =
-    BlazeServerBuilder[IO]
-      .bindHttp(8080, "localhost")
+    EmberServerBuilder.default[IO]
+      .withHost(ipv4"0.0.0.0")
+      .withPort(port"8080")
       .withHttpApp(Controller.actions.orNotFound)
-      .serve
-      .compile
-      .drain
-      .map(_ => ExitCode.Success)
+      .build
+      .useForever
 }

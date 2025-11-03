@@ -53,8 +53,8 @@ lazy val core = simpleProj(projectMatrix.in(file("core")), "core", List(
 
 lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")(axis => _ => _.settings(
   libraryDependencies ++= Seq(
-    http4sDep("core", axis.version).value,
-    http4sDep("dsl", axis.version).value,
+    axis.dep("core").value,
+    axis.dep("dsl").value,
   )
 ))
   .settings(publishSettings)
@@ -85,15 +85,18 @@ def playDepString(axis: PlayAxis.Value): String =
 lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs", _ => List(Platform.Jvm))(
   axis => _ => _.settings(
     scalacOptions -= "-Xfatal-warnings",
-    mdocVariables ++= Map(
-      "VERSION" -> currentVersion,
-      "GITHUB_REPO_URL" -> githubRepoUrl,
-      "GITHUB_BLOB_URL" -> s"$githubRepoUrl/blob/master",
-      "HTTP4S_SUFFIX" -> axis.suffix,
-      "HTTP4S_VERSION_COMMENT" -> axis.comment,
-      "PLAY_LATEST_DEPENDENCY" -> playDepString(PlayAxis.v3_0),
-      "PLAY_SUPPORTED_VERSIONS" -> PlayAxis.all.map(a => s"- ${a.version} -- `${playDepString(a)}`").mkString("\n"),
-    ),
+    mdocVariables ++= {
+      val playAxisDeps = PlayAxis.all.map(_.dep("fake")).join.value
+      Map(
+        "VERSION" -> currentVersion,
+        "GITHUB_REPO_URL" -> githubRepoUrl,
+        "GITHUB_BLOB_URL" -> s"$githubRepoUrl/blob/master",
+        "HTTP4S_SUFFIX" -> axis.suffix,
+        "HTTP4S_VERSION_COMMENT" -> axis.comment,
+        "PLAY_LATEST_DEPENDENCY" -> playDepString(PlayAxis.v3_0),
+        "PLAY_SUPPORTED_VERSIONS" -> PlayAxis.all.zip(playAxisDeps).map { case (a, d) => s"${d.revision} -- `${playDepString(a)}`" }.mkString("\n"),
+      )
+    },
   ),
 ).enablePlugins(MdocPlugin)
   .settings(noPublishSettings)
@@ -143,15 +146,11 @@ publishDocsSite := Def.taskDyn {
 lazy val example = http4sProj(projectMatrix.in(file("example")), "example", _ => List(Platform.Jvm))(
   axis => sjsNowarnGlobalECSettings.andThen(_.andThen(_.settings(
     libraryDependencies ++= Seq(
-      http4sDep("circe", axis.version).value,
-      http4sDep("blaze-server", axis match {
-        case Http4sAxis.v0_23 => s"${axis.suffix}.17"
-        case Http4sAxis.v1_0_0_M46 => s"${axis.suffix.dropRight(2)}41"
-        case _ => axis.version
-      }).value,
+      axis.dep("circe").value,
+      axis.dep("ember-server").value,
     ),
     dependencyOverrides ++= Seq(
-      http4sDep("core", axis.version).value
+      axis.dep("core").value
     ),
   ))),
 )
