@@ -9,7 +9,7 @@ import sbtprojectmatrix.ProjectMatrixPlugin.autoImport._
 import scala.sys.process._
 
 object Build {
-  lazy val scalaVersions = Seq("2.13.16", "3.3.5")
+  lazy val scalaVersions = Seq("2.13.17", "3.3.5")
   lazy val latestScalaV = scalaVersions.find(_.startsWith("3.")).get
   lazy val kindProjector = compilerPlugin("org.typelevel" % "kind-projector" % "0.13.4" cross CrossVersion.full)
 
