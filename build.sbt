@@ -146,7 +146,7 @@ lazy val example = http4sProj(projectMatrix.in(file("example")), "example", _ =>
       http4sDep("circe", axis.version).value,
       http4sDep("blaze-server", axis match {
         case Http4sAxis.v0_23 => s"${axis.suffix}.17"
-        case Http4sAxis.v1_0_0_M44 => s"${axis.suffix.dropRight(2)}41"
+        case Http4sAxis.v1_0_0_M46 => s"${axis.suffix.dropRight(2)}41"
         case _ => axis.version
       }).value,
     ),
