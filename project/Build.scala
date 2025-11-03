@@ -11,7 +11,7 @@ import scala.sys.process._
 object Build {
   lazy val scalaVersions = Seq("2.13.16", "3.3.5")
   lazy val latestScalaV = scalaVersions.find(_.startsWith("3.")).get
-  lazy val kindProjector = compilerPlugin("org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full)
+  lazy val kindProjector = compilerPlugin("org.typelevel" % "kind-projector" % "0.13.4" cross CrossVersion.full)
 
   def profileTraceOpts(baseDir: File, name: String): Seq[String] = {
     val dir = baseDir / ".traces"
