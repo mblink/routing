@@ -271,7 +271,7 @@ object Build {
     implicit def valueToHAVal(v: Value): HAVal = v.asInstanceOf[HAVal]
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
-    val v0_23 = HAVal("0.23", proj => Def.setting("org.http4s" %%% s"http4s-$proj" % "0.23.30"), "latest stable on cats effect 3")
+    val v0_23 = HAVal("0.23", proj => Def.setting("org.http4s" %%% s"http4s-$proj" % "0.23.33"), "latest stable on cats effect 3")
     val v1_0_0_M46 = HAVal(s"${http4sV1Milestone}46", proj => Def.setting("org.http4s" %%% s"http4s-$proj" % "1.0.0-M46"), "latest development on cats effect 3")
 
     lazy val all = values.toList
