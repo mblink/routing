@@ -255,7 +255,7 @@ object Build {
   )
 
   val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.13.0")
-  val izumiReflect = Def.setting("dev.zio" %%% "izumi-reflect" % "3.0.6")
+  val izumiReflect = Def.setting("dev.zio" %%% "izumi-reflect" % "3.0.7")
   val http4sV1Milestone = "1.0.0-M"
 
   object Http4sAxis extends Enumeration {
