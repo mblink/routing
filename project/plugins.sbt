@@ -1,6 +1,6 @@
 addSbtPlugin("com.eed3si9n" % "sbt-projectmatrix" % "0.11.0")
 addSbtPlugin("com.frugalmechanic" % "fm-sbt-s3-resolver" % "0.23.0")
-addSbtPlugin("com.github.sbt" % "sbt-github-actions" % "0.28.0")
+addSbtPlugin("com.github.sbt" % "sbt-github-actions" % "0.29.0")
 addSbtPlugin("io.spray" % "sbt-revolver" % "0.10.0")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.20.1")
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.9")
