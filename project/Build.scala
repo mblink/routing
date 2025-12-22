@@ -291,7 +291,7 @@ object Build {
     implicit def valueToVirtualAxis(v: Value): VirtualAxis.WeakAxis = v.axis
 
     val v3_0 = PAVal("3.0", proj => Def.setting("org.playframework" %%% proj % "3.0.9"))
-    val v2_9 = PAVal("2.9", proj => Def.setting("com.typesafe.play" %%% proj % "2.9.9"))
+    val v2_9 = PAVal("2.9", proj => Def.setting("com.typesafe.play" %%% proj % "2.9.10"))
 
     lazy val all = values.toList
   }
