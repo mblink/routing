@@ -84,7 +84,7 @@ def playDepString(axis: PlayAxis.Value): String =
 
 lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs", _ => List(Platform.Jvm))(
   axis => _ => _.settings(
-    scalacOptions -= "-Xfatal-warnings",
+    scalacOptions -= "-Werror",
     mdocVariables ++= {
       val playAxisDeps = PlayAxis.all.map(_.dep("fake")).join.value
       Map(
