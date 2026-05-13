@@ -159,8 +159,8 @@ lazy val example = http4sProj(projectMatrix.in(file("example")), "example", _ =>
     libraryDependencies ++= Seq(
       circeDep("core").value,
       circeDep("generic").value,
-      "org.slf4j" % "slf4j-api" % "2.0.17",
-      "org.slf4j" % "slf4j-simple" % "2.0.17"
+      "org.slf4j" % "slf4j-api" % "2.0.18",
+      "org.slf4j" % "slf4j-simple" % "2.0.18"
     )
   )
   .dependsOn(core, http4s, play)
