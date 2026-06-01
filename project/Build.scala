@@ -83,7 +83,6 @@ object Build {
       Seq(kindProjector),
       Seq()
     ),
-    libraryDependencySchemes += "org.scala-native" %% "test-interface_native0.5" % VersionScheme.EarlySemVer,
     // scalacOptions ++= profileTraceOpts(baseDirectory.value, name.value),
     publish / skip := true,
     Compile / packageDoc / publishArtifact := false,
