@@ -1,5 +1,6 @@
 package routing
 
+import com.typesafe.tools.mima.plugin.MimaPlugin.autoImport.{mimaFailOnNoPrevious, mimaPreviousArtifacts}
 import java.io.File
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import sbt._
@@ -87,18 +88,25 @@ object Build {
     publish / skip := true,
     Compile / packageDoc / publishArtifact := false,
     packageDoc / publishArtifact := false,
-    Compile / doc / sources := Seq()
+    Compile / doc / sources := Seq(),
   )
 
   val publishSettings = Seq(
     licenses += License.Apache2,
     publish / skip := false,
     publishTo := Some("BondLink S3".at("s3://bondlink-maven-repo")),
+    resolvers += "bondlink-maven-repo" at "https://maven.bondlink-cdn.com",
+    mimaPreviousArtifacts := Set(organization.value %%% (moduleName.value match {
+      case s if s.startsWith(s"routing-http4s_$http4sV1Milestone") => s"routing-http4s_${http4sV1Milestone.toLowerCase}44"
+      case s => s
+    }) % "5.0.0"),
+    mimaFailOnNoPrevious := false,
   )
 
   val noPublishSettings = Seq(
     publish := {},
     publishLocal := {},
+    mimaFailOnNoPrevious := false,
   )
 
   sealed abstract class Platform(val s: String)
@@ -194,7 +202,7 @@ object Build {
       axesProj(matrix, nme, axes)(
         platforms,
         axis => platform => proj => settings(axis)(platform)(defaultSettings(axis)(platform)(proj)).settings(
-          moduleName := s"${name.value}_${suffix(axis).toLowerCase}",
+          moduleName := s"${name.value}_${suffix(axis)}",
           Compile / sources := {
             val srcs = (Compile / sources).value
             val srcManaged = (Compile / sourceManaged).value / "parsed"

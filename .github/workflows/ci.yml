@@ -80,3 +80,7 @@ jobs:
       - name: Build docs
         if: matrix.java == 'temurin@25'
         run: sbt mdoc
+
+      - name: Check binary compatibility
+        if: matrix.java == 'temurin@25'
+        run: sbt mimaReportBinaryIssues
