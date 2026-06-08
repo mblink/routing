@@ -162,12 +162,10 @@ object Build {
     nme: String,
     platforms: List[Platform],
     extraSettings: ProjSettings = _ => identity,
-    modScalaVersions: Platform => Seq[String] => Seq[String] = _ => identity,
-    includeNative: Boolean = false
   ) =
     platformAxes(platforms).foldLeft(baseProj(matrix, nme)) { case (acc, (platform, axis)) =>
       acc.customRow(
-        scalaVersions = modScalaVersions(platform)(scalaVersions),
+        scalaVersions = scalaVersions,
         axisValues = Seq(axis),
         projSettings(extraSettings)(platform),
       )
@@ -176,13 +174,12 @@ object Build {
   def axesProj[V](matrix: ProjectMatrix, nme: String, axes: List[V])(
     platforms: V => List[Platform],
     extraSettings: V => ProjSettings,
-    modScalaVersions: V => Platform => Seq[String] => Seq[String] = (_: V) => (_: Platform) => identity _,
   )(implicit va: V => VirtualAxis) =
     axes
       .flatMap(a => platformAxes(platforms(a)).map(a -> _))
       .foldLeft(baseProj(matrix, nme)) { case (acc, (versionAxis, (platform, platformAxis))) =>
         acc.customRow(
-          scalaVersions = modScalaVersions(versionAxis)(platform)(scalaVersions),
+          scalaVersions = scalaVersions,
           axisValues = Seq(va(versionAxis), platformAxis),
           projSettings(extraSettings(versionAxis))(platform),
         )
@@ -192,17 +189,14 @@ object Build {
 
   case class LibAxesProj[V](axes: List[V])(
     suffix: V => String,
-    defaultSettings: V => ProjSettings,
     defaultPlatforms: V => List[Platform],
-    defaultModScalaVersions: V => Platform => Seq[String] => Seq[String],
   ) {
     def apply(matrix: ProjectMatrix, nme: String, platforms: V => List[Platform] = defaultPlatforms)(
       settings: V => ProjSettings,
-      modScalaVersions: V => Platform => Seq[String] => Seq[String] = (_: V) => (_: Platform) => identity[Seq[String]],
     )(implicit va: V => VirtualAxis) =
       axesProj(matrix, nme, axes)(
         platforms,
-        axis => platform => proj => settings(axis)(platform)(defaultSettings(axis)(platform)(proj)).settings(
+        axis => platform => proj => settings(axis)(platform)(proj).settings(
           moduleName := s"${name.value}_${suffix(axis)}",
           Compile / sources := {
             val srcs = (Compile / sources).value
@@ -221,36 +215,16 @@ object Build {
             }
           },
         ),
-        modScalaVersions = axis => platform =>
-          defaultModScalaVersions(axis)(platform).andThen(modScalaVersions(axis)(platform)),
       )
   }
 
   val defaultHttp4sPlatforms = (_: Http4sAxis.Value) match {
     case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M46 => List(Platform.Jvm, Platform.Js)
   }
-  val defaultHttp4sScalaVersions = (axis: Http4sAxis.Value) => (_: Platform) => axis match {
-    case Http4sAxis.v0_23 | Http4sAxis.v1_0_0_M46 => identity[Seq[String]] _
-  }
-
-  lazy val http4sProj = LibAxesProj(Http4sAxis.all)(
-    _.suffix,
-    _ => _ => identity[Project],
-    defaultHttp4sPlatforms,
-    defaultHttp4sScalaVersions,
-  )
+  lazy val http4sProj = LibAxesProj(Http4sAxis.all)(_.suffix, defaultHttp4sPlatforms)
 
   val defaultPlayPlatforms = (_: PlayAxis.Value) => List(Platform.Jvm)
-  val defaultPlayScalaVersions = (axis: PlayAxis.Value) => (_: Platform) => axis match {
-    case PlayAxis.v2_9 | PlayAxis.v3_0 => identity[Seq[String]] _
-  }
-
-  lazy val playProj = LibAxesProj(PlayAxis.all)(
-    _.suffix,
-    _ => _ => identity[Project],
-    defaultPlayPlatforms,
-    defaultPlayScalaVersions,
-  )
+  lazy val playProj = LibAxesProj(PlayAxis.all)(_.suffix, defaultPlayPlatforms)
 
   val scalacheckVersion = "1.19.0"
   val scalacheckDep = Def.setting("org.scalacheck" %%% "scalacheck" % scalacheckVersion)
@@ -304,8 +278,6 @@ object Build {
 
     lazy val all = values.toList
   }
-
-  def isHttp4sV1Milestone(version: String): Boolean = version.startsWith(http4sV1Milestone)
 
   def circeDep(proj: String) = Def.setting("io.circe" %%% s"circe-$proj" % "0.14.15")
 }
