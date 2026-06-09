@@ -18,6 +18,7 @@ private[routing] object CatsShow {
 }
 
 trait LPShow {
+  @deprecated("Define instances of routing.util.Show explicitly", "5.1.0")
   final implicit def showFromCatsShow[F[_], A](implicit ev: GetTC[CatsShow, F], F: F[A]): Show[A] = {
     import ev._
     Show.show(F.show(_))

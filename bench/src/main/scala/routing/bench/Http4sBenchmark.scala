@@ -36,8 +36,7 @@ object http4sHelper extends BenchmarkHelper[Request[IO], Request[IO] => IO[Respo
     runIO(routes.run(request).value.flatMap(_.get.as[String]))
 }
 
-class Http4sBenchmark_0_23 { // 0.23
-class Http4sBenchmark_1_0_0_M46 { // 1.0.0-M46
+class Http4sBenchmark {
   import http4sHelper._
 
   @Benchmark def http4s: String = run(http4sService)

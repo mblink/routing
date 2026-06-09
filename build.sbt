@@ -1,5 +1,4 @@
 import java.io.File
-import routing.currentVersion
 import routing.Build._
 import scala.sys.process._
 
@@ -21,6 +20,7 @@ def isJava(v: Int) = s"matrix.java == '${javaVersions.find(_.version == v.toStri
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Run(List("sbt test"), name = Some("Build project")),
   WorkflowStep.Run(List("sbt mdoc"), name = Some("Build docs"), cond = Some(isJava(25))),
+  WorkflowStep.Run(List("sbt mimaReportBinaryIssues"), name = Some("Check binary compatibility"), cond = Some(isJava(25))),
 )
 
 lazy val core = simpleProj(projectMatrix.in(file("core")), "core", List(
