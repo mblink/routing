@@ -7,6 +7,7 @@ import sbt._
 import sbt.Keys._
 import sbt.internal.ProjectMatrix
 import sbtprojectmatrix.ProjectMatrixPlugin.autoImport._
+import sbts3publish.S3PublishPlugin.autoImport.{s3PublishBucket, s3Release}
 import scala.sys.process._
 
 object Build {
@@ -95,7 +96,7 @@ object Build {
   val publishSettings = Seq(
     licenses += License.Apache2,
     publish / skip := false,
-    publishTo := Some("BondLink S3".at("s3://bondlink-maven-repo")),
+    s3PublishBucket := "bondlink-maven-repo",
     resolvers += "bondlink-maven-repo" at "https://maven.bondlink-cdn.com",
     mimaPreviousArtifacts := Set(organization.value %%% (moduleName.value match {
       case s if s.startsWith(s"routing-http4s_$http4sV1Milestone") => s"routing-http4s_${http4sV1Milestone.toLowerCase}44"
@@ -107,6 +108,7 @@ object Build {
   val noPublishSettings = Seq(
     publish := {},
     publishLocal := {},
+    s3Release := {},
     mimaFailOnNoPrevious := false,
   )
 
