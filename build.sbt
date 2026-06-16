@@ -24,15 +24,15 @@ ThisBuild / githubWorkflowBuild := Seq(
 )
 
 lazy val core = simpleProj(projectMatrix.in(file("core")), "core", List(
-  Platform.Jvm,
-  Platform.Js,
-  Platform.Native,
+  BuildPlatform.Jvm,
+  BuildPlatform.Js,
+  BuildPlatform.Native,
 ))
   .settings(publishSettings)
   .settings(
     libraryDependencies ++= Seq(
-      catsCore.value % Optional,
-      izumiReflect.value,
+      catsCore % Optional,
+      izumiReflect,
     ),
     Compile / sourceGenerators += Def.task {
       val generators = new File("git rev-parse --show-toplevel".!!.trim) / "generators"
@@ -53,8 +53,8 @@ lazy val core = simpleProj(projectMatrix.in(file("core")), "core", List(
 
 lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")(axis => _ => _.settings(
   libraryDependencies ++= Seq(
-    axis.dep("core").value,
-    axis.dep("dsl").value,
+    axis.dep("core"),
+    axis.dep("dsl"),
   )
 ))
   .settings(publishSettings)
@@ -62,12 +62,12 @@ lazy val http4s = http4sProj(projectMatrix.in(file("http4s")), "http4s")(axis =>
   .dependsOn(core % "compile->compile;test->test")
 
 lazy val play = playProj(projectMatrix.in(file("play")), "play")(axis => _ => _.settings(
-  libraryDependencies ++= Seq(axis.dep("play").value),
+  libraryDependencies ++= Seq(axis.dep("play")),
 ))
   .settings(publishSettings)
   .dependsOn(core % "compile->compile;test->test")
 
-lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench", _ => List(Platform.Jvm))(
+lazy val bench = http4sProj(projectMatrix.in(file("bench")), "bench", _ => List(BuildPlatform.Jvm))(
   _ => sjsNowarnGlobalECSettings,
 )
   .settings(noPublishSettings)
@@ -82,11 +82,11 @@ def http4sImplDoc(dir: File, axis: Http4sAxis.Value): (File, String) =
 def playDepString(axis: PlayAxis.Value): String =
   s""""bondlink" %% "routing-play_${axis.suffix}" % "$currentVersion""""
 
-lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs", _ => List(Platform.Jvm))(
+lazy val docs = http4sProj(projectMatrix.in(file("routing-docs")), "routing-docs", _ => List(BuildPlatform.Jvm))(
   axis => _ => _.settings(
     scalacOptions -= "-Werror",
     mdocVariables ++= {
-      val playAxisDeps = PlayAxis.all.map(_.dep("fake")).join.value
+      val playAxisDeps = PlayAxis.all.map(_.dep("fake"))
       Map(
         "VERSION" -> currentVersion,
         "GITHUB_REPO_URL" -> githubRepoUrl,
@@ -143,22 +143,22 @@ publishDocsSite := Def.taskDyn {
   )
 }.value
 
-lazy val example = http4sProj(projectMatrix.in(file("example")), "example", _ => List(Platform.Jvm))(
+lazy val example = http4sProj(projectMatrix.in(file("example")), "example", _ => List(BuildPlatform.Jvm))(
   axis => sjsNowarnGlobalECSettings.andThen(_.andThen(_.settings(
     libraryDependencies ++= Seq(
-      axis.dep("circe").value,
-      axis.dep("ember-server").value,
+      axis.dep("circe"),
+      axis.dep("ember-server"),
     ),
     dependencyOverrides ++= Seq(
-      axis.dep("core").value
+      axis.dep("core")
     ),
   ))),
 )
   .settings(noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
-      circeDep("core").value,
-      circeDep("generic").value,
+      circeDep("core"),
+      circeDep("generic"),
       "org.slf4j" % "slf4j-api" % "2.0.18",
       "org.slf4j" % "slf4j-simple" % "2.0.18"
     )
