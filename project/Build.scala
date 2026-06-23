@@ -12,7 +12,7 @@ import scala.sys.process._
 
 object Build {
   lazy val currentVersion = "5.1.0"
-  lazy val scalaVersions = Seq("2.13.18", "3.3.8")
+  lazy val scalaVersions = Seq("2.13.18", "3.8.4")
   lazy val latestScalaV = scalaVersions.find(_.startsWith("3.")).get
   lazy val kindProjector = compilerPlugin("org.typelevel" % "kind-projector" % "0.13.4" cross CrossVersion.full)
 
