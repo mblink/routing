@@ -281,5 +281,5 @@ object Build {
     lazy val all = values.toList
   }
 
-  def circeDep(proj: String) = Def.setting("io.circe" %%% s"circe-$proj" % "0.14.16")
+  def circeDep(proj: String) = Def.setting("io.circe" %%% s"circe-$proj" % "0.14.17")
 }
