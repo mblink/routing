@@ -228,7 +228,7 @@ object Build {
   val defaultPlayPlatforms = (_: PlayAxis.Value) => List(Platform.Jvm)
   lazy val playProj = LibAxesProj(PlayAxis.all)(_.suffix, defaultPlayPlatforms)
 
-  val scalacheckVersion = "1.19.0"
+  val scalacheckVersion = "1.20.0"
   val scalacheckDep = Def.setting("org.scalacheck" %%% "scalacheck" % scalacheckVersion)
 
   val testSettings = Seq(
